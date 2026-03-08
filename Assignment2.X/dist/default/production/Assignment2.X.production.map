@@ -7,7 +7,7 @@ Command:
   -p33EP512MU810 \
   --mdfp=C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/dsPIC33E-GM-GP-MC-GU-MU_DFP/1.6.297/xc16 \
   -o \
-  dist/default/production/Assignment1ES.X.production.elf \
+  dist/default/production/Assignment2.X.production.elf \
   -Lc:/program files/microchip/xc16/v2.10/bin/bin/.. \
   -LC:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/dsPIC33E-GM-GP-MC-GU-MU_DFP/1.6.297/xc16/bin/../support/PIC24E/gld \
   -LC:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/dsPIC33E-GM-GP-MC-GU-MU_DFP/1.6.297/xc16/bin/../support/dsPIC33E/gld \
@@ -20,6 +20,7 @@ Command:
   -Lc:/program files/microchip/xc16/v2.10/bin/bin/../../support/dsPIC33E/gld \
   -Lc:/program files/microchip/xc16/v2.10/bin/bin/../../support/dsPIC33F/gld \
   build/default/production/newmainXC16.o \
+  build/default/production/timer.o \
   --local-stack \
   --defsym=__MPLAB_BUILD=1 \
   -Tp33EP512MU810.gld.00 \
@@ -34,7 +35,7 @@ Command:
   --stackguard=16 \
   --no-force-link \
   --smart-io \
-  -Map=dist/default/production/Assignment1ES.X.production.map \
+  -Map=dist/default/production/Assignment2.X.production.map \
   --report-mem \
   --memorysummary \
   dist/default/production/memoryfile.xml \
@@ -54,6 +55,10 @@ c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(data_
                               c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o) (__data_init_extended)
 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt_start_mode_normalep.Meo)
                               (__crt_start_mode_normal)
+c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+                              build/default/production/timer.o (___divsi3)
+c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+                              build/default/production/timer.o (___udivsi3)
 
 
 xc16-ld 2.10 (B)
@@ -66,10 +71,10 @@ Default Scalar Model: Small
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x200               0x100           0x180  (384)
-.text                        0x300                0x70            0xa8  (168)
+.text                        0x200               0x13e           0x1dd  (477)
+.text                        0x33e               0x36a           0x51f  (1311)
 
-                 Total "program" memory used (bytes):          0x228  (552) <1%
+                 Total "program" memory used (bytes):          0x6fc  (1788) <1%
 
 
 Auxflash Memory  [Origin = 0x7fc000, Length = 0x3ffa]
@@ -104,21 +109,35 @@ External Symbols in Program Memory (by address):
 
                   0x000200                  __resetPRI
                   0x00023c                  __psv_init
-                  0x000248                  __data_init
                   0x000248                  __data_init_extended
+                  0x000248                  __data_init
                   0x0002fa                  __DefaultInterrupt
-                  0x000300                  _count
-                  0x00031a                  _main
+                  0x000300                  ___divsi3
+                  0x00031e                  ___udivsi3
+                  0x00033e                  _tmr_setup_period
+                  0x000512                  _tmr_wait_period
+                  0x00054c                  _tmr_wait_ms
+                  0x000592                  _tmr_wait_period_alternative
+                  0x0005ec                  _tmr_wait_ms_alternative
+                  0x000612                  _tmr_setup_period_alternative
+                  0x00067c                  _main
 
 External Symbols in Program Memory (by name):
 
                   0x0002fa                  __DefaultInterrupt
+                  0x000300                  ___divsi3
+                  0x00031e                  ___udivsi3
                   0x000248                  __data_init
                   0x000248                  __data_init_extended
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000300                  _count
-                  0x00031a                  _main
+                  0x00067c                  _main
+                  0x00033e                  _tmr_setup_period
+                  0x000612                  _tmr_setup_period_alternative
+                  0x00054c                  _tmr_wait_ms
+                  0x0005ec                  _tmr_wait_ms_alternative
+                  0x000512                  _tmr_wait_period
+                  0x000592                  _tmr_wait_period_alternative
 
 Memory Configuration
 
@@ -141,6 +160,7 @@ FUID0            0xf80012           0x000002
 Linker script and memory map
 
 LOAD build/default/production/newmainXC16.o
+LOAD build/default/production/timer.o
                     0x0001                  __MPLAB_BUILD = 0x1
 LOAD p33EP512MU810
 LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libfx-elf.a
@@ -168,7 +188,7 @@ LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000200        0x100
+.text             0x000200        0x13e
  *(.init)
  .init            0x000200         0x48 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o)
                   0x000200                  __resetPRI
@@ -190,6 +210,10 @@ LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libfx-elf.a
                   0x0002fe          0x2 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt_start_mode_normalep.Meo)
                   0x0002fe                  __crt_start_mode
                   0x0002fe                  __crt_start_mode_normal
+ .libm.divsi3     0x000300         0x1e c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+                  0x000300                  ___divsi3
+ .libm.udivsi3    0x00031e         0x20 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+                  0x00031e                  ___udivsi3
 
 usercode
  *(usercode)
@@ -221,26 +245,37 @@ __FUID0
 .comment
  *(.comment)
 
-.debug_info       0x000000        0x723
+.debug_info       0x000000       0x11ac
  *(.debug_info)
- .debug_info      0x000000        0x723 build/default/production/newmainXC16.o
+ .debug_info      0x000000        0x65d build/default/production/newmainXC16.o
+ .debug_info      0x00065d        0xa36 build/default/production/timer.o
+ .debug_info      0x001093         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_info      0x00111f         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000         0xc3
+.debug_abbrev     0x000000        0x1e5
  *(.debug_abbrev)
- .debug_abbrev    0x000000         0xc3 build/default/production/newmainXC16.o
+ .debug_abbrev    0x000000         0x9b build/default/production/newmainXC16.o
+ .debug_abbrev    0x00009b        0x122 build/default/production/timer.o
+ .debug_abbrev    0x0001bd         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_abbrev    0x0001d1         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.debug_line       0x000000        0x132
+.debug_line       0x000000        0x344
  *(.debug_line)
- .debug_line      0x000000        0x132 build/default/production/newmainXC16.o
+ .debug_line      0x000000        0x11e build/default/production/newmainXC16.o
+ .debug_line      0x00011e        0x19e build/default/production/timer.o
+ .debug_line      0x0002bc         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_line      0x0002ff         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.debug_frame      0x000000         0x48
+.debug_frame      0x000000         0xea
  *(.debug_frame)
- .debug_frame     0x000000         0x48 build/default/production/newmainXC16.o
+ .debug_frame     0x000000         0x2e build/default/production/newmainXC16.o
+ .debug_frame     0x00002e         0xbc build/default/production/timer.o
 
-.debug_str        0x000000         0x27
+.debug_str        0x000000         0x6a
  *(.debug_str)
- .debug_str       0x000000         0x27 build/default/production/newmainXC16.o
+ .debug_str       0x000000         0x26 build/default/production/newmainXC16.o
+ .debug_str       0x000026         0x44 build/default/production/timer.o
 
 .debug_loc
  *(.debug_loc)
@@ -249,18 +284,26 @@ __FUID0
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000         0x25
+                  0x000000         0xc3
  *(.debug_pubnames)
  .debug_pubnames
-                  0x000000         0x25 build/default/production/newmainXC16.o
+                  0x000000         0x1b build/default/production/newmainXC16.o
+ .debug_pubnames
+                  0x00001b         0xa8 build/default/production/timer.o
 
 .debug_ranges
  *(.debug_ranges)
 
-.debug_aranges    0x000000         0x18
+.debug_aranges    0x000000         0x70
  *(.debug_aranges)
  .debug_aranges
                   0x000000         0x18 build/default/production/newmainXC16.o
+ .debug_aranges
+                  0x000018         0x18 build/default/production/timer.o
+ .debug_aranges
+                  0x000030         0x20 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_aranges
+                  0x000050         0x20 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
                     0x0000                  WREG0 = 0x0
                     0x0000                  _WREG0 = 0x0
                     0x0002                  WREG1 = 0x2
@@ -2967,24 +3010,38 @@ LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a
 LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libm-elf.a
 LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-elf.a
 END GROUP
-OUTPUT(dist/default/production/Assignment1ES.X.production.elf elf32-pic30)
+OUTPUT(dist/default/production/Assignment2.X.production.elf elf32-pic30)
 LOAD default_isr
 
 .debug_pubtypes
-                  0x000018         0x99
+                  0x000070        0x15a
  .debug_pubtypes
-                  0x000018         0x99 build/default/production/newmainXC16.o
+                  0x000070         0x97 build/default/production/newmainXC16.o
+ .debug_pubtypes
+                  0x000107         0xc3 build/default/production/timer.o
 
 __c30_signature
-                  0x0000b1         0x12
+                  0x0001ca         0x24
  __c30_signature
-                  0x0000b1          0x6 build/default/production/newmainXC16.o
+                  0x0001ca          0x6 build/default/production/newmainXC16.o
  __c30_signature
-                  0x0000b7          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o)
+                  0x0001d0          0x6 build/default/production/timer.o
  __c30_signature
-                  0x0000bd          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(data_init_extended.o)
+                  0x0001d6          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o)
+ __c30_signature
+                  0x0001dc          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(data_init_extended.o)
+ __c30_signature
+                  0x0001e2          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ __c30_signature
+                  0x0001e8          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.text             0x000300         0x70
- .text            0x000300         0x70 build/default/production/newmainXC16.o
-                  0x000300                  _count
-                  0x00031a                  _main
+.text             0x00033e        0x36a
+ .text            0x00033e        0x33e build/default/production/timer.o
+                  0x00033e                  _tmr_setup_period
+                  0x000512                  _tmr_wait_period
+                  0x00054c                  _tmr_wait_ms
+                  0x000592                  _tmr_wait_period_alternative
+                  0x0005ec                  _tmr_wait_ms_alternative
+                  0x000612                  _tmr_setup_period_alternative
+ .text            0x00067c         0x2c build/default/production/newmainXC16.o
+                  0x00067c                  _main

@@ -7,21 +7,36 @@
 
 
 #include "xc.h"
-#define FCY 3685000UL // cycle frequency for delays (took from Window>Target memory views>configuration bits)
-#include <libpic30.h> // delay functions
+
+void count(int start){
+    while(start > 0){
+        start--;
+        start++;
+        start--;
+        start++;
+        start--;
+    }
+}
 
 int main(void) {
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
     
     // Turn LD1 on + turn off
     /*
+    int start = 100000;
     TRISAbits.TRISA0 = 0;
+    
     LATAbits.LATA0 = 1;
-    __delay_ms(5000);
+    for(int a = 10000; a > 0; a--){
+        count(start); 
+    }
+    
     LATAbits.LATA0 = 0;
     */
     
+    
     // Turn LD1 on if button T2 is being pressed
+    /*
     TRISEbits.TRISE8 = 1;
     TRISAbits.TRISA0 = 0;
     TRISEbits.TRISE9 = 1;
@@ -41,11 +56,13 @@ int main(void) {
                 } 
             }
     }
+     * */
     
     // Toggle LD1 for every click of T2 (LD1 starts turned off)
-    /*
+    
     TRISEbits.TRISE8 = 1;
     TRISAbits.TRISA0 = 0;
+    
     while(1){
         if(PORTEbits.RE8 == 0) // button clicked
             while(1){
@@ -55,8 +72,11 @@ int main(void) {
                     break;
                 } 
             }
+        
     }
-    */
+    
+  
+    
     
     return 0;
 }
