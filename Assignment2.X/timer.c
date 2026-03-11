@@ -51,8 +51,9 @@ void tmr_setup_period(int timer, int ms){
         T2CONbits.TON = 0; // ensure timer is off
         TMR2 = 0; // reset timer 2
         IFS0bits.T2IF = 0; // clear stale period flag before restarting
-        if(cycles <= 65535)
+        if(cycles <= 65535){
             PR2 = cycles;
+        }
         else if(cycles/8 <= 65535){
             T2CONbits.TCKPS = 1; // 1:8 prescaler
             PR2 = cycles/8;
@@ -126,8 +127,9 @@ void tmr_wait_ms(int timer, int ms){
 int tmr_wait_period_alternative(int timer){
     int temp = 0;
     if(timer == 1){
-        if(IFS0bits.T1IF == 1)
+        if(IFS0bits.T1IF == 1){
             temp = 1;
+        }
         while(1){
             if(IFS0bits.T1IF == 1){
                 // flag set
@@ -138,8 +140,9 @@ int tmr_wait_period_alternative(int timer){
         }
     }
     else if(timer == 2){
-        if(IFS0bits.T2IF == 1)
+        if(IFS0bits.T2IF == 1){
             temp = 1;
+        }
         while(1){
             if(IFS0bits.T2IF == 1){
                 IFS0bits.T2IF = 0;
@@ -182,7 +185,7 @@ void tmr_setup_period_alternative(int timer,int ms){
     T2CONbits.TCKPS = 0; // 1:1 prescaler otherwise overflow
     TMR2 = 0; // reset timer 2
     TMR3 = 0; // reset timer 3
-    IFS0bits.T2IF = 0; // clear stale period flag before restarting
+    IFS0bits.T2IF = 0; // clear state period flag before restarting
     IFS0bits.T3IF = 0;
     IEC0bits.T3IE = 0; // polling mode: interrupt not required
     //IPC2bits.T3IP = 0x01; // set priority level for timer 3
@@ -192,4 +195,17 @@ void tmr_setup_period_alternative(int timer,int ms){
     
     T2CONbits.TON = 1;
     return;
+}
+
+void tmr_wait_ms_ultimate(int timer, int ms){
+    int n = 100;
+    int n_calls = ms/n;
+    while(1){
+       if(n_calls == 0){
+          break;
+       }
+       tmr_wait_ms(timer, n); // max 16 bit timer
+       n_calls--;
+    }
+       
 }

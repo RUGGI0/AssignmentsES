@@ -40,6 +40,7 @@ void tmr_wait_ms(int timer, int ms); // Assignment 2/3
 int tmr_wait_period_alternative(int timer); // Assignment 3/3
 void tmr_wait_ms_alternative(int timer, int ms); // Assignment 3/3
 void tmr_setup_period_alternative(int timer, int ms); // Assignment 3/3
+void tmr_wait_ms_ultimate(int timer, int ms); // Assignment 3/3
 
 #endif
 
