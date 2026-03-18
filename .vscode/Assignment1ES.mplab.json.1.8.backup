@@ -1,6 +1,24 @@
 {
-    "version": "1.9",
+    "version": "1.8",
     "importedFrom": "Assignment1ES.X",
+    "configurations": [
+        {
+            "name": "default",
+            "id": "conf1",
+            "device": "dsPIC33EP512MU810",
+            "imageType": "application",
+            "imagePath": "./out/Assignment1ES/default.elf",
+            "packs": [
+                {
+                    "name": "dsPIC33E-GM-GP-MC-GU-MU_DFP",
+                    "vendor": "Microchip",
+                    "version": "1.6.297"
+                }
+            ],
+            "fileSet": "Project files",
+            "toolchain": "default-XC16"
+        }
+    ],
     "propertyGroups": [
         {
             "name": "default-XC16",
@@ -110,25 +128,6 @@
                 "Assignment1ES.X/*{.c,.mc3}"
             ],
             "encoding": "ISO-8859-1"
-        }
-    ],
-    "configurations": [
-        {
-            "name": "default",
-            "id": "conf1",
-            "device": "dsPIC33EP512MU810",
-            "imageType": "application",
-            "imagePath": "./out/Assignment1ES/default.elf",
-            "packs": [
-                {
-                    "name": "dsPIC33E-GM-GP-MC-GU-MU_DFP",
-                    "vendor": "Microchip",
-                    "version": "1.6.297"
-                }
-            ],
-            "fileSet": "Project files",
-            "toolchain": "default-XC16",
-            "includeLegacyMacros": true
         }
     ]
 }

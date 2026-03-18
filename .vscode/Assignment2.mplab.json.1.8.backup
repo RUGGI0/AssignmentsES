@@ -1,6 +1,24 @@
 {
-    "version": "1.9",
-    "importedFrom": "Assignment1ES.X",
+    "version": "1.8",
+    "importedFrom": "Assignment2.X",
+    "configurations": [
+        {
+            "name": "default",
+            "id": "conf1",
+            "device": "dsPIC33EP512MU810",
+            "imageType": "application",
+            "imagePath": "./out/Assignment2/default.elf",
+            "packs": [
+                {
+                    "name": "dsPIC33E-GM-GP-MC-GU-MU_DFP",
+                    "vendor": "Microchip",
+                    "version": "1.6.297"
+                }
+            ],
+            "fileSet": "Project files",
+            "toolchain": "default-XC16"
+        }
+    ],
     "propertyGroups": [
         {
             "name": "default-XC16",
@@ -23,7 +41,7 @@
                 "compiler.enable-symbols": true,
                 "compiler.enable-unroll-loops": false,
                 "compiler.expand-pragma-config": false,
-                "compiler.extra-include-directories": "Assignment1ES.X",
+                "compiler.extra-include-directories": "Assignment2.X",
                 "compiler.isolate-each-function": false,
                 "compiler.keep-inline": false,
                 "compiler.oXC16gcc-align-arr": false,
@@ -42,8 +60,8 @@
                 "compiler.use-cci": false,
                 "compiler.use-iar": false,
                 "assembler.expand-macros": false,
-                "assembler.extra-include-directories-for-assembler": "Assignment1ES.X",
-                "assembler.extra-include-directories-for-preprocessor": "Assignment1ES.X",
+                "assembler.extra-include-directories-for-assembler": "Assignment2.X",
+                "assembler.extra-include-directories-for-preprocessor": "Assignment2.X",
                 "assembler.false-conditionals": false,
                 "assembler.keep-locals": false,
                 "assembler.list-assembly": false,
@@ -64,7 +82,7 @@
                 "linker.enable-default-isr": true,
                 "linker.enable-handles": true,
                 "linker.enable-pack-data": true,
-                "linker.extra-lib-directories": "Assignment1ES.X",
+                "linker.extra-lib-directories": "Assignment2.X",
                 "linker.fill-flash-options-how": "0",
                 "linker.fill-flash-options-inc-const": "1",
                 "linker.fill-flash-options-what": "0",
@@ -106,29 +124,10 @@
         {
             "name": "Project files",
             "files": [
-                "Assignment1ES.X/Makefile",
-                "Assignment1ES.X/*{.c,.mc3}"
+                "Assignment2.X/Makefile",
+                "Assignment2.X/*{.c,.h,.mc3}"
             ],
             "encoding": "ISO-8859-1"
-        }
-    ],
-    "configurations": [
-        {
-            "name": "default",
-            "id": "conf1",
-            "device": "dsPIC33EP512MU810",
-            "imageType": "application",
-            "imagePath": "./out/Assignment1ES/default.elf",
-            "packs": [
-                {
-                    "name": "dsPIC33E-GM-GP-MC-GU-MU_DFP",
-                    "vendor": "Microchip",
-                    "version": "1.6.297"
-                }
-            ],
-            "fileSet": "Project files",
-            "toolchain": "default-XC16",
-            "includeLegacyMacros": true
         }
     ]
 }
