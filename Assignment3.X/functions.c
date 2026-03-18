@@ -130,20 +130,20 @@ void tmr_setup_period_alternative(int ms){
     T2CONbits.TCKPS = 0; // 1:1 prescaler otherwise overflow
     TMR2 = 0; // reset timer 2
     TMR3 = 0; // reset timer 3
+    PR2 = (uint16_t)(cycles & 65535); // lsw (taking least significant 16 bits)
+    PR3 = (uint16_t)(cycles >> 16); // msw (taking most significant 16 bits)
+    
     IFS0bits.T2IF = 0; // clear interrupt flag
     IFS0bits.T3IF = 0; // clear interrupt flag
     IEC0bits.T3IE = 1; // enable interrupt
     IPC2bits.T3IP = 0x01; // set priority level for timer 3
-    
-    PR2 = (uint16_t)(cycles & 65535); // lsw (taking least significant 16 bits)
-    PR3 = (uint16_t)(cycles >> 16); // msw (taking most significant 16 bits)
     
     T2CONbits.TON = 1;
     return;
 }
 
 // Redefinition of ISR for timer 3
-void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void){
+void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt(void){
     IFS0bits.T3IF = 0; // clearing timer flag
     LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
 }

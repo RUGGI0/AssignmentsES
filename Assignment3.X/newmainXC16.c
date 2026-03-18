@@ -19,23 +19,14 @@ int main(void) {
     INTCON2bits.GIE = 1; // allow enabling interrupts
     
     // Assignment 1: LD1 on 500ms - off 500ms (no interrupts), LD2 on 250ms - off 250ms (interrupts)
-    /*
+    
     tmr_setup_period_alternative(250);
     while(1){
         tmr_wait_ms_ultimate(TIMER1,500);
         LATAbits.LATA0 = !LATAbits.LATA0; // toggle LD1
-    }
-     * */
+    } 
     
-    
-    /* 2nd version of assignment 1(not complete)
-    while(1){
-        tmr_wait_ms_ultimate(TIMER1,250);
-        tmr_wait_ms_ultimate(TIMER1,250);
-        LATAbits.LATA0 = !LATAbits.LATA0; // toggle LD1
-    }
-    */
-    
+    /*
     // Assignment 2: LD1 on 500ms - off 500ms (no interrupts), LD2 toggles at every T2 (RE8) press (interrupts)
     TRISEbits.TRISE8 = 1; // T2 set in input
     RPINR0bits.INT1R = 88; // external interrupt 1 is mapped to button T2 (RP88)
@@ -46,6 +37,6 @@ int main(void) {
         tmr_wait_ms_ultimate(TIMER1,500);
         LATAbits.LATA0 = !LATAbits.LATA0; // toggle LD1
     }
-    
+    */
     return 0;
 }
