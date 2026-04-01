@@ -1,0 +1,5 @@
+/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/Assignment1ES_default_default_XC16_compile.dir
+/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/Assignment1ES_default_image_BJoHZvk8.dir
+/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/Assignment1ES_default_Bin2Hex.dir
+/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/edit_cache.dir
+/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/rebuild_cache.dir

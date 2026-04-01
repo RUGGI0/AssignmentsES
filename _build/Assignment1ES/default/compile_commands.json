@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default",
+  "command": "/opt/microchip/xc16/v2.10/bin/xc16-gcc -DXPRJ_default=default -D__DEBUG -I/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/cmake/Assignment1ES/default/../../../Assignment1ES.X -x c -g -mcpu=33EP512MU810 -O0 -msmart-io=1 -Wall -msfr-warn=off -mdfp=/home/ruggio/.mchp_packs/Microchip/dsPIC33E-GM-GP-MC-GU-MU_DFP/1.6.297/xc16 -o CMakeFiles/Assignment1ES_default_default_XC16_compile.dir/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment1ES.X/newmainXC16.c.o -c /home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment1ES.X/newmainXC16.c",
+  "file": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment1ES.X/newmainXC16.c",
+  "output": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/Assignment1ES_default_default_XC16_compile.dir/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment1ES.X/newmainXC16.c.o"
+},
+{
+  "directory": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default",
+  "command": "/opt/microchip/xc16/v2.10/bin/xc16-gcc -DXPRJ_default=default -D__DEBUG -I/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/cmake/Assignment1ES/default/../../../Assignment1ES.X -x c -g -mcpu=33EP512MU810 -O0 -msmart-io=1 -Wall -msfr-warn=off -mdfp=/home/ruggio/.mchp_packs/Microchip/dsPIC33E-GM-GP-MC-GU-MU_DFP/1.6.297/xc16 -o CMakeFiles/Assignment1ES_default_default_XC16_compile.dir/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/functions4.c.o -c /home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/functions4.c",
+  "file": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/functions4.c",
+  "output": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/Assignment1ES_default_default_XC16_compile.dir/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/functions4.c.o"
+},
+{
+  "directory": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default",
+  "command": "/opt/microchip/xc16/v2.10/bin/xc16-gcc -DXPRJ_default=default -D__DEBUG -I/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/cmake/Assignment1ES/default/../../../Assignment1ES.X -x c -g -mcpu=33EP512MU810 -O0 -msmart-io=1 -Wall -msfr-warn=off -mdfp=/home/ruggio/.mchp_packs/Microchip/dsPIC33E-GM-GP-MC-GU-MU_DFP/1.6.297/xc16 -o CMakeFiles/Assignment1ES_default_default_XC16_compile.dir/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/newmainXC16_4.c.o -c /home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/newmainXC16_4.c",
+  "file": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/newmainXC16_4.c",
+  "output": "/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment1ES/default/CMakeFiles/Assignment1ES_default_default_XC16_compile.dir/home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/Assignment4.X/newmainXC16_4.c.o"
+}
+]

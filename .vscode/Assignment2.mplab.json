@@ -106,10 +106,19 @@
         {
             "name": "Project files",
             "files": [
-                "Assignment2.X/Makefile",
-                "Assignment2.X/*{.c,.h,.mc3}"
-            ],
-            "encoding": "ISO-8859-1"
+                {
+                    "include": "Assignment2.X/Makefile",
+                    "encoding": "ISO-8859-1"
+                },
+                {
+                    "include": "Assignment2.X/*{.c,.h,.mc3}",
+                    "encoding": "ISO-8859-1"
+                },
+                "Assignment4.X",
+                "Assignment4.X/functions4.c",
+                "Assignment4.X/functions4.h",
+                "Assignment4.X/newmainXC16_4.c"
+            ]
         }
     ],
     "configurations": [

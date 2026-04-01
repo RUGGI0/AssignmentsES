@@ -1,0 +1,1280 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/uname"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/uname"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/uname"
+      - "/home/ruggio/bin/uname"
+      - "/usr/local/sbin/uname"
+      - "/usr/local/bin/uname"
+      - "/usr/sbin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:207 (message)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      The target system is: Generic -  - 
+      The host system is: Linux - 6.17.0-20-generic - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeNinjaFindMake.cmake:5 (find_program)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Program used to build from build.ninja files."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ninja-build"
+      - "ninja"
+      - "samu"
+    candidate_directories:
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/ninja-build"
+    found: "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/ninja"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCCompilerId.c.in"
+    candidate_directories:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/"
+    found: "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeCCompilerId.c.in"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /opt/microchip/xc16/v2.10/bin/xc16-gcc 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      Assembler messages:
+      Warning: Using default target divide cycle count of 17; please specify device.
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is GNU, found in:
+        /home/ruggio/Documents/UniGe/ES/AssignmentES/AssignmentsES/_build/Assignment2/default/CMakeFiles/4.2.3/CompilerIdC/a.out
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_RANLIB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-ranlib"
+      - "ranlib"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-ranlib"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-strip"
+      - "strip"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-strip"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-ld"
+      - "ld"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-ld"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_NM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-nm"
+      - "nm"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-nm"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-objdump"
+      - "objdump"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-objdump"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-objcopy"
+      - "objcopy"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-objcopy"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-readelf"
+      - "readelf"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/opt/microchip/xc16/v2.10/bin/xc16-readelf"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-dlltool"
+      - "dlltool"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-dlltool"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-dlltool"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-dlltool"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-dlltool"
+      - "/home/ruggio/bin/xc16-dlltool"
+      - "/usr/local/sbin/xc16-dlltool"
+      - "/usr/local/bin/xc16-dlltool"
+      - "/usr/sbin/xc16-dlltool"
+      - "/usr/bin/xc16-dlltool"
+      - "/sbin/xc16-dlltool"
+      - "/bin/xc16-dlltool"
+      - "/usr/games/xc16-dlltool"
+      - "/usr/local/games/xc16-dlltool"
+      - "/snap/bin/xc16-dlltool"
+      - "/opt/microchip/xc16/v2.10/bin/dlltool"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/dlltool"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/dlltool"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/dlltool"
+      - "/home/ruggio/bin/dlltool"
+      - "/usr/local/sbin/dlltool"
+      - "/usr/local/bin/dlltool"
+      - "/usr/sbin/dlltool"
+      - "/usr/bin/dlltool"
+      - "/sbin/dlltool"
+      - "/bin/dlltool"
+      - "/usr/games/dlltool"
+      - "/usr/local/games/dlltool"
+      - "/snap/bin/dlltool"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-addr2line"
+      - "addr2line"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-addr2line"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-addr2line"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-addr2line"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-addr2line"
+      - "/home/ruggio/bin/xc16-addr2line"
+      - "/usr/local/sbin/xc16-addr2line"
+      - "/usr/local/bin/xc16-addr2line"
+      - "/usr/sbin/xc16-addr2line"
+      - "/usr/bin/xc16-addr2line"
+      - "/sbin/xc16-addr2line"
+      - "/bin/xc16-addr2line"
+      - "/usr/games/xc16-addr2line"
+      - "/usr/local/games/xc16-addr2line"
+      - "/snap/bin/xc16-addr2line"
+      - "/opt/microchip/xc16/v2.10/bin/addr2line"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/addr2line"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/addr2line"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/addr2line"
+      - "/home/ruggio/bin/addr2line"
+      - "/usr/local/sbin/addr2line"
+      - "/usr/local/bin/addr2line"
+      - "/usr/sbin/addr2line"
+    found: "/usr/bin/addr2line"
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-tapi"
+      - "tapi"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-tapi"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-tapi"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-tapi"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-tapi"
+      - "/home/ruggio/bin/xc16-tapi"
+      - "/usr/local/sbin/xc16-tapi"
+      - "/usr/local/bin/xc16-tapi"
+      - "/usr/sbin/xc16-tapi"
+      - "/usr/bin/xc16-tapi"
+      - "/sbin/xc16-tapi"
+      - "/bin/xc16-tapi"
+      - "/usr/games/xc16-tapi"
+      - "/usr/local/games/xc16-tapi"
+      - "/snap/bin/xc16-tapi"
+      - "/opt/microchip/xc16/v2.10/bin/tapi"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/tapi"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/tapi"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/tapi"
+      - "/home/ruggio/bin/tapi"
+      - "/usr/local/sbin/tapi"
+      - "/usr/local/bin/tapi"
+      - "/usr/sbin/tapi"
+      - "/usr/bin/tapi"
+      - "/sbin/tapi"
+      - "/bin/tapi"
+      - "/usr/games/tapi"
+      - "/usr/local/games/tapi"
+      - "/snap/bin/tapi"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:201 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-gcc-ar-4.5"
+      - "xc16-gcc-ar-4"
+      - "xc16-gcc-ar4"
+      - "xc16-gcc-ar"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar-4.5"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar-4.5"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar-4.5"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar-4.5"
+      - "/home/ruggio/bin/xc16-gcc-ar-4.5"
+      - "/usr/local/sbin/xc16-gcc-ar-4.5"
+      - "/usr/local/bin/xc16-gcc-ar-4.5"
+      - "/usr/sbin/xc16-gcc-ar-4.5"
+      - "/usr/bin/xc16-gcc-ar-4.5"
+      - "/sbin/xc16-gcc-ar-4.5"
+      - "/bin/xc16-gcc-ar-4.5"
+      - "/usr/games/xc16-gcc-ar-4.5"
+      - "/usr/local/games/xc16-gcc-ar-4.5"
+      - "/snap/bin/xc16-gcc-ar-4.5"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar-4"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar-4"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar-4"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar-4"
+      - "/home/ruggio/bin/xc16-gcc-ar-4"
+      - "/usr/local/sbin/xc16-gcc-ar-4"
+      - "/usr/local/bin/xc16-gcc-ar-4"
+      - "/usr/sbin/xc16-gcc-ar-4"
+      - "/usr/bin/xc16-gcc-ar-4"
+      - "/sbin/xc16-gcc-ar-4"
+      - "/bin/xc16-gcc-ar-4"
+      - "/usr/games/xc16-gcc-ar-4"
+      - "/usr/local/games/xc16-gcc-ar-4"
+      - "/snap/bin/xc16-gcc-ar-4"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar4"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar4"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar4"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar4"
+      - "/home/ruggio/bin/xc16-gcc-ar4"
+      - "/usr/local/sbin/xc16-gcc-ar4"
+      - "/usr/local/bin/xc16-gcc-ar4"
+      - "/usr/sbin/xc16-gcc-ar4"
+      - "/usr/bin/xc16-gcc-ar4"
+      - "/sbin/xc16-gcc-ar4"
+      - "/bin/xc16-gcc-ar4"
+      - "/usr/games/xc16-gcc-ar4"
+      - "/usr/local/games/xc16-gcc-ar4"
+      - "/snap/bin/xc16-gcc-ar4"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar"
+      - "/home/ruggio/bin/xc16-gcc-ar"
+      - "/usr/local/sbin/xc16-gcc-ar"
+      - "/usr/local/bin/xc16-gcc-ar"
+      - "/usr/sbin/xc16-gcc-ar"
+      - "/usr/bin/xc16-gcc-ar"
+      - "/sbin/xc16-gcc-ar"
+      - "/bin/xc16-gcc-ar"
+      - "/usr/games/xc16-gcc-ar"
+      - "/usr/local/games/xc16-gcc-ar"
+      - "/snap/bin/xc16-gcc-ar"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:201 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-gcc-ranlib-4.5"
+      - "xc16-gcc-ranlib-4"
+      - "xc16-gcc-ranlib4"
+      - "xc16-gcc-ranlib"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib-4.5"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib-4.5"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib-4.5"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib-4.5"
+      - "/home/ruggio/bin/xc16-gcc-ranlib-4.5"
+      - "/usr/local/sbin/xc16-gcc-ranlib-4.5"
+      - "/usr/local/bin/xc16-gcc-ranlib-4.5"
+      - "/usr/sbin/xc16-gcc-ranlib-4.5"
+      - "/usr/bin/xc16-gcc-ranlib-4.5"
+      - "/sbin/xc16-gcc-ranlib-4.5"
+      - "/bin/xc16-gcc-ranlib-4.5"
+      - "/usr/games/xc16-gcc-ranlib-4.5"
+      - "/usr/local/games/xc16-gcc-ranlib-4.5"
+      - "/snap/bin/xc16-gcc-ranlib-4.5"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib-4"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib-4"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib-4"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib-4"
+      - "/home/ruggio/bin/xc16-gcc-ranlib-4"
+      - "/usr/local/sbin/xc16-gcc-ranlib-4"
+      - "/usr/local/bin/xc16-gcc-ranlib-4"
+      - "/usr/sbin/xc16-gcc-ranlib-4"
+      - "/usr/bin/xc16-gcc-ranlib-4"
+      - "/sbin/xc16-gcc-ranlib-4"
+      - "/bin/xc16-gcc-ranlib-4"
+      - "/usr/games/xc16-gcc-ranlib-4"
+      - "/usr/local/games/xc16-gcc-ranlib-4"
+      - "/snap/bin/xc16-gcc-ranlib-4"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib4"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib4"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib4"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib4"
+      - "/home/ruggio/bin/xc16-gcc-ranlib4"
+      - "/usr/local/sbin/xc16-gcc-ranlib4"
+      - "/usr/local/bin/xc16-gcc-ranlib4"
+      - "/usr/sbin/xc16-gcc-ranlib4"
+      - "/usr/bin/xc16-gcc-ranlib4"
+      - "/sbin/xc16-gcc-ranlib4"
+      - "/bin/xc16-gcc-ranlib4"
+      - "/usr/games/xc16-gcc-ranlib4"
+      - "/usr/local/games/xc16-gcc-ranlib4"
+      - "/snap/bin/xc16-gcc-ranlib4"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib"
+      - "/home/ruggio/bin/xc16-gcc-ranlib"
+      - "/usr/local/sbin/xc16-gcc-ranlib"
+      - "/usr/local/bin/xc16-gcc-ranlib"
+      - "/usr/sbin/xc16-gcc-ranlib"
+      - "/usr/bin/xc16-gcc-ranlib"
+      - "/sbin/xc16-gcc-ranlib"
+      - "/bin/xc16-gcc-ranlib"
+      - "/usr/games/xc16-gcc-ranlib"
+      - "/usr/local/games/xc16-gcc-ranlib"
+      - "/snap/bin/xc16-gcc-ranlib"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:1290 (message)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineASMCompiler.cmake:170 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "CMakeLists.txt:13 (project)"
+    message: |
+      Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
+      elf-gcc (Microchip Technology) 4.5.1 (XC16, Microchip v2.10)  (A) Build date: Mar 27 2023
+      Part support version: 2.10 (A)
+      __XC16_VERSION__ == 2010
+      Copyright (C) 2010 Free Software Foundation, Inc.
+      This is free software; see the source for copying conditions.  There is NO
+      warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineASMCompiler.cmake:268 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_ASM_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-gcc-ar-"
+      - "xc16-gcc-ar-"
+      - "xc16-gcc-ar"
+      - "xc16-gcc-ar"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar-"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar-"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar-"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar-"
+      - "/home/ruggio/bin/xc16-gcc-ar-"
+      - "/usr/local/sbin/xc16-gcc-ar-"
+      - "/usr/local/bin/xc16-gcc-ar-"
+      - "/usr/sbin/xc16-gcc-ar-"
+      - "/usr/bin/xc16-gcc-ar-"
+      - "/sbin/xc16-gcc-ar-"
+      - "/bin/xc16-gcc-ar-"
+      - "/usr/games/xc16-gcc-ar-"
+      - "/usr/local/games/xc16-gcc-ar-"
+      - "/snap/bin/xc16-gcc-ar-"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar-"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar-"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar-"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar-"
+      - "/home/ruggio/bin/xc16-gcc-ar-"
+      - "/usr/local/sbin/xc16-gcc-ar-"
+      - "/usr/local/bin/xc16-gcc-ar-"
+      - "/usr/sbin/xc16-gcc-ar-"
+      - "/usr/bin/xc16-gcc-ar-"
+      - "/sbin/xc16-gcc-ar-"
+      - "/bin/xc16-gcc-ar-"
+      - "/usr/games/xc16-gcc-ar-"
+      - "/usr/local/games/xc16-gcc-ar-"
+      - "/snap/bin/xc16-gcc-ar-"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar"
+      - "/home/ruggio/bin/xc16-gcc-ar"
+      - "/usr/local/sbin/xc16-gcc-ar"
+      - "/usr/local/bin/xc16-gcc-ar"
+      - "/usr/sbin/xc16-gcc-ar"
+      - "/usr/bin/xc16-gcc-ar"
+      - "/sbin/xc16-gcc-ar"
+      - "/bin/xc16-gcc-ar"
+      - "/usr/games/xc16-gcc-ar"
+      - "/usr/local/games/xc16-gcc-ar"
+      - "/snap/bin/xc16-gcc-ar"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ar"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ar"
+      - "/home/ruggio/bin/xc16-gcc-ar"
+      - "/usr/local/sbin/xc16-gcc-ar"
+      - "/usr/local/bin/xc16-gcc-ar"
+      - "/usr/sbin/xc16-gcc-ar"
+      - "/usr/bin/xc16-gcc-ar"
+      - "/sbin/xc16-gcc-ar"
+      - "/bin/xc16-gcc-ar"
+      - "/usr/games/xc16-gcc-ar"
+      - "/usr/local/games/xc16-gcc-ar"
+      - "/snap/bin/xc16-gcc-ar"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/home/ruggio/.mplab/app-finder/apps/cmake/v4.2.3/cmake-4.2.3-linux-x86_64/share/cmake-4.2/Modules/CMakeDetermineASMCompiler.cmake:268 (include)"
+      - "CMakeLists.txt:13 (project)"
+    mode: "program"
+    variable: "CMAKE_ASM_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "xc16-gcc-ranlib-"
+      - "xc16-gcc-ranlib-"
+      - "xc16-gcc-ranlib"
+      - "xc16-gcc-ranlib"
+    candidate_directories:
+      - "/opt/microchip/xc16/v2.10/bin/"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/"
+      - "/home/ruggio/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib-"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib-"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib-"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib-"
+      - "/home/ruggio/bin/xc16-gcc-ranlib-"
+      - "/usr/local/sbin/xc16-gcc-ranlib-"
+      - "/usr/local/bin/xc16-gcc-ranlib-"
+      - "/usr/sbin/xc16-gcc-ranlib-"
+      - "/usr/bin/xc16-gcc-ranlib-"
+      - "/sbin/xc16-gcc-ranlib-"
+      - "/bin/xc16-gcc-ranlib-"
+      - "/usr/games/xc16-gcc-ranlib-"
+      - "/usr/local/games/xc16-gcc-ranlib-"
+      - "/snap/bin/xc16-gcc-ranlib-"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib-"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib-"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib-"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib-"
+      - "/home/ruggio/bin/xc16-gcc-ranlib-"
+      - "/usr/local/sbin/xc16-gcc-ranlib-"
+      - "/usr/local/bin/xc16-gcc-ranlib-"
+      - "/usr/sbin/xc16-gcc-ranlib-"
+      - "/usr/bin/xc16-gcc-ranlib-"
+      - "/sbin/xc16-gcc-ranlib-"
+      - "/bin/xc16-gcc-ranlib-"
+      - "/usr/games/xc16-gcc-ranlib-"
+      - "/usr/local/games/xc16-gcc-ranlib-"
+      - "/snap/bin/xc16-gcc-ranlib-"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib"
+      - "/home/ruggio/bin/xc16-gcc-ranlib"
+      - "/usr/local/sbin/xc16-gcc-ranlib"
+      - "/usr/local/bin/xc16-gcc-ranlib"
+      - "/usr/sbin/xc16-gcc-ranlib"
+      - "/usr/bin/xc16-gcc-ranlib"
+      - "/sbin/xc16-gcc-ranlib"
+      - "/bin/xc16-gcc-ranlib"
+      - "/usr/games/xc16-gcc-ranlib"
+      - "/usr/local/games/xc16-gcc-ranlib"
+      - "/snap/bin/xc16-gcc-ranlib"
+      - "/opt/microchip/xc16/v2.10/bin/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux/xc16-gcc-ranlib"
+      - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin/xc16-gcc-ranlib"
+      - "/home/ruggio/bin/xc16-gcc-ranlib"
+      - "/usr/local/sbin/xc16-gcc-ranlib"
+      - "/usr/local/bin/xc16-gcc-ranlib"
+      - "/usr/sbin/xc16-gcc-ranlib"
+      - "/usr/bin/xc16-gcc-ranlib"
+      - "/sbin/xc16-gcc-ranlib"
+      - "/bin/xc16-gcc-ranlib"
+      - "/usr/games/xc16-gcc-ranlib"
+      - "/usr/local/games/xc16-gcc-ranlib"
+      - "/snap/bin/xc16-gcc-ranlib"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/ruggio/.mplab/app-finder/apps/ninja/v1.13.2"
+        - "/home/ruggio/.mplab/app-finder/apps/make/v4.4.1/linux"
+        - "/home/ruggio/.mplab/app-finder/apps/hexmate/v3.00/dist/linux/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/home/ruggio/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+        - "/snap/bin"
+...
