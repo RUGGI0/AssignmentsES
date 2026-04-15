@@ -1,12 +1,66 @@
-.generated_files/
-build/
+# ---- MPLAB X / NetBeans ----
 dist/
-nbproject/
-Makefile*
-Package-*
-private/
+build/
+nbproject/private/
+nbproject/Makefile-*.mk
+nbproject/Package-*.bash
+nbproject/configurations.xml
+nbproject/private/
+*.X/nbproject/private/
+
+# ---- Generated build folders ----
 _build/
-!cmake/**/user.cmake
-cmake/**/.generated/*
-cmake/**/CMake*
 out/
+cmake-build-*/
+build-*/
+
+# ---- CMake generated ----
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+build.ninja
+.ninja_deps
+.ninja_log
+CMakeConfigureLog.yaml
+
+# generated subtrees created by MPLAB/CMake integration
+cmake/**/.generated/
+cmake/**/CMakeFiles/
+cmake/**/CMakeCache.txt
+cmake/**/cmake_install.cmake
+cmake/**/build.ninja
+cmake/**/compile_commands.json
+cmake/**/CMakeConfigureLog.yaml
+cmake/**/Makefile
+
+# keep only hand-written user config if needed
+!cmake/**/user.cmake
+
+# ---- VS Code / MPLAB for VS Code ----
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# if even these are machine-specific, ignore all of .vscode
+# .vscode/
+
+# specific MPLAB generated metadata
+*.mplab.json
+
+# ---- OS / editor noise ----
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.tmp
+
+# ---- Hex / debug outputs, if generated ----
+*.elf
+*.hex
+*.map
+*.o
+*.obj
+*.d
