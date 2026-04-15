@@ -51,6 +51,8 @@ void tmr_wait_ms(int timer, int ms);
 void algorithm();
 void tmr_setup_period_alternative(int ms);
 
+///higrdjògjso
+
 
 #endif
 
