@@ -8,6 +8,8 @@
 
 #include "xc.h"
 #include "functions4.h"
+
+volatile CircularBuffer rx_buffer;
 volatile char char_1 = 'a';
 volatile char char_2 = 'a';
 volatile char char_3 = 'a';
@@ -51,6 +53,8 @@ void first_part(){
     U1STAbits.URXISEL = 0; // interrupt if a character is received
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
+
+    buffer_init(&rx_buffer);
 
     while(1){
         if(U1STAbits.OERR == 1){
@@ -125,6 +129,50 @@ void tmr_setup_period(int timer, int ms){
         T2CONbits.TON = 1;
         return;
     }
+    else if(timer == TIMER3){
+        T3CONbits.TCS = 0;
+        T3CONbits.TGATE = 0;
+        T3CONbits.TON = 0; // ensure timer is off
+        TMR3 = 0; // reset timer 2
+        IFS0bits.T3IF = 0; // clear state period flag before restarting
+        if(cycle_case == 0){
+            T3CONbits.TCKPS = 0b00; // 1:1 prescaler
+        }
+        else if(cycle_case == 1){
+            T3CONbits.TCKPS = 0b01; // 1:8 prescaler
+        }
+        else if(cycle_case == 2){
+            T3CONbits.TCKPS = 0b10; // 1:64 prescaler
+        }
+        else{
+            T3CONbits.TCKPS = 0b11; // 1:256 prescaler
+        }
+        PR3 = cycles;
+        T3CONbits.TON = 1;
+        return;
+    }
+    else if(timer == TIMER4){
+        T4CONbits.TCS = 0;
+        T4CONbits.TGATE = 0;
+        T4CONbits.TON = 0; // ensure timer is off
+        TMR4 = 0; // reset timer 2
+        IFS1bits.T4IF = 0; // clear state period flag before restarting
+        if(cycle_case == 0){
+            T4CONbits.TCKPS = 0b00; // 1:1 prescaler
+        }
+        else if(cycle_case == 1){
+            T4CONbits.TCKPS = 0b01; // 1:8 prescaler
+        }
+        else if(cycle_case == 2){
+            T4CONbits.TCKPS = 0b10; // 1:64 prescaler
+        }
+        else{
+            T4CONbits.TCKPS = 0b11; // 1:256 prescaler
+        }
+        PR4 = cycles;
+        T4CONbits.TON = 1;
+        return;
+    }
 }
 
 // Variation of void tmr_wait_period (function to clear flag of the expired timer)
@@ -139,21 +187,6 @@ int tmr_wait_period_alternative(int timer){
             if(IFS0bits.T1IF == 1){
                 // flag set
                 IFS0bits.T1IF = 0; // flag cleared
-                break;
-            }
-        }
-    }
-    else if(timer == TIMER5){
-        if(IFS1bits.T5IF == 1){
-            temp = 1;
-        }
-        while(1){
-            if(IFS1bits.T5IF == 1){
-                IFS1bits.T5IF = 0;
-                if(LD2_flag == 1){
-                    // checks if blinking has been stopped (received LD2 odd times)
-                   LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
-                }
                 break;
             }
         }
@@ -179,86 +212,86 @@ void algorithm(){
     tmr_wait_ms(TIMER2,7);
 }
 
-// Function to setup a 32-bits timer (timer4 and timer5)
-void tmr_setup_period_alternative(int ms){
-    uint32_t Fcy = 72000000; // dsPIC33EP512MU810
-    uint32_t cycles = Fcy / 1000;
-    cycles *= ms; // avoids overflow with Fcy*ms/1000
-    T4CONbits.TON = 0; // ensure timer is off
-    T5CONbits.TON = 0;
-    T4CONbits.T32 = 1; // enabling 32-bit timer
-    T4CONbits.TCS = 0;
-    T4CONbits.TGATE = 0;
-    T4CONbits.TCKPS = 0; // 1:1 prescaler otherwise overflow
-    TMR4 = 0; // reset timer 4
-    TMR5 = 0; // reset timer 5
-    
-    PR4 = (uint16_t)(cycles & 65535); // lsw (taking least significant 16 bits)
-    PR5 = (uint16_t)(cycles >> 16); // msw (taking most significant 16 bits)
-    
-    IFS1bits.T4IF = 0; // clear interrupt flag
-    IFS1bits.T5IF = 0; // clear interrupt flag
-    // no interrupt (busy waiting)
-    //IEC1bits.T5IE = 1; // (enable interrupt)
-    //IPC7bits.T5IP = 0x01; // set priority level for timer 5
-    
-    T4CONbits.TON = 1;
-    return;
+void buffer_init(volatile CircularBuffer* cb) {
+    cb->head = 0;
+    cb->tail = 0;
 }
 
-// Redefinition of ISR for UART1 Rx
-// Assignment 1 version
-/*
-void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
-    IFS0bits.U1RXIF = 0;
-    char_1 = U1RXREG;
-    U1TXREG = char_1;
-    LATAbits.LATA0 = !LATAbits.LATA0; // toggle LD1
+int buffer_is_empty(volatile CircularBuffer* cb) {
+    return cb->head == cb->tail;
 }
-*/
+
+int buffer_write(volatile CircularBuffer* cb, char c) {
+    int next = (cb->head + 1) % SIZE;
+    if (next == cb->tail) {
+        return -1; // Buffer is full
+    }
+    cb->buffer[cb->head] = c;
+    cb->head = next;
+    return 0;
+}
+
+int buffer_read(volatile CircularBuffer* cb, char* c) {
+    if (buffer_is_empty(cb)) {
+        return -1; // Buffer is empty
+    }
+    *c = cb->buffer[cb->tail];
+    cb->tail = (cb->tail + 1) % SIZE;
+    return 0;
+}
 
 // Redefinition of ISR for UART1 Rx
 // Assignment 2 version
 void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
     IFS0bits.U1RXIF = 0;
-    char_counter++;
     
-    // storing characters
-    char_3 = char_2;
-    char_2 = char_1;
-    char_1 = U1RXREG;
-    if(char_3 == 'L'){
-        if(char_2 == 'D'){
-            if(char_1 == '1'){
-                LATAbits.LATA0 = !LATAbits.LATA0; // toggle LD1
-            }
-            else if(char_1 == '2'){
-                LD2_flag = !LD2_flag; // stop/resume LD2 blinking
-            }
-        }
+    // Reading all characters in the Rx buffer (until empty) and writing them in the circular buffer
+    while(U1STAbits.URXDA == 1){
+        buffer_write(&rx_buffer, U1RXREG);
     }
+    
+    /*
+    if(U1STAbits.OERR == 1){
+        U1STAbits.OERR = 0;
+    }
+        */
 }
 
-// Redefinition of ISR for external interrupt 1
+// Redefinition of ISR for external interrupt 1 (robust implementation)
 void __attribute__((__interrupt__, __auto_psv__)) _INT1Interrupt(void){
     IFS1bits.INT1IF = 0; // clearing flag of external interrupt
-    send_T2_msg = 1;
+    IPC2bits.T3IP = 0x01; // set priority to one
+    IEC0bits.T3IE = 1;
+    tmr_setup_period(TIMER3,10);
 }
 
 // Redefinition of ISR for external interrupt 2
 void __attribute__((__interrupt__, __auto_psv__)) _INT2Interrupt(void){
     IFS1bits.INT2IF = 0; // clearing flag of external interrupt
-    send_T3_msg = 1;
+    IPC6bits.T4IP = 0x01; // set priority to one
+    IEC1bits.T4IE = 1;
+    tmr_setup_period(TIMER4,10);
 }
 
-// Redefinition of ISR for timer 5
-/*
-blinking of LD2 with interrupts
-void __attribute__((__interrupt__, __auto_psv__)) _T5Interrupt(void){
-    IFS1bits.T5IF = 0; // clearing timer flag
-    if(LD2_flag == 1){
-        // checks if blinking has been stopped (received LD2 odd times)
-        LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
+// Redefinition of ISR for timer 3
+void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt(void){
+    T3CONbits.TON = 0;
+    IFS0bits.T3IF = 0; // clearing timer flag
+    IEC0bits.T3IE = 0; // disabling timer interrupt
+    
+    if(PORTEbits.RE8 == 0){
+        send_T2_msg = 1;
     }
 }
-*/
+
+// Redefinition of ISR for timer 4
+void __attribute__((__interrupt__, __auto_psv__)) _T4Interrupt(void){
+    T4CONbits.TON = 0;
+    IFS1bits.T4IF = 0; // clearing timer flag
+    IEC1bits.T4IE = 0; // disabling timer interrupt
+    
+    if(PORTEbits.RE9 == 0){
+        send_T3_msg = 1;
+    }
+    
+}

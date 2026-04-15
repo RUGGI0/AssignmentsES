@@ -17,11 +17,11 @@ int main(void) {
     
     // Assignment 2
     int ret = -1;
-    int ret_2 = -1;
     int cycle_counter = 0;
-    int mis_counter = 0;
-    char T2_msg[6] = "";
-    char T3_msg[6] = "";
+    int miss_counter = 0;
+    char T2_msg[SIZE] = "";
+    char T3_msg[SIZE] = "";
+    char c1 = '-', c2 = '-', c3 = '-';
     TRISAbits.TRISA0 = 0; // LD1 in output
     TRISGbits.TRISG9 = 0; // LD2 in output
     TRISEbits.TRISE8 = 1; // T2 in input
@@ -60,7 +60,7 @@ int main(void) {
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
     
-    tmr_setup_period_alternative(400); // managed by interrupt of timer 5
+    buffer_init(&rx_buffer);
     tmr_setup_period(TIMER1,10);
     while(1){
         
@@ -79,7 +79,7 @@ int main(void) {
             // T2 button has been clicked
             send_T2_msg = 0; // reset flag
             sprintf(T2_msg, "C=%d", char_counter);
-            for(int i = 0;i<6;i++){
+            for(int i = 0;i<SIZE;i++){
                 if(T2_msg[i] == '\0'){
                     break;
                 }
@@ -90,33 +90,60 @@ int main(void) {
         if(send_T3_msg == 1){
             // T3 button has been clicked
             send_T3_msg = 0; // reset flag
-            sprintf(T3_msg, "D=%d", mis_counter);
-            for(int i = 0;i<6;i++){
+            sprintf(T3_msg, "D=%d", miss_counter);
+            for(int i = 0;i<SIZE;i++){
                 if(T3_msg[i] == '\0'){
                     break;
                 }
                 while(U1STAbits.UTXBF == 1); // Tx buffer is full -> wait
                 U1TXREG = T3_msg[i];
             }
+            /*
+            int i = 0;
+            while(1){
+                if(T3_msg[i] == '\0'){
+                    break;
+                }
+                while(U1STAbits.UTXBF == 1); // Tx buffer is full -> wait
+                U1TXREG = T3_msg[i];
+                i++;
+            }
+                */
+        }
+        while(buffer_is_empty(&rx_buffer) == 0){
+            char c;
+            buffer_read(&rx_buffer, &c);
+            char_counter++;
+            c3 = c2;
+            c2 = c1;
+            c1 = c;
+            if(c3 == 'L' && c2 == 'D' && c1 == '1'){
+                LATAbits.LATA0 = !LATAbits.LATA0; // toggle LD1
+            }
+            else if(c3 == 'L' && c2 == 'D' && c1 == '2'){
+                LD2_flag = !LD2_flag; // suspend/activate LD2
+            }
         }
         
         if(cycle_counter == 39){
             cycle_counter = 0;
-            ret_2 = tmr_wait_period_alternative(TIMER5); // busy waiting for timer of 400ms
-            /*
-            if(ret_2){
-                LATAbits.LATA0 = 1;
+            if(LD2_flag == 1){
+                LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
             }
-            */
         }
         
         // -- 10 ms shouldn't have already passed, otherwise it arrives late (ret == 1)
         // (it manages to execute code in less than 10ms if timer 5 works with interrupts)
         ret = tmr_wait_period_alternative(TIMER1);
         if(ret){
-            mis_counter++;
+            miss_counter++;
         }
     }
     
     return 0;
 }
+
+// cancel TIMER5 
+// button: interrupt avoiding bouncing/interrupt flag in main
+// circular buffer for Rx, move parsing logic in main
+// maximum number of characters transmitted in a loop (3ms) and considering the baud rate

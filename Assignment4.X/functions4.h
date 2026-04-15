@@ -36,6 +36,17 @@
 #define TIMER1 1
 #define TIMER2 2
 #define TIMER3 3
+#define TIMER4 4
+
+#define SIZE 128
+
+typedef struct {
+    char buffer[SIZE];
+    volatile int head;
+    volatile int tail;
+} CircularBuffer;
+
+extern volatile CircularBuffer rx_buffer;
 extern volatile char char_1;
 extern volatile char char_2;
 extern volatile char char_3;
@@ -49,9 +60,10 @@ void tmr_setup_period(int timer, int ms);
 int tmr_wait_period_alternative(int timer);
 void tmr_wait_ms(int timer, int ms);
 void algorithm();
-void tmr_setup_period_alternative(int ms);
-
-///higrdjògjso
+void buffer_init(volatile CircularBuffer* cb);
+int buffer_is_empty(volatile CircularBuffer* cb);
+int buffer_read(volatile CircularBuffer* cb, char* c);
+int buffer_write(volatile CircularBuffer* cb, char c);
 
 
 #endif
