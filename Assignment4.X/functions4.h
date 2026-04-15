@@ -35,7 +35,7 @@
 #include <stdio.h>
 #define TIMER1 1
 #define TIMER2 2
-#define TIMER5 5
+#define TIMER3 3
 extern volatile char char_1;
 extern volatile char char_2;
 extern volatile char char_3;

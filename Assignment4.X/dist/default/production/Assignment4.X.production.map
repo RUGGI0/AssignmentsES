@@ -121,10 +121,10 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200               0xfaa          0x177f  (6015)
 .const                      0x11aa                 0xa             0xf  (15)
-.text                       0x11b4               0x4a6           0x6f9  (1785)
-.dinit                      0x165a                0x32            0x4b  (75)
+.text                       0x11b4               0x4aa           0x6ff  (1791)
+.dinit                      0x165e                0x32            0x4b  (75)
 
-                 Total "program" memory used (bytes):         0x1ed2  (7890) 1%
+                 Total "program" memory used (bytes):         0x1ed8  (7896) 1%
 
 
 Auxflash Memory  [Origin = 0x7fc000, Length = 0x3ffa]
@@ -516,15 +516,15 @@ __FUID0
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x4564
+.debug_info       0x000000       0x458c
  *(.debug_info)
- .debug_info      0x000000       0x1f2f build/default/production/functions4.o
- .debug_info      0x001f2f       0x2373 build/default/production/newmainXC16_4.o
- .debug_info      0x0042a2         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_info      0x00432e         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
- .debug_info      0x0043bb         0x90 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(extendsfdf.EP_o)
- .debug_info      0x00444b         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(funpack.EP_o)
- .debug_info      0x0044d8         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_info      0x000000       0x1f43 build/default/production/functions4.o
+ .debug_info      0x001f43       0x2387 build/default/production/newmainXC16_4.o
+ .debug_info      0x0042ca         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_info      0x004356         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_info      0x0043e3         0x90 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(extendsfdf.EP_o)
+ .debug_info      0x004473         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(funpack.EP_o)
+ .debug_info      0x004500         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0x2f2
@@ -537,15 +537,15 @@ __FUID0
  .debug_abbrev    0x0002ca         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(funpack.EP_o)
  .debug_abbrev    0x0002de         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
 
-.debug_line       0x000000        0x4aa
+.debug_line       0x000000        0x4ab
  *(.debug_line)
  .debug_line      0x000000        0x1cd build/default/production/functions4.o
- .debug_line      0x0001cd        0x178 build/default/production/newmainXC16_4.o
- .debug_line      0x000345         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_line      0x000388         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
- .debug_line      0x0003cd         0x59 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(extendsfdf.EP_o)
- .debug_line      0x000426         0x4a c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(funpack.EP_o)
- .debug_line      0x000470         0x3a c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_line      0x0001cd        0x179 build/default/production/newmainXC16_4.o
+ .debug_line      0x000346         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_line      0x000389         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_line      0x0003ce         0x59 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(extendsfdf.EP_o)
+ .debug_line      0x000427         0x4a c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(funpack.EP_o)
+ .debug_line      0x000471         0x3a c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
 
 .debug_frame      0x000000        0x176
  *(.debug_frame)
@@ -3408,7 +3408,7 @@ __c30_signature
 .const              0x91aa          0xa load address 0x0011aa  
  .const             0x91aa          0xa build/default/production/newmainXC16_4.o
 
-.text             0x0011b4        0x4a6
+.text             0x0011b4        0x4aa
  .text            0x0011b4        0x2fc build/default/production/functions4.o
                   0x0011b4                  _first_part
                   0x00121a                  _tmr_setup_period
@@ -3416,8 +3416,8 @@ __c30_signature
                   0x00141c                  _tmr_wait_ms
                   0x00143e                  _algorithm
                   0x00144a                  _tmr_setup_period_alternative
- .text            0x0014b0        0x1aa build/default/production/newmainXC16_4.o
+ .text            0x0014b0        0x1ae build/default/production/newmainXC16_4.o
                   0x0014b0                  _main
 
-.dinit            0x00165a         0x32
- .dinit           0x00165a         0x32 data_init
+.dinit            0x00165e         0x32
+ .dinit           0x00165e         0x32 data_init
