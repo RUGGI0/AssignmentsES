@@ -35,10 +35,11 @@
 
 #define TIMER1 1
 #define TIMER2 2
-#define SIZE 128
+#define SIZE 256
 
 void assignment_1();
 void assignment_2();
+unsigned int auxiliary_spi_write(unsigned int adr, unsigned int data, int r_w);
 unsigned int spi_write(unsigned int data);
 void tmr_setup_period(int timer, int ms);
 void tmr_wait_ms(int timer, int ms);

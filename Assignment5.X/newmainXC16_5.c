@@ -7,6 +7,8 @@
 
 
 #include "xc.h"
+#include <stdio.h>
+#include "functions5.h"
 
 int main(void) {
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
@@ -15,27 +17,36 @@ int main(void) {
     TRISAbits.TRISA1 = 1; // MISO (input)
     TRISFbits.TRISF12 = 0; // SCK (clock)(output)
     TRISFbits.TRISF13 = 0; // MOSI (output)
-    TRISBbits.TRISB3 = 0; // CS1 (input)
-    TRISBbits.TRISB4 = 0; // CS2 (input)
-    TRISCbits.TRISC1 = 0; // CS3 (input)
+    TRISBbits.TRISB3 = 0; // CS1 (output)
+    TRISBbits.TRISB4 = 0; // CS2 (output)
+    TRISDbits.TRISD6 = 0; // CS3 (output)
     
     // pin mapping
     RPINR20bits.SDI1R = 17; // RPI17 -> MISO (SDI1)
-    RPOR11bits.RP108R = 000110; // RF12 -> SCK1 (clock)
-    RPOR12bits.RP109R = 000101; // RF13 -> MOSI (SDO1)
+    RPOR11bits.RP108R = 0b000110; // RF12 -> SCK1 (clock)
+    RPOR12bits.RP109R = 0b000101; // RF13 -> MOSI (SDO1)
     
     // setting SPI
+    IFS0bits.SPI1IF = 0;
+    IEC0bits.SPI1IE = 0;
+    
+    SPI1CON1bits.DISSCK = 0;
+    SPI1CON1bits.DISSDO = 0;
+    SPI1CON1bits.SMP = 0;
+    SPI1CON1bits.CKE = 1;
+    SPI1CON1bits.CKP = 0;
+    
     SPI1CON1bits.MSTEN = 1; // master mode on
-    SPI1CON1bits.PPRE = 3; // primary prescaler 1:1
-    SPI1CON1bits.SPRE = 3; // primary prescaler 5:1
+    SPI1CON1bits.PPRE = 2; // primary prescaler 4:1
+    SPI1CON1bits.SPRE = 6; // primary prescaler 4:1
+    // 4.5MHZ clock for SPI (Fcy/16 -> 72MHz/16)
     SPI1CON1bits.MODE16 = 0; // 8-bit data communication
-    SPI1CON1bits.CKP = 1; // idle clock value is one
     SPI1STATbits.SPIEN = 1; // enable SPI
     
     // selecting chip (magnetometer)
     LATBbits.LATB3 = 1; // accelerometers (off)
     LATBbits.LATB4 = 1; // gyroscope (off)
-    LATCbits.LATC1 = 0; // magnetometer (on)
+    LATDbits.LATD6 = 1; // magnetometer (on)
     
     // ----* Configure UART *---- //
     TRISDbits.TRISD0 = 0; // Tx in output
@@ -54,7 +65,7 @@ int main(void) {
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
     
-    assignment_1();
+    //assignment_1();
     
     assignment_2();
     
