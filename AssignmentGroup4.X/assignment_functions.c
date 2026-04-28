@@ -154,6 +154,13 @@ int get_accelerometer_value(unsigned int adr){
     return data;
 }
 
+void set_accelerometer_bandwidth(unsigned int input){
+    LATBbits.LATB3 = 0;
+    spi_write(0x10);
+    spi_write(input);
+    LATBbits.LATB3 = 1;
+}
+
 unsigned int spi_write(unsigned int data){
     // writing data provided
     while(SPI1STATbits.SPITBF == 1); // wait until Tx buffer is empty
@@ -166,7 +173,6 @@ unsigned int spi_write(unsigned int data){
 }
 
 void send_error_to_uart(){
-    
     char msg[SIZE] = "$ERR,1*";
     for(int i = 0;i<SIZE;i++){
         if(msg[i] == '\0'){
@@ -174,6 +180,8 @@ void send_error_to_uart(){
         }
         buffer_write(&tx_buffer,msg[i]);
     }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
 }
 
 // ISR redefinition for UART1 Rx register
@@ -191,10 +199,15 @@ void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
     IFS0bits.U1TXIF = 0;
     
     // Reading all characters in the circular buffer buffer (until empty) and writing them in the Tx buffer
-    if(!buffer_is_empty(&tx_buffer)){
+    while(U1STAbits.UTXBF == 0 && !buffer_is_empty(&tx_buffer)){
         // checking if there is anything to send, since the interrupt will trigger right after enabling U1TX
-        while(U1STAbits.UTXBF == 0){ // Tx buffer is not full
-            buffer_read(&tx_buffer, U1TXREG);
-        }
+       // Tx buffer is not full, at least one more char can be written
+            char c;
+            buffer_read(&tx_buffer, &c);
+            U1TXREG = c;
+    }
+    
+    if(buffer_is_empty(&tx_buffer)){
+        IEC0bits.U1TXIE = 0; // disable interrupt to avoid multiple triggers
     }
 }

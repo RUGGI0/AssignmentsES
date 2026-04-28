@@ -66,6 +66,8 @@ int buffer_read(volatile CircularBuffer* cb, char* c);
 int buffer_write(volatile CircularBuffer* cb, char c);
 unsigned int spi_write(unsigned int data);
 int get_accelerometer_value(unsigned int adr);
+void send_error_to_uart();
+void set_accelerometer_bandwidth(unsigned int input);
 
 
 

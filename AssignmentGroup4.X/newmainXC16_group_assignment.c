@@ -14,7 +14,7 @@ int main(void) {
     
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
     
-    // ----* Configure LD2 ---- //
+    // ----* Configure LD2 *---- //
     TRISGbits.TRISG9 = 0; // LD2 in output
     LATGbits.LATG9 = 0; // initial value of LD2
     
@@ -47,7 +47,6 @@ int main(void) {
     U1STAbits.UTXISEL0 = 0; // Tx interrupt triggers if a char is sent to U1TXREG,
     U1STAbits.UTXISEL1 = 0; // meaning U1TXREG has at least one slot empty ->
     // it will trigger right after enabling U1TX
-    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
     
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
@@ -87,6 +86,7 @@ int main(void) {
     LATBbits.LATB4 = 1; // gyroscope (off)
     LATDbits.LATD6 = 1; // magnetometer (off)
     
+    int yy;
     int ret = -1;
     int acc_x = 0;
     int acc_y = 0;
@@ -125,7 +125,7 @@ int main(void) {
                 if(c6 == 'B' && c5 == 'W' && c4 == ',' && c1 == '*'){
                     temp = (c3 - '0')*10 + (c2 - '0');
                     if(temp >= 8 && temp <= 15){
-                        
+                        set_accelerometer_bandwidth(temp);
                     }
                     else{
                         // send error
@@ -135,7 +135,7 @@ int main(void) {
                 if(c6 == 'H' && c5 == 'Z' && c4 == ',' && c1 == '*'){
                     temp = (c3 - '0')*10 + (c2 - '0');
                     if(temp == 0 || temp == 1 || temp == 2 || temp == 5 || temp == 10){
-                        
+                        yy = temp;
                     }
                     else{
                         // send error
@@ -144,9 +144,8 @@ int main(void) {
                 }
             }
         }
-                
-        if(cycle_counter == 50){
-            cycle_counter = 0;
+        
+        if(cycle_counter % 50 == 0){
             LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
         }
         
@@ -161,29 +160,20 @@ int main(void) {
             
             // acquiring z-axis of accelerometer
             acc_z = get_accelerometer_value(0x06);
-            
-            // computing roll and pitch
-            
-            // printing acc values inside the circular buffer
-            char msg[SIZE] = "";
-            sprintf(msg, "$ACC,%d,%d,%d*", acc_x, acc_y, acc_z);
-            for(int i = 0;i<SIZE;i++){
-                if(msg[i] = '\0'){
-                    break;
-                }
-                buffer_write(&tx_buffer,msg[i]);
-            }
-            // sending to UART acc values at yyHz (need to add yyHz part)
-            while(!buffer_is_empty(&tx_buffer)){
-                // until the Tx buffer is empty keep sending one char to U1TXREG,
-                // this will trigger the interrupt, and send all the data
-                buffer_read(&tx_buffer,U1TXREG);
-            }
+        }
+        
+        if(yy != 0 && cycle_counter % (1000/yy) == 0){
             
         }
+        
+        if(cycle_counter == 1000){
+            cycle_counter = 0;
+        }
+        
         cycle_counter++;
         ret = tmr_wait_period(TIMER1);
     }
+    
     
     return 0;
 }
