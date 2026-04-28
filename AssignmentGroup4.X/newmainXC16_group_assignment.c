@@ -148,8 +148,7 @@ int main(void) {
                 }
             }
         }
-        
-        ret = tmr_wait_period(TIMER1);
+                
         if(cycle_counter == 50){
             cycle_counter = 0;
             LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
@@ -187,8 +186,8 @@ int main(void) {
             
         }
         cycle_counter++;
+        ret = tmr_wait_period(TIMER1);
     }
-    
     
     return 0;
 }
