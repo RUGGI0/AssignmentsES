@@ -7,6 +7,7 @@
 
 
 #include "xc.h"
+#include <stdio.h>
 #include "assignment_functions.h"
 
 int main(void) {
@@ -25,14 +26,29 @@ int main(void) {
     
     // Mapping pins
     RPOR0bits.RP64R = 1; // RD0 (RP64) mapped to UART1 Tx
+    RPINR18bits.U1RXR = 75; // UART1 Rx mapped to RD11
 
     // configuring UART1 to have baud rate = 9600 -> [72 000 000/(16*9600)] - 1
-    U1BRG = 468; // 467.75
+    U1BRG = 468; // 467.75 baud rate = 9600
     U1MODEbits.STSEL = 0; // 1 stop bit
     U1MODEbits.PDSEL = 0; // no parity bits - 8 data bits
     U1MODEbits.ABAUD = 0; // no auto baud rate
     U1MODEbits.BRGH = 0; // low-speed mode
-    IPC3bits.U1TXIP = 0; // priority for Tx (interrupt not needed)
+    
+    // Rx interrupt set up
+    IFS0bits.U1RXIF = 0; // clearing Rx interrupt flag
+    IPC2bits.U1RXIP = 1; // priority for Rx
+    U1STAbits.URXISEL = 0; // interrupt if a character is received
+    IEC0bits.U1RXIE = 1; // enabling interrupt for UART1 Rx
+    
+    // Tx interrupt set up
+    IFS0bits.U1TXIF = 0; // clearing Tx interrupt flag
+    IPC3bits.U1TXIP = 1; // priority for Tx
+    U1STAbits.UTXISEL0 = 0; // Tx interrupt triggers if a char is sent to U1TXREG,
+    U1STAbits.UTXISEL1 = 0; // meaning U1TXREG has at least one slot empty ->
+    // it will trigger right after enabling U1TX
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
+    
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
     
@@ -49,7 +65,7 @@ int main(void) {
     RPOR11bits.RP108R = 0b000110; // RF12 -> SCK1 (clock)
     RPOR12bits.RP109R = 0b000101; // RF13 -> MOSI (SDO1)
     
-    // setting SPI
+    // clearing SPI interrupt
     IFS0bits.SPI1IF = 0;
     IEC0bits.SPI1IE = 0;
     
@@ -85,6 +101,14 @@ int main(void) {
     char c7 = '-';
     volatile CircularBuffer rx_buffer;
     volatile CircularBuffer tx_buffer;
+    
+    buffer_init(&rx_buffer);
+    buffer_init(&tx_buffer);
+    
+    // enable interrupt for UART
+    IEC0bits.U1RXIE = 1; // enable interrupt for Rx
+    IPC2bits.U1RXIP = 1; // priority for Rx
+    
     tmr_setup_period(TIMER1,10);
     
     while(1){
@@ -109,6 +133,7 @@ int main(void) {
                     }
                     else{
                         // send error
+                        send_error_to_uart();
                     }
                 }
                 if(c6 == 'H' && c5 == 'Z' && c4 == ',' && c1 == '*'){
@@ -118,6 +143,7 @@ int main(void) {
                     }
                     else{
                         // send error
+                        send_error_to_uart();
                     }
                 }
             }
@@ -141,7 +167,23 @@ int main(void) {
             // acquiring z-axis of accelerometer
             acc_z = get_accelerometer_value(0x06);
             
+            // computing roll and pitch
             
+            // printing acc values inside the circular buffer
+            char msg[SIZE] = "";
+            sprintf(msg, "$ACC,%d,%d,%d*", acc_x, acc_y, acc_z);
+            for(int i = 0;i<SIZE;i++){
+                if(msg[i] = '\0'){
+                    break;
+                }
+                buffer_write(&tx_buffer,msg[i]);
+            }
+            // sending to UART acc values at yyHz (need to add yyHz part)
+            while(!buffer_is_empty(&tx_buffer)){
+                // until the Tx buffer is empty keep sending one char to U1TXREG,
+                // this will trigger the interrupt, and send all the data
+                buffer_read(&tx_buffer,U1TXREG);
+            }
             
         }
         cycle_counter++;

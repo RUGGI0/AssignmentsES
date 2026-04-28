@@ -9,6 +9,9 @@
 #include "xc.h"
 #include "assignment_functions.h"
 
+volatile CircularBuffer rx_buffer;
+volatile CircularBuffer tx_buffer;
+
 void algorithm(){
     tmr_wait_ms(TIMER2, 7);
 }
@@ -162,11 +165,36 @@ unsigned int spi_write(unsigned int data){
     return data;
 }
 
+void send_error_to_uart(){
+    
+    char msg[SIZE] = "$ERR,1*";
+    for(int i = 0;i<SIZE;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+}
+
+// ISR redefinition for UART1 Rx register
 void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
     IFS0bits.U1RXIF = 0;
     
     // Reading all characters in the Rx buffer (until empty) and writing them in the circular buffer
     while(U1STAbits.URXDA == 1){
         buffer_write(&rx_buffer, U1RXREG);
+    }
+}
+
+// ISR redefinition for UART1 Tx register
+void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
+    IFS0bits.U1TXIF = 0;
+    
+    // Reading all characters in the circular buffer buffer (until empty) and writing them in the Tx buffer
+    if(!buffer_is_empty(&tx_buffer)){
+        // checking if there is anything to send, since the interrupt will trigger right after enabling U1TX
+        while(U1STAbits.UTXBF == 0){ // Tx buffer is not full
+            buffer_read(&tx_buffer, U1TXREG);
+        }
     }
 }
