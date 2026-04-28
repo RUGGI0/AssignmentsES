@@ -105,10 +105,6 @@ int main(void) {
     buffer_init(&rx_buffer);
     buffer_init(&tx_buffer);
     
-    // enable interrupt for UART
-    IEC0bits.U1RXIE = 1; // enable interrupt for Rx
-    IPC2bits.U1RXIP = 1; // priority for Rx
-    
     tmr_setup_period(TIMER1,10);
     
     while(1){
