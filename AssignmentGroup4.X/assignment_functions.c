@@ -7,6 +7,7 @@
 
 
 #include "xc.h"
+#include <stdio.h>
 #include "assignment_functions.h"
 
 volatile CircularBuffer rx_buffer;
@@ -174,6 +175,32 @@ unsigned int spi_write(unsigned int data){
 
 void send_error_to_uart(){
     char msg[SIZE] = "$ERR,1*";
+    for(int i = 0;i<SIZE;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
+}
+
+void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z){
+    char msg[SIZE] = "";
+    sprintf(msg,"$ACC,%d,%d,%d*", acc_x, acc_y, acc_z);
+    for(int i = 0;i<SIZE;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
+}
+
+void send_roll_pitch_to_uart(int roll, int pitch){
+    char msg[SIZE] = "";
+    sprintf(msg,"$ANG,%d,%d*", roll, pitch);
     for(int i = 0;i<SIZE;i++){
         if(msg[i] == '\0'){
             break;

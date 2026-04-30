@@ -7,7 +7,7 @@
 
 
 #include "xc.h"
-#include <stdio.h>
+#include <math.h>
 #include "assignment_functions.h"
 
 int main(void) {
@@ -91,6 +91,7 @@ int main(void) {
     int acc_x = 0;
     int acc_y = 0;
     int acc_z = 0;
+    int roll = 0, pitch = 0;
     int cycle_counter = 0;
     char c1 = '-';
     char c2 = '-';
@@ -160,10 +161,20 @@ int main(void) {
             
             // acquiring z-axis of accelerometer
             acc_z = get_accelerometer_value(0x06);
+            
+            // compute roll and pitch angles
+            roll = atan2(acc_y, acc_z);
+            pitch = atan2(-acc_x,sqrt(acc_y*acc_y + acc_z*acc_z));
         }
         
         if(yy != 0 && cycle_counter % (1000/yy) == 0){
-            
+            // send the x, y, z accelerations
+            send_accelerometer_values_to_uart(acc_x, acc_y, acc_z);
+        }
+        
+        if(cycle_counter % 200 == 0){
+            // frequency of 5Hz to send the computed angles
+            send_roll_pitch_to_uart(roll, pitch);
         }
         
         if(cycle_counter == 1000){

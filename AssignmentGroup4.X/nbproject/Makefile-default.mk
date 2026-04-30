@@ -89,26 +89,26 @@ MP_LINKER_FILE_OPTION=,--script=p33EP256MU810.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/newmainXC16_group_assignment.o: newmainXC16_group_assignment.c  .generated_files/flags/default/e68cab3e8a584ee62925c656fa496960ce303413 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_group_assignment.o: newmainXC16_group_assignment.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_group_assignment.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_group_assignment.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_group_assignment.c  -o ${OBJECTDIR}/newmainXC16_group_assignment.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_group_assignment.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/assignment_functions.o: assignment_functions.c  .generated_files/flags/default/db0bdd300fe27e4667a8a73de73181f65561b740 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/assignment_functions.o: assignment_functions.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/assignment_functions.o.d 
 	@${RM} ${OBJECTDIR}/assignment_functions.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  assignment_functions.c  -o ${OBJECTDIR}/assignment_functions.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/assignment_functions.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
 else
-${OBJECTDIR}/newmainXC16_group_assignment.o: newmainXC16_group_assignment.c  .generated_files/flags/default/10ce784d29cc7a92f0525ee62bb6905150eb6553 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_group_assignment.o: newmainXC16_group_assignment.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_group_assignment.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_group_assignment.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_group_assignment.c  -o ${OBJECTDIR}/newmainXC16_group_assignment.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_group_assignment.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/assignment_functions.o: assignment_functions.c  .generated_files/flags/default/b40c83c60c0e421d535f9d22ce5fc6381369051c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/assignment_functions.o: assignment_functions.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/assignment_functions.o.d 
 	@${RM} ${OBJECTDIR}/assignment_functions.o 

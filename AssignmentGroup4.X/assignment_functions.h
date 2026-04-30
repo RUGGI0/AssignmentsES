@@ -68,6 +68,8 @@ unsigned int spi_write(unsigned int data);
 int get_accelerometer_value(unsigned int adr);
 void send_error_to_uart();
 void set_accelerometer_bandwidth(unsigned int input);
+void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z);
+void send_roll_pitch_to_uart(int roll, int pitch);
 
 
 
