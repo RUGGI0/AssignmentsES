@@ -86,7 +86,7 @@ int main(void) {
     LATBbits.LATB4 = 1; // gyroscope (off)
     LATDbits.LATD6 = 1; // magnetometer (off)
     
-    int yy;
+    int yy = 10;
     int ret = -1;
     int acc_x = 0;
     int acc_y = 0;
@@ -167,12 +167,12 @@ int main(void) {
             pitch = atan2(-acc_x,sqrt(acc_y*acc_y + acc_z*acc_z));
         }
         
-        if(yy != 0 && cycle_counter % (1000/yy) == 0){
+        if(yy != 0 && cycle_counter % (100/yy) == 0){
             // send the x, y, z accelerations
             send_accelerometer_values_to_uart(acc_x, acc_y, acc_z);
         }
         
-        if(cycle_counter % 200 == 0){
+        if(cycle_counter % 20 == 0){
             // frequency of 5Hz to send the computed angles
             send_roll_pitch_to_uart(roll, pitch);
         }
