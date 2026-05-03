@@ -144,14 +144,14 @@ int get_accelerometer_value(unsigned int adr){
     unsigned int output2 = 0;
     LATBbits.LATB3 = 0;
     spi_write(adr | 0x80);
-    output1 = spi_write(0x00); // 0x02
-    output2 = spi_write(0x00); // 0x03
+    output1 = spi_write(0x00); // 0x02 | 0x04 | 0x06
+    output2 = spi_write(0x00); // 0x03 | 0x05 | 0x07
     LATBbits.LATB3 = 1;
 
     output1 = output1 & 0x00F0; // clear last 4 bits
-    output2 = output2 << 8;
+    output2 = output2 << 8; // left shift of 8 bits
     int data = output2 | output1;
-    data = data / 16;
+    data = data / 16; // right shift of 16 bits
     return data;
 }
 
@@ -174,7 +174,7 @@ unsigned int spi_write(unsigned int data){
 }
 
 void send_error_to_uart(){
-    char msg[SIZE] = "$ERR,1*";
+    char msg[SIZE] = "------$ERR,1*-------";
     for(int i = 0;i<SIZE;i++){
         if(msg[i] == '\0'){
             break;
@@ -182,7 +182,7 @@ void send_error_to_uart(){
         buffer_write(&tx_buffer,msg[i]);
     }
     
-    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
 }
 
 void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z){
@@ -225,16 +225,22 @@ void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
 void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
     IFS0bits.U1TXIF = 0;
     
-    // Reading all characters in the circular buffer buffer (until empty) and writing them in the Tx buffer
+    // Reading all characters in the circular buffer buffer (until empty),
+    // and writing them in the Tx buffer until it is full
     while(U1STAbits.UTXBF == 0 && !buffer_is_empty(&tx_buffer)){
-        // checking if there is anything to send, since the interrupt will trigger right after enabling U1TX
-       // Tx buffer is not full, at least one more char can be written
+        // - checking if there is anything to send, since the interrupt will trigger right after enabling U1TX
+        // - Tx buffer is not full, at least one more char can be written
             char c;
             buffer_read(&tx_buffer, &c);
             U1TXREG = c;
     }
     
     if(buffer_is_empty(&tx_buffer)){
+        // Tx buffer could be full or not, in any case no more data to send
         IEC0bits.U1TXIE = 0; // disable interrupt to avoid multiple triggers
     }
+    
+    // In case the circular buffer is not empty, the enabler remains set, 
+    // so, as soon as one byte is sent, thus freeing on slot in the Tx buffer,
+    // the interrupt will trigger again
 }

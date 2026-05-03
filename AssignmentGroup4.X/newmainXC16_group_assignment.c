@@ -15,6 +15,10 @@ int main(void) {
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
     
     // ----* Configure LD2 *---- //
+    
+    TRISAbits.TRISA0 = 0;
+    LATAbits.LATA0 = 0;
+    
     TRISGbits.TRISG9 = 0; // LD2 in output
     LATGbits.LATG9 = 0; // initial value of LD2
     
@@ -100,8 +104,6 @@ int main(void) {
     char c5 = '-';
     char c6 = '-';
     char c7 = '-';
-    volatile CircularBuffer rx_buffer;
-    volatile CircularBuffer tx_buffer;
     
     buffer_init(&rx_buffer);
     buffer_init(&tx_buffer);
@@ -147,11 +149,13 @@ int main(void) {
         }
         
         if(cycle_counter % 50 == 0){
+            // frequency of 1Hz (every 500ms)
             LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
         }
         
         if(cycle_counter % 2 == 0){
-            // every 50Hz, and triggers at start
+            // frequency of 50Hz (every 20ms), 
+            // and triggers at the beginning (cycle_counter = 0)
             
             // acquiring x-axis of accelerometer
             acc_x = get_accelerometer_value(0x02);
@@ -177,7 +181,7 @@ int main(void) {
             send_roll_pitch_to_uart(roll, pitch);
         }
         
-        if(cycle_counter == 1000){
+        if(cycle_counter == 100){
             cycle_counter = 0;
         }
         
