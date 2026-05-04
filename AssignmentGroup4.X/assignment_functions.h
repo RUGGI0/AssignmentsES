@@ -39,6 +39,11 @@
 #define SIZE 128
 //#define SIZE2 128
 
+// max num caratteri inviati a burst (tutti insime)
+// in Tx 46 caratteri,
+// in Rx 14 (7+7) caratteri (vincoli sull'utente)
+// prova a diminunire la size dei buffer e vedere se messaggi vengono tagliati
+
 typedef struct {
     char buffer[SIZE];
     volatile int head;

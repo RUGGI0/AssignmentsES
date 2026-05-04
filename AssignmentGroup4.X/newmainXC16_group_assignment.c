@@ -116,7 +116,10 @@ int main(void) {
         while(buffer_is_empty(&rx_buffer) == 0){
             char c;
             int temp;
+            IEC0bits.U1RXIE = 0; 
+            // disabling interrupt to ensure rx_buffer data is not inconsistent
             buffer_read(&rx_buffer, &c);
+            IEC0bits.U1RXIE = 1;
             c7 = c6;
             c6 = c5;
             c5 = c4;
@@ -131,7 +134,6 @@ int main(void) {
                         set_accelerometer_bandwidth(temp);
                     }
                     else{
-                        // send error
                         send_error_to_uart();
                     }
                 }
@@ -141,7 +143,6 @@ int main(void) {
                         yy = temp;
                     }
                     else{
-                        // send error
                         send_error_to_uart();
                     }
                 }
@@ -167,8 +168,10 @@ int main(void) {
             acc_z = get_accelerometer_value(0x06);
             
             // compute roll and pitch angles
-            roll = atan2(acc_y, acc_z);
-            pitch = atan2(-acc_x,sqrt(acc_y*acc_y + acc_z*acc_z));
+            
+            // controlla cast implicito da double (atan2) a int (roll/pitch)
+            roll = (int)(atan2(acc_y, acc_z) * (180.0 / 3.14));
+            pitch = (int)(atan2(-acc_x,sqrt((long)(acc_y*acc_y) + (long)(acc_z*acc_z))) * (180.0 / 3.14));
         }
         
         if(yy != 0 && cycle_counter % (100/yy) == 0){

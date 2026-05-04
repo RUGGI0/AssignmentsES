@@ -174,7 +174,7 @@ unsigned int spi_write(unsigned int data){
 }
 
 void send_error_to_uart(){
-    char msg[SIZE] = "------$ERR,1*-------";
+    char msg[SIZE] = "$ERR,1*";
     for(int i = 0;i<SIZE;i++){
         if(msg[i] == '\0'){
             break;
