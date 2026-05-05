@@ -36,16 +36,20 @@
 #define TIMER1 1
 #define TIMER2 2
 
-#define SIZE 128
-//#define SIZE2 128
+#define SIZETX 64
+#define SIZERX 16
 
 // max num caratteri inviati a burst (tutti insime)
-// in Tx 46 caratteri,
+// in Tx 42 caratteri, (20 + 15 + 7) -> limitazione su buffer size minima
 // in Rx 14 (7+7) caratteri (vincoli sull'utente)
+
+// baud rate minima per worst case scenario 2750 (solo roba periodica)
+
 // prova a diminunire la size dei buffer e vedere se messaggi vengono tagliati
 
 typedef struct {
-    char buffer[SIZE];
+    char* buffer; 
+    int size;
     volatile int head;
     volatile int tail;
 } CircularBuffer;
@@ -56,8 +60,10 @@ typedef struct {
     volatile int head;
     volatile int tail;
 } CircularBufferRx;
- * */
+*/
 
+extern char rx_array[SIZERX];
+extern char tx_array[SIZETX];
 extern volatile CircularBuffer rx_buffer;
 extern volatile CircularBuffer tx_buffer;
 
@@ -65,7 +71,7 @@ void algorithm();
 void tmr_setup_period(int timer, int ms);
 void tmr_wait_ms(int timer, int ms);
 int tmr_wait_period(int timer);
-void buffer_init(volatile CircularBuffer* cb);
+void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size);
 int buffer_is_empty(volatile CircularBuffer* cb);
 int buffer_read(volatile CircularBuffer* cb, char* c);
 int buffer_write(volatile CircularBuffer* cb, char c);

@@ -32,8 +32,8 @@ int main(void) {
     RPOR0bits.RP64R = 1; // RD0 (RP64) mapped to UART1 Tx
     RPINR18bits.U1RXR = 75; // UART1 Rx mapped to RD11
 
-    // configuring UART1 to have baud rate = 9600 -> [72 000 000/(16*9600)] - 1
-    U1BRG = 468; // 467.75 baud rate = 9600
+    // configuring UART1 to have baud rate = 4800 -> [72 000 000/(16*4800)] - 1
+    U1BRG = 937; // 936.5 baud rate = 4800
     U1MODEbits.STSEL = 0; // 1 stop bit
     U1MODEbits.PDSEL = 0; // no parity bits - 8 data bits
     U1MODEbits.ABAUD = 0; // no auto baud rate
@@ -97,6 +97,7 @@ int main(void) {
     int acc_z = 0;
     int roll = 0, pitch = 0;
     int cycle_counter = 0;
+    int miss_counter = 0;
     char c1 = '-';
     char c2 = '-';
     char c3 = '-';
@@ -105,8 +106,8 @@ int main(void) {
     char c6 = '-';
     char c7 = '-';
     
-    buffer_init(&rx_buffer);
-    buffer_init(&tx_buffer);
+    buffer_init(&rx_buffer, rx_array, SIZERX);
+    buffer_init(&tx_buffer, tx_array, SIZETX);
     
     tmr_setup_period(TIMER1,10);
     
@@ -169,16 +170,16 @@ int main(void) {
             
             // compute roll and pitch angles
             
-            // controlla cast implicito da double (atan2) a int (roll/pitch)
             roll = (int)(atan2(acc_y, acc_z) * (180.0 / 3.14));
-            pitch = (int)(atan2(-acc_x,sqrt((long)(acc_y*acc_y) + (long)(acc_z*acc_z))) * (180.0 / 3.14));
+            pitch = (int)(atan2(-acc_x, sqrt((long)acc_y * (long)acc_y + (long)acc_z * (long)acc_z)) * (180.0 / 3.14));
         }
-        
+        // max char 20
         if(yy != 0 && cycle_counter % (100/yy) == 0){
             // send the x, y, z accelerations
             send_accelerometer_values_to_uart(acc_x, acc_y, acc_z);
         }
         
+        // max char 15
         if(cycle_counter % 20 == 0){
             // frequency of 5Hz to send the computed angles
             send_roll_pitch_to_uart(roll, pitch);
@@ -190,6 +191,8 @@ int main(void) {
         
         cycle_counter++;
         ret = tmr_wait_period(TIMER1);
+        
+        miss_counter = miss_counter + ret;
     }
     
     

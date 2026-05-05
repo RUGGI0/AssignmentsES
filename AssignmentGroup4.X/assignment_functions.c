@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include "assignment_functions.h"
 
+char rx_array[SIZERX];
+char tx_array[SIZETX];
 volatile CircularBuffer rx_buffer;
 volatile CircularBuffer tx_buffer;
 
@@ -111,7 +113,9 @@ int tmr_wait_period(int timer){
     return temp;
 }
 
-void buffer_init(volatile CircularBuffer* cb) {
+void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
+    cb->buffer = array_ptr; 
+    cb->size = max_size;
     cb->head = 0;
     cb->tail = 0;
 }
@@ -121,7 +125,7 @@ int buffer_is_empty(volatile CircularBuffer* cb) {
 }
 
 int buffer_write(volatile CircularBuffer* cb, char c) {
-    int next = (cb->head + 1) % SIZE;
+    int next = (cb->head + 1) % cb->size;
     if (next == cb->tail) {
         return -1; // Buffer is full
     }
@@ -135,7 +139,7 @@ int buffer_read(volatile CircularBuffer* cb, char* c) {
         return -1; // Buffer is empty
     }
     *c = cb->buffer[cb->tail];
-    cb->tail = (cb->tail + 1) % SIZE;
+    cb->tail = (cb->tail + 1) % cb->size;
     return 0;
 }
 
@@ -174,8 +178,8 @@ unsigned int spi_write(unsigned int data){
 }
 
 void send_error_to_uart(){
-    char msg[SIZE] = "$ERR,1*";
-    for(int i = 0;i<SIZE;i++){
+    char msg[8] = "$ERR,1*";
+    for(int i = 0;i<8;i++){
         if(msg[i] == '\0'){
             break;
         }
@@ -186,9 +190,9 @@ void send_error_to_uart(){
 }
 
 void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z){
-    char msg[SIZE] = "";
+    char msg[24] = "";
     sprintf(msg,"$ACC,%d,%d,%d*", acc_x, acc_y, acc_z);
-    for(int i = 0;i<SIZE;i++){
+    for(int i = 0;i<24;i++){
         if(msg[i] == '\0'){
             break;
         }
@@ -199,9 +203,9 @@ void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z){
 }
 
 void send_roll_pitch_to_uart(int roll, int pitch){
-    char msg[SIZE] = "";
+    char msg[16] = "";
     sprintf(msg,"$ANG,%d,%d*", roll, pitch);
-    for(int i = 0;i<SIZE;i++){
+    for(int i = 0;i<16;i++){
         if(msg[i] == '\0'){
             break;
         }
