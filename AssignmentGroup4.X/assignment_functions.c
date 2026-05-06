@@ -120,6 +120,8 @@ void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
     cb->tail = 0;
 }
 
+
+
 int buffer_is_empty(volatile CircularBuffer* cb) {
     return cb->head == cb->tail;
 }
@@ -205,6 +207,19 @@ void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z){
 void send_roll_pitch_to_uart(int roll, int pitch){
     char msg[16] = "";
     sprintf(msg,"$ANG,%d,%d*", roll, pitch);
+    for(int i = 0;i<16;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt
+}
+
+void send_miss(int miss_counter){
+    char msg[16] = "";
+    sprintf(msg,"+++%d++*", miss_counter);
     for(int i = 0;i<16;i++){
         if(msg[i] == '\0'){
             break;

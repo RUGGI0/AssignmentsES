@@ -43,7 +43,11 @@
 // in Tx 42 caratteri, (20 + 15 + 7) -> limitazione su buffer size minima
 // in Rx 14 (7+7) caratteri (vincoli sull'utente)
 
-// baud rate minima per worst case scenario 2750 (solo roba periodica)
+// baud rate minima per worst case scenario 2750 (solo roba periodica) 
+// 10 Hz massimo per Acc message (20 char)
+// 5 Hz costante per Ang message (15 char)
+// 200 + 75 = 275 char al secondo
+// per ogni char -> 10 bit -> baud rate >= 275*10 = 2750
 
 // prova a diminunire la size dei buffer e vedere se messaggi vengono tagliati
 
@@ -81,6 +85,7 @@ void send_error_to_uart();
 void set_accelerometer_bandwidth(unsigned int input);
 void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z);
 void send_roll_pitch_to_uart(int roll, int pitch);
+void send_miss(int miss_counter);
 
 
 

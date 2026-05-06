@@ -150,14 +150,15 @@ int main(void) {
             }
         }
         
-        if(cycle_counter % 50 == 0){
+        if((cycle_counter + 6) % 50 == 0){
+            // (cycle_counter = 44 94)
             // frequency of 1Hz (every 500ms)
             LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
         }
         
-        if(cycle_counter % 2 == 0){
-            // frequency of 50Hz (every 20ms), 
-            // and triggers at the beginning (cycle_counter = 0)
+        if((cycle_counter + 1) % 2 == 0){
+            // (cycle-counter : odd)
+            // frequency of 50Hz (every 20ms)
             
             // acquiring x-axis of accelerometer
             acc_x = get_accelerometer_value(0x02);
@@ -168,25 +169,30 @@ int main(void) {
             // acquiring z-axis of accelerometer
             acc_z = get_accelerometer_value(0x06);
             
-            // compute roll and pitch angles
-            
-            roll = (int)(atan2(acc_y, acc_z) * (180.0 / 3.14));
-            pitch = (int)(atan2(-acc_x, sqrt((long)acc_y * (long)acc_y + (long)acc_z * (long)acc_z)) * (180.0 / 3.14));
         }
         // max char 20
         if(yy != 0 && cycle_counter % (100/yy) == 0){
+            // (cycle_counter yy=10 : 0 10 20 30 40 50 60 70 80 90 100)
+            // (cycle_counter yy=5 : 0 20 40 60 80 100)
+            // (cycle_counter yy=2 : 0 50 100)
+            // (cycle_counter yy=1 : 0 100)
             // send the x, y, z accelerations
             send_accelerometer_values_to_uart(acc_x, acc_y, acc_z);
         }
         
         // max char 15
-        if(cycle_counter % 20 == 0){
-            // frequency of 5Hz to send the computed angles
+        if((cycle_counter + 3) % 20 == 0){
+            // frequency of 5Hz 
+            // (cycle_counter = 17 37 57 77 97)
+            // compute roll and pitch angles and send them
+            roll = (int)(atan2(acc_y, acc_z) * (180.0 / 3.14));
+            pitch = (int)(atan2(-acc_x, sqrt((long)acc_y * (long)acc_y + (long)acc_z * (long)acc_z)) * (180.0 / 3.14));
             send_roll_pitch_to_uart(roll, pitch);
         }
         
-        if(cycle_counter == 100){
+        if(cycle_counter == 500){
             cycle_counter = 0;
+            send_miss(miss_counter);
         }
         
         cycle_counter++;
