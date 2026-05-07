@@ -32,8 +32,8 @@ int main(void) {
     RPOR0bits.RP64R = 1; // RD0 (RP64) mapped to UART1 Tx
     RPINR18bits.U1RXR = 75; // UART1 Rx mapped to RD11
 
-    // configuring UART1 to have baud rate = 4800 -> [72 000 000/(16*4800)] - 1
-    U1BRG = 937; // 936.5 baud rate = 4800
+    // configuring UART1 to have baud rate = 9600 -> [72 000 000/(16*9600)] - 1
+    U1BRG = 468; // 467.75 baud rate = 9600
     U1MODEbits.STSEL = 0; // 1 stop bit
     U1MODEbits.PDSEL = 0; // no parity bits - 8 data bits
     U1MODEbits.ABAUD = 0; // no auto baud rate

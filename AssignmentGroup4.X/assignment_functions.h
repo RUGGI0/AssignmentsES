@@ -41,7 +41,6 @@
 
 // max num caratteri inviati a burst (tutti insime)
 // in Tx 42 caratteri, (20 + 15 + 7) -> limitazione su buffer size minima
-// in Rx 14 (7+7) caratteri (vincoli sull'utente)
 
 // baud rate minima per worst case scenario 2750 (solo roba periodica) 
 // 10 Hz massimo per Acc message (20 char)
@@ -49,7 +48,7 @@
 // 200 + 75 = 275 char al secondo
 // per ogni char -> 10 bit -> baud rate >= 275*10 = 2750
 
-// prova a diminunire la size dei buffer e vedere se messaggi vengono tagliati
+// con baud rate a 9600 al massimo tra un ciclo e l'altro (dove controlla rx_buffer) possono arrivare al massimo 9 char -> SIZERX : 16
 
 typedef struct {
     char* buffer; 
@@ -57,14 +56,6 @@ typedef struct {
     volatile int head;
     volatile int tail;
 } CircularBuffer;
-
-/*
-typedef struct {
-    char buffer[SIZE2];
-    volatile int head;
-    volatile int tail;
-} CircularBufferRx;
-*/
 
 extern char rx_array[SIZERX];
 extern char tx_array[SIZETX];

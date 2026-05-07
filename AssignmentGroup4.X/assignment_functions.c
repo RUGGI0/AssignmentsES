@@ -121,7 +121,6 @@ void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
 }
 
 
-
 int buffer_is_empty(volatile CircularBuffer* cb) {
     return cb->head == cb->tail;
 }
