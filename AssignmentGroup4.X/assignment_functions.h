@@ -1,54 +1,28 @@
-/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
- * and any derivatives exclusively with Microchip products. 
- * 
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
- * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
- * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
- *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
- * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
- * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *
- * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
- * TERMS. 
- */
-
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
- */
-
-// This is a guard condition so that contents of this file are not included
-// more than once.  
-#ifndef XC_HEADER_TEMPLATE_H
-#define	XC_HEADER_TEMPLATE_H
+#ifndef ASSIGNMENTGROUP4_FUNCTIONS_H
+#define	ASSIGNMENTGROUP4_FUNCTIONS_H
 
 #include <xc.h> 
 
 #define TIMER1 1
 #define TIMER2 2
 
-#define SIZETX 64
-#define SIZERX 16
+// ---* Baud Rate configuration *---
+// lowest baud rate necessary in worst case scenario is 2750 (considering only periodic messages):
+// - ACC message sent at maximum 10 Hz (20 char) -> 200 char/s
+// - ANG message sent at maximum 5 Hz (15 char) -> 75 char/s
+// total = (200 + 75) char/s = 275 char/s
+// UART protocol uses 10 bit for each char -> 275 * 10 = 2750 char/s
+// We choose a baud rate of 9600 to guarantee that at least 9 char are received in a main cycle (10 ms) (see line 23)
 
-// max num caratteri inviati a burst (tutti insime)
-// in Tx 42 caratteri, (20 + 15 + 7) -> limitazione su buffer size minima
+#define SIZETX 64 // Tx buffer size -> maximum number of char in a single burst is 42:
+// - highest amount of char composing a gravitational acceleration message is 20
+// - highest amount of char composing a pitch-roll measurement message is 15 
+// - highest amount of char composing an error message is 7
+// this ensures all chars to be sent are saved in the buffer without loss
 
-// baud rate minima per worst case scenario 2750 (solo roba periodica) 
-// 10 Hz massimo per Acc message (20 char)
-// 5 Hz costante per Ang message (15 char)
-// 200 + 75 = 275 char al secondo
-// per ogni char -> 10 bit -> baud rate >= 275*10 = 2750
-
-// con baud rate a 9600 al massimo tra un ciclo e l'altro (dove controlla rx_buffer) possono arrivare al massimo 9 char -> SIZERX : 16
+#define SIZERX 16 // Rx buffer size -> with baud rate = 9600
+// the maximum amount of char received in a main cycle (10 ms) is 9
+// (quantity measured in worst case scenario: char delivered at line 144 of main file)
 
 typedef struct {
     char* buffer; 
@@ -76,9 +50,9 @@ void send_error_to_uart();
 void set_accelerometer_bandwidth(unsigned int input);
 void send_accelerometer_values_to_uart(int acc_x, int acc_y, int acc_z);
 void send_roll_pitch_to_uart(int roll, int pitch);
-void send_miss(int miss_counter);
 
+// Debug function to send on UART number of misses on TIMER1
+//void send_miss(int miss_counter);
 
-
-#endif	/* XC_HEADER_TEMPLATE_H */
+#endif
 

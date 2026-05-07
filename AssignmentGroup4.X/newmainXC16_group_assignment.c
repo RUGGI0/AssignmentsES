@@ -1,11 +1,3 @@
-/*
- * File:   newmainXC16_group_assignment.c
- * Author: gregd
- *
- * Created on April 27, 2026, 1:55 PM
- */
-
-
 #include "xc.h"
 #include <math.h>
 #include "assignment_functions.h"
@@ -15,7 +7,6 @@ int main(void) {
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
     
     // ----* Configure LD2 *---- //
-    
     TRISAbits.TRISA0 = 0;
     LATAbits.LATA0 = 0;
     
@@ -118,7 +109,7 @@ int main(void) {
             char c;
             int temp;
             IEC0bits.U1RXIE = 0; 
-            // disabling interrupt to ensure rx_buffer data is not inconsistent
+            // disabling interrupt before using rx_buffer to ensure it is not accessed inside U1RXInterrupt at the same time
             buffer_read(&rx_buffer, &c);
             IEC0bits.U1RXIE = 1;
             c7 = c6;
@@ -135,6 +126,7 @@ int main(void) {
                         set_accelerometer_bandwidth(temp);
                     }
                     else{
+                        // incorrect message received
                         send_error_to_uart();
                     }
                 }
@@ -144,6 +136,7 @@ int main(void) {
                         yy = temp;
                     }
                     else{
+                        // incorrect message received
                         send_error_to_uart();
                     }
                 }
@@ -151,14 +144,17 @@ int main(void) {
         }
         
         if((cycle_counter + 6) % 50 == 0){
-            // (cycle_counter = 44 94)
-            // frequency of 1Hz (every 500ms)
+            // frequency of 1Hz with an offset of 6 cycles to avoid simultaneous send (in same main cycle)
+            // with other if conditions, so to prevent eventual misses on TIMER1 from triggering 
+            // fires with cycle_counter: 44 94
+            
             LATGbits.LATG9 = !LATGbits.LATG9; // toggle LD2
         }
         
         if((cycle_counter + 1) % 2 == 0){
-            // (cycle-counter : odd)
-            // frequency of 50Hz (every 20ms)
+            // frequency of 50Hz with an offset of 1 cycles to avoid simultaneous send (in same main cycle)
+            // with other if conditions, so to prevent eventual misses on TIMER1 from triggering
+            // fires with odd values of cycle_counter
             
             // acquiring x-axis of accelerometer
             acc_x = get_accelerometer_value(0x02);
@@ -172,27 +168,35 @@ int main(void) {
         }
         // max char 20
         if(yy != 0 && cycle_counter % (100/yy) == 0){
-            // (cycle_counter yy=10 : 0 10 20 30 40 50 60 70 80 90 100)
-            // (cycle_counter yy=5 : 0 20 40 60 80 100)
-            // (cycle_counter yy=2 : 0 50 100)
-            // (cycle_counter yy=1 : 0 100)
-            // send the x, y, z accelerations
+            // frequency dependent on yy
+            // fires in these situations:
+            // - in case yy=10 with cycle_counter: 0 10 20 30 40 50 60 70 80 90 100
+            // - in case yy=5 with cycle_counter: 0 20 40 60 80 100
+            // - in case yy=2 with cycle_counter: 0 50 100
+            // - in case yy=1 with cycle_counter: 0 100
+            // if yy=0 messages disabled
+            
+            // send to UART the x, y, z accelerations
             send_accelerometer_values_to_uart(acc_x, acc_y, acc_z);
         }
         
         // max char 15
         if((cycle_counter + 3) % 20 == 0){
-            // frequency of 5Hz 
-            // (cycle_counter = 17 37 57 77 97)
-            // compute roll and pitch angles and send them
+            // frequency of 5Hz with an offset of 3 cycles to avoid simultaneous send (in same main cycle)
+            // with other if conditions, so to prevent eventual misses on TIMER1 from triggering
+            // fires with cycle_counter: 17 37 57 77 97
+            
+            // compute roll and pitch angles and send them to UART
             roll = (int)(atan2(acc_y, acc_z) * (180.0 / 3.14));
             pitch = (int)(atan2(-acc_x, sqrt((long)acc_y * (long)acc_y + (long)acc_z * (long)acc_z)) * (180.0 / 3.14));
             send_roll_pitch_to_uart(roll, pitch);
         }
         
         if(cycle_counter == 100){
+            // cycle_counter reseted to avoid overflow
+            
             cycle_counter = 0;
-           // send_miss(miss_counter); // debug function
+           // send_miss(miss_counter); // see line 53 on assignment_functions.h
         }
         
         cycle_counter++;

@@ -1,11 +1,3 @@
-/*
- * File:   assignment_functions.c
- * Author: gregd
- *
- * Created on April 27, 2026, 1:59 PM
- */
-
-
 #include "xc.h"
 #include <stdio.h>
 #include "assignment_functions.h"
@@ -120,7 +112,6 @@ void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
     cb->tail = 0;
 }
 
-
 int buffer_is_empty(volatile CircularBuffer* cb) {
     return cb->head == cb->tail;
 }
@@ -217,9 +208,10 @@ void send_roll_pitch_to_uart(int roll, int pitch){
 }
 
 /*
+// see line 53 on assignment_functions.h
 void send_miss(int miss_counter){
     char msg[16] = "";
-    sprintf(msg,"+++%d++*", miss_counter);
+    sprintf(msg,"$MNUM%d*", miss_counter);
     for(int i = 0;i<16;i++){
         if(msg[i] == '\0'){
             break;
