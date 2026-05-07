@@ -190,9 +190,9 @@ int main(void) {
             send_roll_pitch_to_uart(roll, pitch);
         }
         
-        if(cycle_counter == 500){
+        if(cycle_counter == 100){
             cycle_counter = 0;
-            send_miss(miss_counter);
+           // send_miss(miss_counter); // debug function
         }
         
         cycle_counter++;

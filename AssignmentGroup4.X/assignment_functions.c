@@ -216,6 +216,7 @@ void send_roll_pitch_to_uart(int roll, int pitch){
     IEC0bits.U1TXIE = 1; // enabling Tx interrupt
 }
 
+/*
 void send_miss(int miss_counter){
     char msg[16] = "";
     sprintf(msg,"+++%d++*", miss_counter);
@@ -228,6 +229,7 @@ void send_miss(int miss_counter){
     
     IEC0bits.U1TXIE = 1; // enabling Tx interrupt
 }
+*/
 
 // ISR redefinition for UART1 Rx register
 void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
