@@ -82,7 +82,7 @@ int main(void) {
     LATDbits.LATD6 = 1; // magnetometer (off)
     
     int yy = 10;
-    int ret = -1;
+    int ret = 0;
     int acc_x = 0;
     int acc_y = 0;
     int acc_z = 0;
@@ -196,7 +196,7 @@ int main(void) {
             // cycle_counter reseted to avoid overflow
             
             cycle_counter = 0;
-           // send_miss(miss_counter); // see line 53 on assignment_functions.h
+           // send_miss(miss_counter); // see line 62 on assignment_functions.h
         }
         
         cycle_counter++;
