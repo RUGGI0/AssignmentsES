@@ -82,7 +82,7 @@ int main(void) {
     LATDbits.LATD6 = 1; // magnetometer (off)
     
     int yy = 10;
-    int ret = 0;
+    int ret = -1;
     int acc_x = 0;
     int acc_y = 0;
     int acc_z = 0;
@@ -144,7 +144,7 @@ int main(void) {
         }
         
         if((cycle_counter + 6) % 50 == 0){
-            // frequency of 2Hz with an offset of 6 cycles to avoid simultaneous send (in same main cycle)
+            // frequency of 1Hz with an offset of 6 cycles to avoid simultaneous send (in same main cycle)
             // with other if conditions, so to prevent eventual misses on TIMER1 from triggering 
             // fires with cycle_counter: 44 94
             
@@ -166,7 +166,7 @@ int main(void) {
             acc_z = get_accelerometer_value(0x06);
             
         }
-        
+        // max char 20
         if(yy != 0 && cycle_counter % (100/yy) == 0){
             // frequency dependent on yy
             // fires in these situations:
@@ -180,6 +180,7 @@ int main(void) {
             send_accelerometer_values_to_uart(acc_x, acc_y, acc_z);
         }
         
+        // max char 15
         if((cycle_counter + 3) % 20 == 0){
             // frequency of 5Hz with an offset of 3 cycles to avoid simultaneous send (in same main cycle)
             // with other if conditions, so to prevent eventual misses on TIMER1 from triggering
@@ -195,7 +196,7 @@ int main(void) {
             // cycle_counter reseted to avoid overflow
             
             cycle_counter = 0;
-           // send_miss(miss_counter); // see line 55 on assignment_functions.h
+           // send_miss(miss_counter); // see line 53 on assignment_functions.h
         }
         
         cycle_counter++;
