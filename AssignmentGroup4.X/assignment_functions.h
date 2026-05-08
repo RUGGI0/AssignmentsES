@@ -11,8 +11,8 @@
 // - ACC message sent at maximum 10 Hz (20 char) -> 200 char/s
 // - ANG message sent at maximum 5 Hz (15 char) -> 75 char/s
 // total = (200 + 75) char/s = 275 char/s
-// UART protocol uses 10 bit for each char -> 275 * 10 = 2750 char/s
-// We choose a baud rate of 9600 to guarantee that at least 9 char are received in a main cycle (10 ms) (see line 23)
+// UART protocol uses 10 bit for each char -> 275 * 10 = 2750 bit/s
+// We choose a baud rate of 9600 to guarantee that at maximum 9 char are received in a main cycle (10 ms) (see line 23)
 
 #define SIZETX 64 // Tx buffer size -> maximum number of char in a single burst is 42:
 // - highest amount of char composing a gravitational acceleration message is 20
