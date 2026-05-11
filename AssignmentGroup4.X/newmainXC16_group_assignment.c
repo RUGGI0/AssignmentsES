@@ -67,7 +67,7 @@ int main(void) {
     SPI1CON1bits.DISSDO = 0;
     SPI1CON1bits.SMP = 0;
     SPI1CON1bits.CKE = 1;
-    SPI1CON1bits.CKP = 0;
+    SPI1CON1bits.CKP = 1;
     
     SPI1CON1bits.MSTEN = 1; // master mode on
     SPI1CON1bits.PPRE = 2; // primary prescaler 4:1
@@ -81,6 +81,7 @@ int main(void) {
     LATBbits.LATB4 = 1; // gyroscope (off)
     LATDbits.LATD6 = 1; // magnetometer (off)
     
+    set_accelerometer_bandwidth(15);
     int yy = 10;
     int ret = 0;
     int acc_x = 0;
@@ -144,7 +145,7 @@ int main(void) {
         }
         
         if((cycle_counter + 6) % 50 == 0){
-            // frequency of 1Hz with an offset of 6 cycles to avoid simultaneous send (in same main cycle)
+            // frequency of 2Hz with an offset of 6 cycles to avoid simultaneous send (in same main cycle)
             // with other if conditions, so to prevent eventual misses on TIMER1 from triggering 
             // fires with cycle_counter: 44 94
             
