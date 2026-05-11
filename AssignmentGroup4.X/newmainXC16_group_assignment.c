@@ -66,7 +66,7 @@ int main(void) {
     SPI1CON1bits.DISSCK = 0;
     SPI1CON1bits.DISSDO = 0;
     SPI1CON1bits.SMP = 0;
-    SPI1CON1bits.CKE = 1;
+    SPI1CON1bits.CKE = 0;
     SPI1CON1bits.CKP = 1;
     
     SPI1CON1bits.MSTEN = 1; // master mode on
