@@ -89,26 +89,26 @@ MP_LINKER_FILE_OPTION=,--script=p33EP512MU810.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/functions6.o: functions6.c  .generated_files/flags/default/7f732de599239fe8b94b35d8b6a263b27411a5db .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/functions6.o: functions6.c  .generated_files/flags/default/adce4de0c3577e4a00bc0ae35a73a43820b2f2b6 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/functions6.o.d 
 	@${RM} ${OBJECTDIR}/functions6.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  functions6.c  -o ${OBJECTDIR}/functions6.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/functions6.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/newmainXC16_6.o: newmainXC16_6.c  .generated_files/flags/default/4b228cd0ead01813e08717e4b7b48214be32c551 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_6.o: newmainXC16_6.c  .generated_files/flags/default/d2762244785ed66558d7503e2e1a612494e295f2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_6.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_6.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_6.c  -o ${OBJECTDIR}/newmainXC16_6.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_6.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
 else
-${OBJECTDIR}/functions6.o: functions6.c  .generated_files/flags/default/46ce5cb83ddd80ba3d46bfa2689a55d0f2c9447b .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/functions6.o: functions6.c  .generated_files/flags/default/ba38f533e636d762e18477aa41dfa9136f3aab2a .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/functions6.o.d 
 	@${RM} ${OBJECTDIR}/functions6.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  functions6.c  -o ${OBJECTDIR}/functions6.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/functions6.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/newmainXC16_6.o: newmainXC16_6.c  .generated_files/flags/default/ba2edda9bf826ae79d7644e74bef7a7d24efbffe .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_6.o: newmainXC16_6.c  .generated_files/flags/default/bf86eaf7482c57f81de32246042251e5df50110e .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_6.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_6.o 

@@ -69,26 +69,29 @@ void part_1_assignment(){
     long value = 0;
     long Vbattery_mV = 0;
     int cycle_counter = 0;
+    int ret;
     
-    while(1){
-        AD1CON1bits.DONE = 0; // ensuring done bit is zero before sampling
-        AD1CON1bits.SAMP = 1; // starting sampling
-        tmr_wait_ms(TIMER1,1); // wait sampling time (few micro seconds)
-        AD1CON1bits.SAMP = 0; // starting conversion
-        while(AD1CON1bits.DONE == 0); // waiting for conversion to finish
-        value = ADC1BUF0; // reading result (0-1023)
-        
-        // converting to correct value:
-        // Vbattery = (value/1023)*Vrefh*k (Volts) (where k is coefficient from voltage divider)
-        // Vbattery_mV = (value/1023)*Vrefh_mV*k; (milliVolts)
-        Vbattery_mV = (value * 3300L * 3L) / 1023L;
-        cycle_counter++;
-        
-        if(cycle_counter == 500){
+    tmr_setup_period(TIMER2,100);
+    
+    while(1){      
+        if(cycle_counter == 5){
             // roughly executed every 500ms
+            AD1CON1bits.DONE = 0; // ensuring done bit is zero before sampling
+            AD1CON1bits.SAMP = 1; // starting sampling
+            tmr_wait_ms(TIMER1,1); // wait sampling time (few micro seconds)
+            AD1CON1bits.SAMP = 0; // starting conversion
+            while(AD1CON1bits.DONE == 0); // waiting for conversion to finish
+            value = ADC1BUF0; // reading result (0-1023)
+
+            // converting to correct value:
+            // Vbattery = (value/1023)*Vrefh*k (Volts) (where k is coefficient from voltage divider)
+            // Vbattery_mV = (value/1023)*Vrefh_mV*k; (milliVolts)
+            Vbattery_mV = (value * 3600L * 3L) / 1023L;
             cycle_counter = 0;
             send_battery_to_uart(Vbattery_mV);
         }
+        cycle_counter++;
+        ret = tmr_wait_period(TIMER2);
     }
 }
 
@@ -139,7 +142,7 @@ void part_2_assignment(){
         
         // converting to correct value:
         // Vsensor = (value/1023)*Vrefh (Volts)
-        Vsensor = ((double)value * 3.3) / 1023.0;
+        Vsensor = ((double)value * 3.6) / 1023.0;
         distance = 2.34 - 4.74*Vsensor + 4.06*pow(Vsensor,2) - 1.6*pow(Vsensor,3) + 0.24*pow(Vsensor,4);
         cycle_counter++;
         
@@ -214,11 +217,11 @@ void part_3_assignment(){
             IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
             // converting AN11 data to correct value (Volts):
             // Vbattery = (AN11_value/1023)*Vrefh*k (Volts) (where k is coefficient from voltage divider)
-            Vbattery += ((double)AN11_value * 3.3 * 3.0) / 1023.0; // cumulative variable to compute average
+            Vbattery += ((double)AN11_value * 3.6 * 3.0) / 1023.0; // cumulative variable to compute average
             
             // converting AN5 data to correct value (centimetres):
             // Vsensor = (AN5_value/1023)*Vrefh (Volts)
-            Vsensor = ((double)AN5_value * 3.3) / 1023.0;
+            Vsensor = ((double)AN5_value * 3.6) / 1023.0;
             IEC0bits.AD1IE = 1; // enabling ADC interrupt again
             
             // applying formula to get distance (meters) registered by sensor
@@ -354,6 +357,23 @@ void tmr_wait_ms(int timer, int ms){
         T1CONbits.TON = 0;
         IFS0bits.T1IF = 0;
     }
+}
+
+int tmr_wait_period(int timer){
+    int temp = 0;
+    if(timer == TIMER2){
+        if(IFS0bits.T2IF == 1){
+            temp = 1;
+        }
+        while(1){
+            if(IFS0bits.T2IF == 1){
+                // flag set
+                IFS0bits.T2IF = 0; // flag cleared
+                break;
+            }
+        }
+    }
+    return temp;
 }
 
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {

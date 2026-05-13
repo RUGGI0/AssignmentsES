@@ -35,6 +35,7 @@ void UART_configuration();
 void tmr_setup_period(int timer, int ms);
 // Function to setup and expire a timer with provided ms (max 200)
 void tmr_wait_ms(int timer, int ms);
+int tmr_wait_period(int timer);
 
 // Functions to manage Tx and Rx buffers
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size);
