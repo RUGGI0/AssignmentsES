@@ -72,10 +72,10 @@ Default Scalar Model: Small
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200               0x1aa           0x27f  (639)
-.text                        0x3aa               0x2c0           0x420  (1056)
-.dinit                       0x66a                 0x8             0xc  (12)
+.text                        0x3aa               0x46e           0x6a5  (1701)
+.dinit                       0x818                 0x8             0xc  (12)
 
-                 Total "program" memory used (bytes):          0x6ab  (1707) <1%
+                 Total "program" memory used (bytes):          0x930  (2352) <1%
 
 
 Auxflash Memory  [Origin = 0x7fc000, Length = 0x3ffa]
@@ -126,13 +126,20 @@ External Symbols in Program Memory (by address):
                   0x000366                  __DefaultInterrupt
                   0x00036c                  ___divsi3
                   0x00038a                  ___udivsi3
-                  0x0003aa                  _OCs_assigning
-                  0x000410                  _tmr_setup_period
-                  0x000542                  _main
+                  0x0003aa                  _OCs_assigning1
+                  0x000410                  _assignment1
+                  0x000448                  _OCs_assigning2
+                  0x0004ae                  _assignment2
+                  0x0004e6                  _OCs_assigning3
+                  0x000514                  _assignment3
+                  0x0005f8                  _tmr_setup_period
+                  0x00072a                  _main
 
 External Symbols in Program Memory (by name):
 
-                  0x0003aa                  _OCs_assigning
+                  0x0003aa                  _OCs_assigning1
+                  0x000448                  _OCs_assigning2
+                  0x0004e6                  _OCs_assigning3
                   0x000366                  __DefaultInterrupt
                   0x0002fa                  __INT1Interrupt
                   0x000338                  __T3Interrupt
@@ -142,8 +149,11 @@ External Symbols in Program Memory (by name):
                   0x000248                  __data_init_extended
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000542                  _main
-                  0x000410                  _tmr_setup_period
+                  0x000410                  _assignment1
+                  0x0004ae                  _assignment2
+                  0x000514                  _assignment3
+                  0x00072a                  _main
+                  0x0005f8                  _tmr_setup_period
 
 Memory Configuration
 
@@ -254,37 +264,37 @@ __FUID0
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x32b8
+.debug_info       0x000000       0x343d
  *(.debug_info)
- .debug_info      0x000000       0x2552 build/default/production/newmainXC16_7.o
- .debug_info      0x002552        0xc4d build/default/production/functions7.o
- .debug_info      0x00319f         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_info      0x00322b         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_info      0x000000       0x2531 build/default/production/newmainXC16_7.o
+ .debug_info      0x002531        0xdf3 build/default/production/functions7.o
+ .debug_info      0x003324         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_info      0x0033b0         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0x242
+.debug_abbrev     0x000000        0x288
  *(.debug_abbrev)
- .debug_abbrev    0x000000         0xfe build/default/production/newmainXC16_7.o
- .debug_abbrev    0x0000fe        0x11c build/default/production/functions7.o
- .debug_abbrev    0x00021a         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_abbrev    0x00022e         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_abbrev    0x000000         0xdc build/default/production/newmainXC16_7.o
+ .debug_abbrev    0x0000dc        0x184 build/default/production/functions7.o
+ .debug_abbrev    0x000260         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_abbrev    0x000274         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.debug_line       0x000000        0x364
+.debug_line       0x000000        0x3ad
  *(.debug_line)
- .debug_line      0x000000        0x161 build/default/production/newmainXC16_7.o
- .debug_line      0x000161        0x17b build/default/production/functions7.o
- .debug_line      0x0002dc         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_line      0x00031f         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_line      0x000000        0x143 build/default/production/newmainXC16_7.o
+ .debug_line      0x000143        0x1e2 build/default/production/functions7.o
+ .debug_line      0x000325         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_line      0x000368         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.debug_frame      0x000000         0xf2
+.debug_frame      0x000000        0x174
  *(.debug_frame)
  .debug_frame     0x000000         0x2e build/default/production/newmainXC16_7.o
- .debug_frame     0x00002e         0xc4 build/default/production/functions7.o
+ .debug_frame     0x00002e        0x146 build/default/production/functions7.o
 
-.debug_str        0x000000        0x23b
+.debug_str        0x000000        0x254
  *(.debug_str)
- .debug_str       0x000000        0x1f1 build/default/production/newmainXC16_7.o
- .debug_str       0x0001f1         0x4a build/default/production/functions7.o
+ .debug_str       0x000000        0x1df build/default/production/newmainXC16_7.o
+ .debug_str       0x0001df         0x75 build/default/production/functions7.o
 
 .debug_loc
  *(.debug_loc)
@@ -293,12 +303,12 @@ __FUID0
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000         0x8e
+                  0x000000         0xe5
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x1b build/default/production/newmainXC16_7.o
  .debug_pubnames
-                  0x00001b         0x73 build/default/production/functions7.o
+                  0x00001b         0xca build/default/production/functions7.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -3059,12 +3069,17 @@ __c30_signature
  .ivt._T3Interrupt
                   0x000024          0x2 build/default/production/functions7.o
 
-.text             0x0003aa        0x2c0
- .text            0x0003aa        0x198 build/default/production/functions7.o
-                  0x0003aa                  _OCs_assigning
-                  0x000410                  _tmr_setup_period
- .text            0x000542        0x128 build/default/production/newmainXC16_7.o
-                  0x000542                  _main
+.text             0x0003aa        0x46e
+ .text            0x0003aa        0x380 build/default/production/functions7.o
+                  0x0003aa                  _OCs_assigning1
+                  0x000410                  _assignment1
+                  0x000448                  _OCs_assigning2
+                  0x0004ae                  _assignment2
+                  0x0004e6                  _OCs_assigning3
+                  0x000514                  _assignment3
+                  0x0005f8                  _tmr_setup_period
+ .text            0x00072a         0xee build/default/production/newmainXC16_7.o
+                  0x00072a                  _main
 
-.dinit            0x00066a          0x8
- .dinit           0x00066a          0x8 data_init
+.dinit            0x000818          0x8
+ .dinit           0x000818          0x8 data_init

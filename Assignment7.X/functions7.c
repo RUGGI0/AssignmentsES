@@ -3,17 +3,17 @@
 
 volatile int button_T2_pressed = 0;
 
-void OCs_assigning(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
+void OCs_assigning1(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
     if(OC1_flag == 1){
         // PWM-A is activated (which receives from OC1)
         // PWM characteristic:
-        // - period: 10Hz
+        // - period: 10kHz
         // - duty cycle: 50% 
         // (necessary to ensure value to wheels is kept constant)
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
         // 7200*0.5 = 3600
         OC1R = 3600; // PWM duty cycle
-        OC1RS = 7200; // PWM period -> 2Hz
+        OC1RS = 7200; // PWM period 10kHz
     }
     else{
         // PWM-A is stopped
@@ -30,7 +30,7 @@ void OCs_assigning(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
         // 7200*0.5 = 3600
         OC2R = 3600; // PWM duty cycle
-        OC2RS = 7200; // PWM period -> 2Hz
+        OC2RS = 7200; // PWM period 10kHz
     }
     else{
         // PWM-B is stopped
@@ -47,7 +47,7 @@ void OCs_assigning(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
         // 7200*0.5 = 3600
         OC3R = 3600; // PWM duty cycle
-        OC3RS = 7200; // PWM period -> 2Hz
+        OC3RS = 7200; // PWM period 10kHz
         
     }
     else{
@@ -65,13 +65,194 @@ void OCs_assigning(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
         // 7200*0.5 = 3600
         OC4R = 3600; // PWM duty cycle
-        OC4RS = 7200; // PWM period -> 2Hz
+        OC4RS = 7200; // PWM period 10kHz
     }
     else{
         // PWM-D is stopped
         OC4R = 0; // no PWM duty cycle
         OC4RS = 7200;
     }
+}
+
+void assignment1(){
+    int moving = 0;
+    while(1){
+        if(button_T2_pressed == 1){
+            button_T2_pressed = 0;
+            if(moving == 0){
+                // move forward buggy
+                // PWM-A = 0, PWM-B = signal, PWM-C = 0, PWM-D = signal
+                OCs_assigning1(0, 1, 0, 1);
+                moving = 1;
+            }
+            else{
+                // stop buggy
+                // PWM-A = 0, PWM-B = signal, PWM-C = 0, PWM-D = signal
+                OCs_assigning1(0, 0, 0, 0);
+                moving = 0;
+            }
+        }
+    }    
+}
+
+void OCs_assigning2(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
+    if(OC1_flag == 1){
+        // PWM-A is activated (which receives from OC1)
+        // PWM characteristic:
+        // - period: 10kHz
+        // - duty cycle: 50% 
+        // (necessary to ensure value to wheels is kept constant)
+        // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
+        // 7200*0.5 = 3600
+        OC1R = 3600; // PWM duty cycle
+        OC1RS = 7200; // PWM period 10kHz
+    }
+    else{
+        // PWM-A is stopped
+        OC1R = 0; // no PWM duty cycle
+        OC1RS = 7200; // ensure stopping is done correctly
+    }
+    
+    if(OC2_flag == 1){
+        // PWM-B is activated (which receives from OC2)
+        // PWM characteristic:
+        // - period: 10Hz
+        // - duty cycle: 50% 
+        // (necessary to ensure value to wheels is kept constant)
+        // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
+        // 7200*0.7 = 5040
+        OC2R = 5400; // PWM duty cycle
+        OC2RS = 7200; // PWM period 10kHz
+    }
+    else{
+        // PWM-B is stopped
+        OC2R = 0; // no PWM duty cycle
+        OC2RS = 7200;
+    }
+    
+    if(OC3_flag == 1){
+        // PWM-C is activated (which receives from OC3)
+        // PWM characteristic:
+        // - period: 10Hz
+        // - duty cycle: 50% 
+        // (necessary to ensure value to wheels is kept constant)
+        // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
+        // 7200*0.5 = 3600
+        OC3R = 3600; // PWM duty cycle
+        OC3RS = 7200; // PWM period 10kHz
+        
+    }
+    else{
+        // PWM-C is stopped
+        OC3R = 0; // no PWM duty cycle
+        OC3RS = 7200;
+    }
+    
+    if(OC4_flag == 1){
+        // PWM-D is activated (which receives from OC4)
+        // PWM characteristic:
+        // - period: 10Hz
+        // - duty cycle: 50% 
+        // (necessary to ensure value to wheels is kept constant)
+        // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
+        // 7200*0.5 = 3600
+        OC4R = 3600; // PWM duty cycle
+        OC4RS = 7200; // PWM period 10kHz
+    }
+    else{
+        // PWM-D is stopped
+        OC4R = 0; // no PWM duty cycle
+        OC4RS = 7200;
+    }
+}
+
+void assignment2(){
+    int moving = 0;
+    while(1){
+        if(button_T2_pressed == 1){
+            button_T2_pressed = 0;
+            if(moving == 0){
+                // move forward buggy
+                // PWM-A = 0, PWM-B = signal, PWM-C = 0, PWM-D = signal
+                OCs_assigning2(0, 1, 0, 1);
+                moving = 1;
+            }
+            else{
+                // stop buggy
+                // PWM-A = 0, PWM-B = signal, PWM-C = 0, PWM-D = signal
+                OCs_assigning2(0, 0, 0, 0);
+                moving = 0;
+            }
+        }
+    }    
+}
+
+void OCs_assigning3(int OC1_DC, int OC2_DC, int OC3_DC, int OC4_DC){
+    
+    OC1R = OC1_DC; // PWM duty cycle
+    OC1RS = 7200; // PWM period 10kHz
+    
+    OC2R = OC2_DC; // PWM duty cycle
+    OC2RS = 7200; // PWM period 10kHz
+    
+    OC3R = OC3_DC; // PWM duty cycle
+    OC3RS = 7200; // PWM period 10kHz
+    
+    OC4R = OC4_DC; // PWM duty cycle
+    OC4RS = 7200; // PWM period 10kHz   
+}
+
+void assignment3(int speed, int yaw){
+    int moving = 0;
+    int period = 7200;
+    int max_DC = 0;
+    int other_DC = 0;
+    while(1){
+        if(button_T2_pressed == 1){
+            button_T2_pressed = 0;
+            if(moving == 0){
+                
+                max_DC = speed/100 * period;
+                
+                if (speed >= 0){
+                    
+                    if (yaw >= 0){
+                        // forward anti-clockwise
+                        other_DC = max_DC * (1-(yaw/100));
+                        
+                        OCs_assigning3(0, other_DC, 0, max_DC);
+                    }
+                    else{
+                        // forward clockwise
+                        other_DC = max_DC * (1-(-yaw/100));
+                        
+                        OCs_assigning3(0, max_DC, 0, other_DC);
+                    }
+                }
+                else{
+                    if (yaw >= 0){
+                        // backward anti-clockwise
+                        other_DC = max_DC * (1-(yaw/100));
+                        
+                        OCs_assigning3(max_DC, 0, other_DC, 0);
+                        
+                    }
+                    else{
+                        // backward clockwise
+                        other_DC = max_DC * (1-(-yaw/100));
+                        
+                        OCs_assigning3(other_DC, 0, max_DC, 0);
+                    }
+                }
+                moving = 1;
+            }
+            else{
+                // STOP
+                OCs_assigning3(0, 0, 0, 0);
+                moving = 0;
+            }
+        }
+    }    
 }
 
 void tmr_setup_period(int timer, int ms){

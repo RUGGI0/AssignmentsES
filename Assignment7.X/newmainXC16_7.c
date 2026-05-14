@@ -67,27 +67,13 @@ int main(void) {
     IFS0bits.T3IF = 0; // clearing timer flag
     IEC0bits.T3IE = 0; // disabling timer interrupt
     
-    int moving = 0;
+    //OCs_assigning1(0,0,0,0); // ensure all value are zeroed
     
-    OCs_assigning(0,0,0,0); // ensure all value are zeroed
+    // assignment1();
+    // assignment2();
+    // assignment3(100, 100);
     
-    while(1){
-        if(button_T2_pressed == 1){
-            button_T2_pressed = 0;
-            if(moving == 0){
-                // move forward buggy
-                // PWM-A = 0, PWM-B = signal, PWM-C = 0, PWM-D = signal
-                OCs_assigning(0, 1, 0, 1);
-                moving = 1;
-            }
-            else{
-                // stop buggy
-                // PWM-A = 0, PWM-B = signal, PWM-C = 0, PWM-D = signal
-                OCs_assigning(0, 0, 0, 0);
-                moving = 0;
-            }
-        }
-    }
+    
     
     return 0;
 }
