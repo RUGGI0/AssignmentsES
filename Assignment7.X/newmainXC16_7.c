@@ -26,6 +26,7 @@ int main(void) {
     // - OCxRS: secondary OCx module register (used for period of OCx pin)
     
     // OC1 module
+    OC1CON1bits.OCM = 0; // ensure disabled for safety
     OC1R = 0; // initial value -> duty cycle zero (no movement)
     OC1RS = 7200; // initial  value of frequency (look OCs_assigning function for details)
     OC1CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC1 module
@@ -33,6 +34,7 @@ int main(void) {
     OC1CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC1) is set high when OC1TMR = 0 and low when OC1TMR = OC1R
     
     // OC2 module
+    OC2CON1bits.OCM = 0; // ensure disabled for safety
     OC2R = 0; // initial value -> duty cycle zero (no movement)
     OC2RS = 7200; // initial value of frequency (look OCs_assigning function for details)
     OC2CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC2 module
@@ -40,6 +42,7 @@ int main(void) {
     OC2CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC2) is set high when OC2TMR = 0 and low when OC2TMR = OC2R
     
     // OC3 module
+    OC3CON1bits.OCM = 0; // ensure disabled for safety
     OC3R = 0; // initial value -> duty cycle zero (no movement)
     OC3RS = 7200; // initial value of frequency (look OCs_assigning function for details)
     OC3CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC3 module
@@ -47,6 +50,7 @@ int main(void) {
     OC3CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC3) is set high when OC1TMR = 0 and low when OC3TMR = OC3R
     
     // OC4 module
+    OC4CON1bits.OCM = 0; // ensure disabled for safety
     OC4R = 0; // initial value -> duty cycle zero (no movement)
     OC4RS = 7200; // initial value of frequency (look OCs_assigning function for details)
     OC4CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC4 module
@@ -67,11 +71,11 @@ int main(void) {
     IFS0bits.T3IF = 0; // clearing timer flag
     IEC0bits.T3IE = 0; // disabling timer interrupt
     
-    //OCs_assigning1(0,0,0,0); // ensure all value are zeroed
+    OCs_assigning1(0,0,0,0); // ensure all value are zeroed
     
-    // assignment1();
-    // assignment2();
-    // assignment3(100, 100);
+    //assignment1();
+    //assignment2();
+    assignment3(-100, 100);
     
     
     

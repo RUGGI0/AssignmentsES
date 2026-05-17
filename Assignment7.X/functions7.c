@@ -8,11 +8,11 @@ void OCs_assigning1(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // PWM-A is activated (which receives from OC1)
         // PWM characteristic:
         // - period: 10kHz
-        // - duty cycle: 50% 
+        // - duty cycle: 75% 
         // (necessary to ensure value to wheels is kept constant)
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
-        // 7200*0.5 = 3600
-        OC1R = 3600; // PWM duty cycle
+        // 7200*0.75 = 5400 (if using 50% one wheel won't move)
+        OC1R = 5400; // PWM duty cycle
         OC1RS = 7200; // PWM period 10kHz
     }
     else{
@@ -25,11 +25,11 @@ void OCs_assigning1(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // PWM-B is activated (which receives from OC2)
         // PWM characteristic:
         // - period: 10Hz
-        // - duty cycle: 50% 
+        // - duty cycle: 75% (wheel which likely has no movement with 50%)
         // (necessary to ensure value to wheels is kept constant)
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
-        // 7200*0.5 = 3600
-        OC2R = 3600; // PWM duty cycle
+        // 7200*0.75 = 5400 (if using 50% one wheel won't move)
+        OC2R = 5400; // PWM duty cycle
         OC2RS = 7200; // PWM period 10kHz
     }
     else{
@@ -42,11 +42,11 @@ void OCs_assigning1(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // PWM-C is activated (which receives from OC3)
         // PWM characteristic:
         // - period: 10Hz
-        // - duty cycle: 50% 
+        // - duty cycle: 75% 
         // (necessary to ensure value to wheels is kept constant)
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
-        // 7200*0.5 = 3600
-        OC3R = 3600; // PWM duty cycle
+        // 7200*0.75 = 5400 (if using 50% one wheel won't move)
+        OC3R = 5400; // PWM duty cycle
         OC3RS = 7200; // PWM period 10kHz
         
     }
@@ -60,11 +60,11 @@ void OCs_assigning1(int OC1_flag, int OC2_flag, int OC3_flag, int OC4_flag){
         // PWM-D is activated (which receives from OC4)
         // PWM characteristic:
         // - period: 10Hz
-        // - duty cycle: 50% 
+        // - duty cycle: 75% 
         // (necessary to ensure value to wheels is kept constant)
         // Fcy = 72MHz (clock source for OC1) -> 72M/10000 = 7200 (< 65535 -> 16 bit precision)
-        // 7200*0.5 = 3600
-        OC4R = 3600; // PWM duty cycle
+        // 7200*0.75 = 5400 (if using 50% one wheel won't move)
+        OC4R = 5400; // PWM duty cycle
         OC4RS = 7200; // PWM period 10kHz
     }
     else{
@@ -212,19 +212,18 @@ void assignment3(int speed, int yaw){
             button_T2_pressed = 0;
             if(moving == 0){
                 
-                max_DC = speed/100 * period;
+                max_DC = (speed * period) / 100;
                 
                 if (speed >= 0){
-                    
                     if (yaw >= 0){
                         // forward anti-clockwise
-                        other_DC = max_DC * (1-(yaw/100));
+                        other_DC = (max_DC * (100 - yaw)) / 100;    
                         
                         OCs_assigning3(0, other_DC, 0, max_DC);
                     }
                     else{
                         // forward clockwise
-                        other_DC = max_DC * (1-(-yaw/100));
+                        other_DC = (max_DC * (100 + yaw)) / 100;
                         
                         OCs_assigning3(0, max_DC, 0, other_DC);
                     }
@@ -232,16 +231,16 @@ void assignment3(int speed, int yaw){
                 else{
                     if (yaw >= 0){
                         // backward anti-clockwise
-                        other_DC = max_DC * (1-(yaw/100));
+                        other_DC = (-max_DC * (100 - yaw)) / 100;
                         
-                        OCs_assigning3(max_DC, 0, other_DC, 0);
+                        OCs_assigning3(-max_DC, 0, other_DC, 0);
                         
                     }
                     else{
                         // backward clockwise
-                        other_DC = max_DC * (1-(-yaw/100));
+                        other_DC = (-max_DC * (100 + yaw)) / 100;
                         
-                        OCs_assigning3(other_DC, 0, max_DC, 0);
+                        OCs_assigning3(other_DC, 0, -max_DC, 0);
                     }
                 }
                 moving = 1;
