@@ -71,11 +71,11 @@ Default Scalar Model: Small
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x200               0x142           0x1e3  (483)
-.text                        0x342               0x378           0x534  (1332)
-.dinit                       0x6ba                 0xe            0x15  (21)
+.text                        0x200               0x18e           0x255  (597)
+.text                        0x38e               0x646           0x969  (2409)
+.dinit                       0x9d4                 0xe            0x15  (21)
 
-                 Total "program" memory used (bytes):          0x72c  (1836) <1%
+                 Total "program" memory used (bytes):          0xbd3  (3027) <1%
 
 
 Auxflash Memory  [Origin = 0x7fc000, Length = 0x3ffa]
@@ -91,9 +91,9 @@ section                    address   length (PC units)   length (bytes) (dec)
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
 .nbss                       0x1000                   0             0x8  (8)
-.bss                        0x1008                   0            0x68  (104)
+.bss                        0x1008                   0            0x38  (56)
 
-                 Total "data" memory used (bytes):           0x70  (112) <1%
+                 Total "data" memory used (bytes):           0x40  (64) <1%
 
 
 Dynamic Memory Usage
@@ -101,26 +101,24 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                       0x1070                              0xcf90  (53136)
+stack                       0x1040                              0x6fc0  (28608)
 
-                 Maximum dynamic memory (bytes):         0xcf90  (53136)
+                 Maximum dynamic memory (bytes):         0x6fc0  (28608)
 
 Info: Project is using a large data memory model when small data memory model is sufficient.
 
 
 External Symbols in Data Memory (by address):
 
-                    0x1000                  _tx_buffer
-                    0x1008                  _tx_array
-                    0x1048                  _schedInfo
-                    0x1070                  _controlData
+                    0x1000                  _rx_buffer
+                    0x1008                  _rx_array
+                    0x1018                  _schedInfo
 
 External Symbols in Data Memory (by name):
 
-                    0x1070                  _controlData
-                    0x1048                  _schedInfo
-                    0x1008                  _tx_array
-                    0x1000                  _tx_buffer
+                    0x1008                  _rx_array
+                    0x1000                  _rx_buffer
+                    0x1018                  _schedInfo
 
 External Symbols in Program Memory (by address):
 
@@ -128,29 +126,47 @@ External Symbols in Program Memory (by address):
                   0x00023c                  __psv_init
                   0x000248                  __data_init_extended
                   0x000248                  __data_init
-                  0x0002fe                  __DefaultInterrupt
-                  0x000304                  ___divsi3
-                  0x000322                  ___udivsi3
-                  0x000342                  _tmr_setup_period
-                  0x000472                  _tmr_wait_period
-                  0x0004a6                  _scheduler
-                  0x000526                  _task_update_feedback
-                  0x000532                  _main
+                  0x00030a                  __U1RXInterrupt
+                  0x00034a                  __DefaultInterrupt
+                  0x000350                  ___divsi3
+                  0x00036e                  ___udivsi3
+                  0x00038e                  _buffer_init
+                  0x0003b2                  _buffer_is_empty
+                  0x0003cc                  _buffer_write
+                  0x00040c                  _buffer_read
+                  0x00044c                  _tmr_setup_period
+                  0x00057c                  _tmr_wait_period
+                  0x0005ac                  _scheduler
+                  0x00062c                  _task1_update_feedback
+                  0x000754                  _parse_value_from_uart
+                  0x000820                  _task2_update_feedback
+                  0x000828                  _task3_update_feedback
+                  0x000830                  _task4_update_feedback
+                  0x000838                  _main
 
 External Symbols in Program Memory (by name):
 
-                  0x0002fe                  __DefaultInterrupt
-                  0x000304                  ___divsi3
-                  0x000322                  ___udivsi3
+                  0x00034a                  __DefaultInterrupt
+                  0x00030a                  __U1RXInterrupt
+                  0x000350                  ___divsi3
+                  0x00036e                  ___udivsi3
                   0x000248                  __data_init
                   0x000248                  __data_init_extended
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000532                  _main
-                  0x0004a6                  _scheduler
-                  0x000526                  _task_update_feedback
-                  0x000342                  _tmr_setup_period
-                  0x000472                  _tmr_wait_period
+                  0x00038e                  _buffer_init
+                  0x0003b2                  _buffer_is_empty
+                  0x00040c                  _buffer_read
+                  0x0003cc                  _buffer_write
+                  0x000838                  _main
+                  0x000754                  _parse_value_from_uart
+                  0x0005ac                  _scheduler
+                  0x00062c                  _task1_update_feedback
+                  0x000820                  _task2_update_feedback
+                  0x000828                  _task3_update_feedback
+                  0x000830                  _task4_update_feedback
+                  0x00044c                  _tmr_setup_period
+                  0x00057c                  _tmr_wait_period
 
 Memory Configuration
 
@@ -201,7 +217,7 @@ LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000200        0x142
+.text             0x000200        0x18e
  *(.init)
  .init            0x000200         0x48 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o)
                   0x000200                  __resetPRI
@@ -212,22 +228,24 @@ LOAD c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libfx-elf.a
                   0x000248                  __data_init_extended
  *(.user_init)
  *(.handle)
- .handle          0x0002fa          0x4 jump_table
+ .handle          0x0002fa         0x10 jump_table
  *(.isr*)
- .isr             0x0002fe          0x4 default_isr
-                  0x0002fe                  __DefaultInterrupt
+ .isr.text        0x00030a         0x40 build/default/production/functions8.o
+                  0x00030a                  __U1RXInterrupt
+ .isr             0x00034a          0x4 default_isr
+                  0x00034a                  __DefaultInterrupt
  *(.libc)
  *(.libm)
  *(.libdsp)
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x000302          0x2 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt_start_mode_normalep.Meo)
-                  0x000302                  __crt_start_mode
-                  0x000302                  __crt_start_mode_normal
- .libm.divsi3     0x000304         0x1e c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
-                  0x000304                  ___divsi3
- .libm.udivsi3    0x000322         0x20 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
-                  0x000322                  ___udivsi3
+                  0x00034e          0x2 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt_start_mode_normalep.Meo)
+                  0x00034e                  __crt_start_mode
+                  0x00034e                  __crt_start_mode_normal
+ .libm.divsi3     0x000350         0x1e c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+                  0x000350                  ___divsi3
+ .libm.udivsi3    0x00036e         0x20 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+                  0x00036e                  ___udivsi3
 
 usercode
  *(usercode)
@@ -259,37 +277,37 @@ __FUID0
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x3265
+.debug_info       0x000000       0x39f5
  *(.debug_info)
- .debug_info      0x000000       0x2a43 build/default/production/newmainXC16_8.o
- .debug_info      0x002a43        0x709 build/default/production/functions8.o
- .debug_info      0x00314c         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_info      0x0031d8         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_info      0x000000       0x2b23 build/default/production/newmainXC16_8.o
+ .debug_info      0x002b23        0xdb9 build/default/production/functions8.o
+ .debug_info      0x0038dc         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_info      0x003968         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0x31e
+.debug_abbrev     0x000000        0x335
  *(.debug_abbrev)
- .debug_abbrev    0x000000        0x157 build/default/production/newmainXC16_8.o
- .debug_abbrev    0x000157        0x19f build/default/production/functions8.o
- .debug_abbrev    0x0002f6         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_abbrev    0x00030a         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_abbrev    0x000000        0x14c build/default/production/newmainXC16_8.o
+ .debug_abbrev    0x00014c        0x1c1 build/default/production/functions8.o
+ .debug_abbrev    0x00030d         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_abbrev    0x000321         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.debug_line       0x000000        0x35b
+.debug_line       0x000000        0x3e4
  *(.debug_line)
- .debug_line      0x000000        0x173 build/default/production/newmainXC16_8.o
- .debug_line      0x000173        0x160 build/default/production/functions8.o
- .debug_line      0x0002d3         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_line      0x000316         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_line      0x000000        0x177 build/default/production/newmainXC16_8.o
+ .debug_line      0x000177        0x1e5 build/default/production/functions8.o
+ .debug_line      0x00035c         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_line      0x00039f         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
-.debug_frame      0x000000         0xb6
+.debug_frame      0x000000        0x1cc
  *(.debug_frame)
  .debug_frame     0x000000         0x2e build/default/production/newmainXC16_8.o
- .debug_frame     0x00002e         0x88 build/default/production/functions8.o
+ .debug_frame     0x00002e        0x19e build/default/production/functions8.o
 
-.debug_str        0x000000        0x22a
+.debug_str        0x000000        0x254
  *(.debug_str)
- .debug_str       0x000000        0x20d build/default/production/newmainXC16_8.o
- .debug_str       0x00020d         0x1d build/default/production/functions8.o
+ .debug_str       0x000000        0x214 build/default/production/newmainXC16_8.o
+ .debug_str       0x000214         0x40 build/default/production/functions8.o
 
 .debug_loc
  *(.debug_loc)
@@ -298,12 +316,12 @@ __FUID0
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000         0xb6
+                  0x000000        0x167
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x1b build/default/production/newmainXC16_8.o
  .debug_pubnames
-                  0x00001b         0x9b build/default/production/functions8.o
+                  0x00001b        0x14c build/default/production/functions8.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -3030,45 +3048,57 @@ LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x000070        0x3b8
+                  0x000070        0x407
  .debug_pubtypes
-                  0x000070        0x32b build/default/production/newmainXC16_8.o
+                  0x000070        0x33e build/default/production/newmainXC16_8.o
  .debug_pubtypes
-                  0x00039b         0x8d build/default/production/functions8.o
+                  0x0003ae         0xc9 build/default/production/functions8.o
 
 __c30_signature
-                  0x000428         0x24
+                  0x000477         0x24
  __c30_signature
-                  0x000428          0x6 build/default/production/newmainXC16_8.o
+                  0x000477          0x6 build/default/production/newmainXC16_8.o
  __c30_signature
-                  0x00042e          0x6 build/default/production/functions8.o
+                  0x00047d          0x6 build/default/production/functions8.o
  __c30_signature
-                  0x000434          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o)
+                  0x000483          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedep.o)
  __c30_signature
-                  0x00043a          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(data_init_extended.o)
+                  0x000489          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(data_init_extended.o)
  __c30_signature
-                  0x000440          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+                  0x00048f          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
  __c30_signature
-                  0x000446          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+                  0x000495          0x6 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
 
 .nbss               0x1000          0x8
  .nbss              0x1000          0x8 build/default/production/functions8.o
-                    0x1000                  _tx_buffer
+                    0x1000                  _rx_buffer
 
-.bss                0x1008         0x68
- .bss               0x1008         0x68 build/default/production/functions8.o
-                    0x1008                  _tx_array
-                    0x1048                  _schedInfo
-                    0x1070                  _controlData
+.bss                0x1008         0x38
+ .bss               0x1008         0x38 build/default/production/functions8.o
+                    0x1008                  _rx_array
+                    0x1018                  _schedInfo
 
-.text             0x000342        0x378
- .text            0x000342        0x1f0 build/default/production/functions8.o
-                  0x000342                  _tmr_setup_period
-                  0x000472                  _tmr_wait_period
-                  0x0004a6                  _scheduler
-                  0x000526                  _task_update_feedback
- .text            0x000532        0x188 build/default/production/newmainXC16_8.o
-                  0x000532                  _main
+.ivt._U1RXInterrupt
+                  0x00002a          0x2
+ .ivt._U1RXInterrupt
+                  0x00002a          0x2 build/default/production/functions8.o
 
-.dinit            0x0006ba          0xe
- .dinit           0x0006ba          0xe data_init
+.text             0x00038e        0x646
+ .text            0x00038e        0x4aa build/default/production/functions8.o
+                  0x00038e                  _buffer_init
+                  0x0003b2                  _buffer_is_empty
+                  0x0003cc                  _buffer_write
+                  0x00040c                  _buffer_read
+                  0x00044c                  _tmr_setup_period
+                  0x00057c                  _tmr_wait_period
+                  0x0005ac                  _scheduler
+                  0x00062c                  _task1_update_feedback
+                  0x000754                  _parse_value_from_uart
+                  0x000820                  _task2_update_feedback
+                  0x000828                  _task3_update_feedback
+                  0x000830                  _task4_update_feedback
+ .text            0x000838        0x19c build/default/production/newmainXC16_8.o
+                  0x000838                  _main
+
+.dinit            0x0009d4          0xe
+ .dinit           0x0009d4          0xe data_init

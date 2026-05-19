@@ -83,40 +83,49 @@ int main(void) {
     OC4CON2bits.SYNCSEL = 0b11111; // No Sync source, however OC4TMR resets if = OC4RS, and OC 4 module uses its own Sync signal
     OC4CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC4) is set high when OC4TMR = 0 and low when OC4TMR = OC4R
     
-    // Initialization //
+    // Initialisation //
     int ret = 0;
-    // contolData defined in here...
+    control_data controlData;
+    controlData.speed = 0;
+    controlData.yaw = 0;
+    controlData.new_values = 0;
     
-    schedInfo[0].n = 0;
-    schedInfo[0].N = 0;
-    schedInfo[0].f = task_update_feedback;
-    schedInfo[0].params = (void*)(&controlData);
-    schedInfo[0].enable = 1;
+    // heartbeat(duration of main loop) is 5ms
     
-    schedInfo[1].n = 0;
-    schedInfo[1].N = 0;
-    schedInfo[1].f = task_update_feedback;
+    // Task 1: parse data from UART (speed/yaw rates) -> 66Hz (15ms)
+    schedInfo[0].n = 0; // number of main loops elapsed
+    schedInfo[0].N = 3; // heartbeat is 5ms -> executes every 3 loops: 3, 6, 9, 12, 15, 18, 21, 24...
+    schedInfo[0].f = task1_update_feedback; // function to use task parameters
+    schedInfo[0].params = (void*)(&controlData); // parameter structure
+    schedInfo[0].enable = 1; // used to temporary disable execution of a task
+    
+    // Task 2: detects E8 button presses -> 50Hz (20ms)
+    schedInfo[1].n = 0; // overlaps with first task every 24 loops and with fourth task every 20 loops
+    schedInfo[1].N = 4; // executes every 4 loops: 4, 8, 12, 16, 20, 24...
+    schedInfo[1].f = task2_update_feedback;
     schedInfo[1].params = (void*)(&controlData);
     schedInfo[1].enable = 1;
     
-    schedInfo[2].n = 0;
-    schedInfo[2].N = 0;
-    schedInfo[2].f = task_update_feedback;
+    // Task 3: refreshes PWM signal -> 100Hz (10ms) (necessary)
+    schedInfo[2].n = -1; // jumps first loop to avoid overlapping with second and fourth task, but overlaps with first one every 6 loops
+    schedInfo[2].N = 2; // executes every 2 loops: 3, 5, 7, 9, 11, 13, 15, 17, 19, 21...
+    schedInfo[2].f = task3_update_feedback;
     schedInfo[2].params = (void*)(&controlData);
     schedInfo[2].enable = 1;
     
-    schedInfo[3].n = 0;
-    schedInfo[3].N = 0;
-    schedInfo[3].f = task_update_feedback;
+    // Task 4: toggles left and right-side light or switches on/off other lights-> 1Hz-2Hz (1000-500ms) (necessary)
+    schedInfo[3].n = 0; // overlaps with second task every 20 loops
+    schedInfo[3].N = 10; // executes every 10 loops: 10, 20, 30, 40...
+    schedInfo[3].f = task4_update_feedback;
     schedInfo[3].params = (void*)(&controlData);
     schedInfo[3].enable = 1;
     
-    tmr_setup_period(TIMER1,1);
+    tmr_setup_period(TIMER1,5);
+    buffer_init(&rx_buffer, rx_array, SIZERX);
     
     while(1){
         scheduler();
         ret = tmr_wait_period(TIMER1);
     }
-    
     return 0;
 }

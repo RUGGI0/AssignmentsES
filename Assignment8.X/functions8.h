@@ -3,7 +3,7 @@
 
 #define TIMER1 1
 
-#define SIZETX 64
+#define SIZERX 16 // buffer emptied every 15ms -> baud rate = 9600 -> at maximum 14 char received
 #define MAX_TASKS 4
 
 typedef struct {
@@ -13,7 +13,7 @@ typedef struct {
     volatile int tail;
 } CircularBuffer;
 
-extern char rx_array[SIZETX];
+extern char rx_array[SIZERX];
 extern volatile CircularBuffer rx_buffer;
 
 typedef struct{
@@ -26,16 +26,27 @@ typedef struct{
 
 extern volatile heartbeat schedInfo[MAX_TASKS];
 
+// parameter for tasks structure to avoid using global variables
 typedef struct{
-    // parameters for tasks
+    int speed;
+    int yaw;
+    int new_values; // tells if new valid values has been received
 }control_data;
 
-extern volatile control_data controlData; // defined in main
+// Functions to manage Rx buffer
+void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size);
+int buffer_is_empty(volatile CircularBuffer* cb);
+int buffer_read(volatile CircularBuffer* cb, char* c);
+int buffer_write(volatile CircularBuffer* cb, char c);
 
 void tmr_setup_period(int timer, int ms);
 int tmr_wait_period(int timer);
 void scheduler();
-void task_update_feedback(void* param);
+void task1_update_feedback(void* param);
+void task2_update_feedback(void* param);
+void task3_update_feedback(void* param);
+void task4_update_feedback(void* param);
 
+int parse_value_from_uart(char msg[15], int* tail, int* value);
 
 #endif
