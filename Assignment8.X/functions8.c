@@ -125,7 +125,7 @@ void task1_update_feedback(void* param){
         }
         if(msg[counter] == '*'){
             // message is ready to be parsed
-            msg[counter] = '-'; // avoids triggering if statement again at next loop
+            msg[counter] = '_'; // avoids triggering if statement again at next loop
             
             tail = --counter; // second number (yaw)
             
