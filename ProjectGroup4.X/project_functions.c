@@ -1,4 +1,12 @@
 #include "xc.h"
+#include "project_functions.h"
+
+#include <string.h>
+
+char rx_array[SIZERX];
+char tx_array[SIZETX];
+volatile CircularBuffer rx_buffer;
+volatile CircularBuffer tx_buffer;
 
 void device_init(){
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
@@ -179,4 +187,237 @@ void device_init(){
     
     AD1CON1bits.ADON = 1; // activating ADC module 1
 
+}
+
+void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
+    cb->buffer = array_ptr; 
+    cb->size = max_size;
+    cb->head = 0;
+    cb->tail = 0;
+}
+
+int buffer_is_empty(volatile CircularBuffer* cb) {
+    return cb->head == cb->tail;
+}
+
+int buffer_write(volatile CircularBuffer* cb, char c) {
+    int next = (cb->head + 1) % cb->size;
+    if (next == cb->tail) {
+        return -1; // Buffer is full
+    }
+    cb->buffer[cb->head] = c;
+    cb->head = next;
+    return 0;
+}
+
+int buffer_read(volatile CircularBuffer* cb, char* c) {
+    if (buffer_is_empty(cb)) {
+        return -1; // Buffer is empty
+    }
+    *c = cb->buffer[cb->tail];
+    cb->tail = (cb->tail + 1) % cb->size;
+    return 0;
+}
+
+void tmr_setup_period(int timer, int ms){
+    int cycle_case = -1;
+    long Fcy = 72000000; // dsPIC33EP512MU810
+    long cycles = Fcy / 1000;
+    cycles *= ms; // avoids overflow with Fcy*ms/1000
+    if(cycles <= 65535){
+        cycle_case = 0;
+    }
+    else if(cycles/8 <= 65535){
+        cycle_case = 1;
+        cycles /= 8;
+    }
+    else if(cycles/64 <= 65535){
+        cycle_case = 2;
+        cycles /= 64;
+    }
+    else{
+        cycle_case = 3;
+        cycles /= 256;
+    }
+    if(timer == TIMER1){
+        T1CONbits.TCS = 0;
+        T1CONbits.TGATE = 0;
+        T1CONbits.TON = 0; // ensure timer is off
+        TMR1 = 0; // reset timer 1
+        IFS0bits.T1IF = 0; // clear state period flag before restarting
+        if(cycle_case == 0){
+            T1CONbits.TCKPS = 0b00; // 1:1 prescaler
+        }
+        else if(cycle_case == 1){
+            T1CONbits.TCKPS = 0b01; // 1:8 prescaler
+        }
+        else if(cycle_case == 2){
+            T1CONbits.TCKPS = 0b10; // 1:64 prescaler
+        }
+        else{
+            T1CONbits.TCKPS = 0b11; // 1:256 prescaler
+        }
+        PR1 = cycles;
+        T1CONbits.TON = 1;
+    }
+}
+
+int tmr_wait_period(int timer){
+    int temp = 0;
+    if(timer == TIMER1){
+        if(IFS0bits.T1IF == 1){
+            temp = 1;
+        }
+        while(1){
+            if(IFS0bits.T1IF == 1){
+                // flag set
+                IFS0bits.T1IF = 0; // flag cleared
+                break;
+            }
+        }
+    }
+    return temp;
+}
+
+
+void scheduler(heartbeat schedInfo[], int nTasks){
+    int i;
+    for (i = 0; i < nTasks; i++) {
+        schedInfo[i].n++;
+        if (schedInfo[i].enable == 1 && schedInfo[i].n >= schedInfo[i].N) {
+            schedInfo[i].f(schedInfo[i].params);            
+            schedInfo[i].n = 0;
+        }
+    }
+}
+
+int parse_byte(parser_state* ps, char byte) {
+    switch (ps->state) {
+        case STATE_DOLLAR:
+            if (byte == '$') {
+                ps->state = STATE_TYPE;
+                ps->index_type = 0;
+            }
+            break;
+        case STATE_TYPE:
+            if (byte == ',') {
+                ps->state = STATE_PAYLOAD;
+                ps->msg_type[ps->index_type] = '\0';
+                ps->index_payload = 0; // initialize properly the index
+            } else if (ps->index_type == 5) { // error! (type is PCREF for messages received)
+                ps->state = STATE_DOLLAR;
+                ps->index_type = 0;
+			} else if (byte == '*') {
+				ps->state = STATE_DOLLAR; // get ready for a new message
+                ps->msg_type[ps->index_type] = '\0';
+				ps->msg_payload[0] = '\0'; // no payload
+                return NEW_MESSAGE;
+            } else {
+                ps->msg_type[ps->index_type] = byte; // ok!
+                ps->index_type++; // increment for the next time;
+            }
+            break;
+        case STATE_PAYLOAD:
+            if (byte == '*') {
+                ps->state = STATE_DOLLAR; // get ready for a new message
+                ps->msg_payload[ps->index_payload] = '\0';
+                return NEW_MESSAGE;
+                } else if (ps->index_payload == 11) { // error (surpassed: two values + one comma + *)
+                ps->state = STATE_DOLLAR;
+                ps->index_payload = 0;
+            } else {
+                ps->msg_payload[ps->index_payload] = byte; // ok!
+                ps->index_payload++; // increment for the next time;
+            }
+            break;
+    }
+    return NO_MESSAGE;
+}
+
+int extract_integer(const char* str) {
+	int i = 0, number = 0, sign = 1;
+	
+	if (str[i] == '-') {
+		sign = -1;
+		i++;
+	}
+	else if (str[i] == '+') {
+		sign = 1;
+		i++;
+	}
+	while (str[i] != ',' && str[i] != '\0') {
+		number *= 10; // multiply the current number by 10;
+		number += str[i] - '0'; // converting character to decimal number
+		i++;
+	}
+	return sign*number;
+}		
+
+int next_value(const char* msg, int i) {
+	while (msg[i] != ',' && msg[i] != '\0') { 
+        i++;
+    }
+	if (msg[i] == ','){
+        i++;
+    }
+	return i;
+}
+
+// Parses one message (assumed correct structurer is $PCREF,speed,yaw*)
+void task_read_speed_yaw(void* param){
+    control_data *cd = (control_data*) param;
+    parser_state ps;
+    ps.state = STATE_DOLLAR;
+    
+    char byte;
+    int res = NO_MESSAGE, counter = 0;
+    while(buffer_is_empty(&rx_buffer) == 0 && counter <= 18){
+        // keeps going until either circular buffer is empty or ps arrays are full
+        buffer_read(&rx_buffer,&byte);
+        if(parse_byte(&ps,byte) == NEW_MESSAGE){
+            // takes only one message at a time
+            res = NEW_MESSAGE;
+            break;
+        }
+        counter++;
+    }
+    
+    if(res != NEW_MESSAGE){
+        // wrong message -> speed and yaw not updated
+        return;
+    }
+    
+    if(!strcmp(ps.msg_type, "PCREF") && ps.index_payload >= 3){
+        // correct protocol and payload is not empty (smallest size is 3) (index_payload points at \0)
+        
+        // extracting values //
+        counter = 0; // to know which value is being read
+        int i = 0, j = 0;
+        char temp[5]; // to store string value (dim = maximum value length + \0)
+        while(i < ps.index_payload && counter < 2){
+            j = next_value(ps.msg_payload,i);
+            switch(counter){
+                case 0:             
+                    strncpy(temp, ps.msg_payload + i, j-1); // copy substring from index i of payload with length j-1
+                    temp[j-1] = '\0';
+                    cd->speed = extract_integer(temp);
+                case 1:
+                    strncpy(temp, ps.msg_payload + i - 1, j-(i-1)); // copy substring from index i - 1 of payload with length j-(i-1)
+                    temp[j-(i-1)] = '\0';
+                    cd->yaw = extract_integer(temp);
+            }
+            i = j; // pointing next value
+            counter++;
+        }
+    }
+}
+
+// ISR redefinition for UART1 Rx register
+void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
+    IFS0bits.U1RXIF = 0;
+    
+    // Reading all characters in the Rx buffer (until empty) and writing them in the circular buffer
+    while(U1STAbits.URXDA == 1){
+        buffer_write(&rx_buffer, U1RXREG);
+    }
 }
