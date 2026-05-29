@@ -2,6 +2,7 @@
 #include "project_functions.h"
 
 #include <string.h>
+#include <stdio.h>
 
 char rx_array[SIZERX];
 char tx_array[SIZETX];
@@ -178,12 +179,12 @@ void device_init(){
     // sample time + conversion time = Tad*16 + Tad*12 = 3.5 us -> 3.5mil/s
     // required sampling/conversion is 1000/s
     
-    AD1CON2bits.SMPI = 1; // ADC interrupt gets triggered after two conversions (AN5 AN11)
+    AD1CON2bits.SMPI = 1; // ADC interrupt gets triggered after two conversions (AN11 AN14)
     IFS0bits.AD1IF = 0;
     IPC3bits.AD1IP = 1;
     IEC0bits.AD1IE = 1; // enabling ADC interrupt
     
-    AD1CON2bits.CHPS = 0; // activating CH0 (1 channel mode -> CH0 needed to access AN11 and AN5 -> using scan mode)
+    AD1CON2bits.CHPS = 0; // activating CH0 (1 channel mode -> CH0 needed to access AN11 and AN14 -> using scan mode)
     AD1CON1bits.FORM = 0; // output format: unsigned integer (10-bit -> 0-1023)
     
     AD1CON2bits.CSCNA = 1; // scan mode active
@@ -381,6 +382,7 @@ int next_value(const char* msg, int i) {
 
 // Parses one message (assumed correct structurer is $PCREF,speed,yaw*)
 void task_read_speed_yaw(void* param){
+    // frequency of 500Hz
     control_data *cd = (control_data*) param;
     parser_state ps;
     ps.state = STATE_DOLLAR;
@@ -526,7 +528,7 @@ void DC_assigning(int DC1, int DC2, int DC3, int DC4){
 }
 
 void task_button_check(void* param){
-    // checked maybe every 100ms
+    // frequency of 10Hz (not required)
     control_data *cd = (control_data*) param;
     if(button_E8_pressed == 1){
         if(cd->robot_state == HALTED_STATE){
@@ -542,8 +544,81 @@ void task_button_check(void* param){
     }
 }
 
-void task_processing_ADC_values(){
+void task_processing_VBAT_value_n_sending_to_uart(){
+    // frequency of 1Hz (to send?)
+    double v_batt = 0.0;
+    IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
+    // converting AN11 data to correct value (Volts):
+    // Vbattery = (AN11_value/1023)*Vrefh*k (Volts) (where k is coefficient from voltage divider)
+    v_batt = ((double)AN11_value * 3.6 * 3.0) / 1023.0; // cumulative variable to compute average
+    IEC0bits.AD1IE = 1; // enabling ADC interrupt again
     
+    // sending data to UART
+    char msg[30] = "";
+    sprintf(msg,"$MBATT,%.2f", v_batt);
+    for(int i = 0;i<30;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+}
+
+void task_processing_IR_value_n_sending_to_uart(void* param){
+    // frequency of 10Hz (to send?)
+    control_data *cd = (control_data*) param;
+    IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
+    // converting AN14 data to correct value (centimetres):
+    // Vsensor = (AN14_value/1023)*Vrefh (Volts)
+    double Vsensor = ((double)AN14_value * 3.6) / 1023.0;
+    IEC0bits.AD1IE = 1; // enabling ADC interrupt again
+
+    // applying formula to get distance (meters) registered by sensor
+    // (not using pow() to increase computation speed)
+    double Vsensor2 = Vsensor*Vsensor;
+    double Vsensor3 = Vsensor2*Vsensor;
+    double Vsensor4 = Vsensor3*Vsensor;
+    int distance = 2.34 - 4.74*Vsensor + 4.06*Vsensor2 - 1.6*Vsensor3 + 0.24*Vsensor4; // must be sent as an integer
+    distance *= 100;
+    cd->distance_sensor_value = distance;
+    
+    // sending data to UART
+    char msg[30] = "";
+    sprintf(msg,"$MDIST,%d", distance);
+    for(int i = 0;i<30;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+}
+
+// ISR redefinition for UART1 Tx register
+void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
+    IFS0bits.U1TXIF = 0;
+    
+    // Reading all characters in the circular buffer buffer (until empty),
+    // and writing them in the Tx buffer until it is full
+    while(U1STAbits.UTXBF == 0 && !buffer_is_empty(&tx_buffer)){
+        // - checking if there is anything to send, since the interrupt will trigger right after enabling U1TX
+        // - Tx buffer is not full, at least one more char can be written
+            char c;
+            buffer_read(&tx_buffer, &c);
+            U1TXREG = c;
+    }
+    
+    if(buffer_is_empty(&tx_buffer)){
+        // Tx buffer could be full or not, in any case no more data to send
+        IEC0bits.U1TXIE = 0; // disable interrupt to avoid multiple triggers
+    }
+    
+    // In case the circular buffer is not empty, the enabler remains set, 
+    // so, as soon as one byte is sent, thus freeing on slot in the Tx buffer,
+    // the interrupt will trigger again
 }
 
 // ISR redefinition for UART1 Rx register

@@ -71,9 +71,7 @@ typedef struct{
     int yaw;
     int robot_state;
     int robot_sub_state;
-    double battery_voltage; // volts
-    double distance_sensor_value; // centimeters
-    
+    int distance_sensor_value; // centimeters
 }control_data;
 
 // Global variable //
@@ -97,7 +95,8 @@ void task_PWM_set(void* param);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 void task_button_check(void* param);
-void task_processing_ADC_values();
+void task_processing_IR_value_n_sending_to_uart(void* param);
+void task_processing_VBAT_value_n_sending_to_uart();
 
 
 #endif

@@ -32,3 +32,9 @@ int main(void) {
     
     return 0;
 }
+
+// eventual final changes: combine tasks with same frequency
+
+// Things to ask prof:
+// - is there a frequency at which distance and v_batt are taken or just use ADC interrupt?
+// - okay to print v_batt with two digits, not rounding nor truncating?
