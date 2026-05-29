@@ -50,10 +50,16 @@ typedef struct {
     void* params;
 } heartbeat;
 
+// --- Robot states --- //
+#define HALTED_STATE (0)
+#define MOVING_STATE (1)
+#define OBSTACLE_AVOIDANCE_STATE (2)
+
 // parameter for tasks structure to avoid using global variables
 typedef struct{
     int speed;
     int yaw;
+    int robot_state;
 }control_data;
 
 void device_init();
@@ -67,6 +73,9 @@ void scheduler(heartbeat schedInfo[], int nTasks);
 int parse_byte(parser_state* ps, char byte);
 int next_value(const char* msg, int i);
 int extract_integer(const char* str);
+void task_PWM_set(void* param);
+void PWM_set(int speed, int yaw);
+void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 
 #endif
 

@@ -303,7 +303,7 @@ int parse_byte(parser_state* ps, char byte) {
             if (byte == ',') {
                 ps->state = STATE_PAYLOAD;
                 ps->msg_type[ps->index_type] = '\0';
-                ps->index_payload = 0; // initialize properly the index
+                ps->index_payload = 0; // initialise properly the index
             } else if (ps->index_type == 5) { // error! (type is PCREF for messages received)
                 ps->state = STATE_DOLLAR;
                 ps->index_type = 0;
@@ -401,15 +401,94 @@ void task_read_speed_yaw(void* param){
                     strncpy(temp, ps.msg_payload + i, j-1); // copy substring from index i of payload with length j-1
                     temp[j-1] = '\0';
                     cd->speed = extract_integer(temp);
+                    break;
                 case 1:
-                    strncpy(temp, ps.msg_payload + i - 1, j-(i-1)); // copy substring from index i - 1 of payload with length j-(i-1)
-                    temp[j-(i-1)] = '\0';
+                    strncpy(temp, ps.msg_payload + i, j-i); // copy substring from index i of payload with length j-i
+                    temp[j-i] = '\0';
                     cd->yaw = extract_integer(temp);
+                    break;
             }
             i = j; // pointing next value
             counter++;
         }
     }
+}
+
+void task_PWM_set(void* param){
+    control_data *cd = (control_data*) param;
+    switch(cd->robot_state){
+        case HALTED_STATE:
+            PWM_set(0,0);
+            break;
+        case MOVING_STATE:
+            PWM_set(cd->speed,cd->yaw);
+            break;
+        case OBSTACLE_AVOIDANCE_STATE:
+            break;
+    }
+}
+
+void PWM_set(int speed, int yaw){
+    
+    int left_pwm = speed - yaw;
+    int right_pwm = speed + yaw;
+    int period = 7200;
+    
+    // saturates values up to +-100
+    if(left_pwm >= 100){
+        left_pwm = 100;
+    }
+    
+    if(left_pwm <= -100){
+        left_pwm = -100;
+    }
+    
+    if(right_pwm >= 100){
+        right_pwm = 100;
+    }
+    
+    if(right_pwm <= -100){
+        right_pwm = -100;
+    }
+    
+    int left_DC = (left_pwm * period) / 100;
+    int right_DC = (right_pwm * period) / 100;
+    
+    if (left_DC >= 0){
+        if (right_DC >= 0){
+            // left and right wheels forward
+            DC_assigning(0,left_DC,0,right_DC);
+        }
+        else{
+            // left wheels forward and right wheels backward
+            DC_assigning(0,left_DC,-right_DC,0);
+        }
+    }
+    else{
+        if (right_DC >= 0){
+            // right wheels forward and left wheels backward
+            DC_assigning(-left_DC,0,0,right_DC);
+        }
+        else{
+            // left and right wheels backward
+            DC_assigning(-left_DC,0,-right_DC,0);
+        } 
+    }
+}
+
+void DC_assigning(int RD1, int RD2, int RD3, int RD4){
+        
+    OC1R = RD1; // PWM duty cycle
+    OC1RS = 7200; // PWM period 10kHz
+    
+    OC2R = RD2; // PWM duty cycle
+    OC2RS = 7200; // PWM period 10kHz
+    
+    OC3R = RD3; // PWM duty cycle
+    OC3RS = 7200; // PWM period 10kHz
+    
+    OC4R = RD4; // PWM duty cycle
+    OC4RS = 7200; // PWM period 10kHz
 }
 
 // ISR redefinition for UART1 Rx register

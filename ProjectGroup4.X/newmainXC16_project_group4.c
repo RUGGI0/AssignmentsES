@@ -8,6 +8,7 @@ int main(void) {
     
     // scheduler configuration
     heartbeat schedInfo[MAX_TASKS];
+    
     tmr_setup_period(TIMER1,2); // control loop executes at 500Hz (2ms)
             
     int cycle_counter = 0;

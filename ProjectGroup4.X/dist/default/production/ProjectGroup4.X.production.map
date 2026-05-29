@@ -83,10 +83,10 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200               0x2e0           0x450  (1104)
 .const                       0x4e0                 0x6             0x9  (9)
-.text                        0x4e6               0x78c           0xb52  (2898)
-.dinit                       0xc72                 0xe            0x15  (21)
+.text                        0x4e6               0x8a6           0xcf9  (3321)
+.dinit                       0xd8c                 0xe            0x15  (21)
 
-                 Total "program" memory used (bytes):          0xfc0  (4032) <1%
+                 Total "program" memory used (bytes):         0x1167  (4455) <1%
 
 
 Auxflash Memory  [Origin = 0x7fc000, Length = 0x3ffa]
@@ -137,8 +137,8 @@ External Symbols in Program Memory (by address):
 
                   0x000200                  __resetPRI
                   0x00023c                  __psv_init
-                  0x000248                  __data_init
                   0x000248                  __data_init_extended
+                  0x000248                  __data_init
                   0x0002fa                  __U1RXInterrupt
                   0x00033a                  __DefaultInterrupt
                   0x000340                  ___divsi3
@@ -147,9 +147,9 @@ External Symbols in Program Memory (by address):
                   0x000394                  _strncpy
                   0x0003a2                  ___stpncpy
                   0x00040c                  _memset
-                  0x0004d4                  ___mulp32peds3
                   0x0004d4                  ___mulp32eds3
                   0x0004d4                  ___mulsi3
+                  0x0004d4                  ___mulp32peds3
                   0x0004e6                  _device_init
                   0x0006f0                  _buffer_init
                   0x000714                  _buffer_is_empty
@@ -162,10 +162,15 @@ External Symbols in Program Memory (by address):
                   0x000a7c                  _extract_integer
                   0x000afa                  _next_value
                   0x000b36                  _task_read_speed_yaw
-                  0x000c30                  _main
+                  0x000c2e                  _task_PWM_set
+                  0x000c60                  _PWM_set
+                  0x000d1c                  _DC_assigning
+                  0x000d4a                  _main
 
 External Symbols in Program Memory (by name):
 
+                  0x000d1c                  _DC_assigning
+                  0x000c60                  _PWM_set
                   0x00033a                  __DefaultInterrupt
                   0x0002fa                  __U1RXInterrupt
                   0x000340                  ___divsi3
@@ -184,13 +189,14 @@ External Symbols in Program Memory (by name):
                   0x00072e                  _buffer_write
                   0x0004e6                  _device_init
                   0x000a7c                  _extract_integer
-                  0x000c30                  _main
+                  0x000d4a                  _main
                   0x00040c                  _memset
                   0x000afa                  _next_value
                   0x00097e                  _parse_byte
                   0x00090e                  _scheduler
                   0x00037e                  _strcmp
                   0x000394                  _strncpy
+                  0x000c2e                  _task_PWM_set
                   0x000b36                  _task_read_speed_yaw
                   0x0007ae                  _tmr_setup_period
                   0x0008de                  _tmr_wait_period
@@ -317,13 +323,13 @@ __FUID0
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x4f97
+.debug_info       0x000000       0x50eb
  *(.debug_info)
  .debug_info      0x000000        0x37d build/default/production/newmainXC16_project_group4.o
- .debug_info      0x00037d       0x4a75 build/default/production/project_functions.o
- .debug_info      0x004df2         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_info      0x004e7e         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
- .debug_info      0x004f0b         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_info      0x00037d       0x4bc9 build/default/production/project_functions.o
+ .debug_info      0x004f46         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_info      0x004fd2         0x8d c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_info      0x00505f         0x8c c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0x341
@@ -334,18 +340,18 @@ __FUID0
  .debug_abbrev    0x000319         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
  .debug_abbrev    0x00032d         0x14 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
 
-.debug_line       0x000000        0x48d
+.debug_line       0x000000        0x4ba
  *(.debug_line)
  .debug_line      0x000000        0x146 build/default/production/newmainXC16_project_group4.o
- .debug_line      0x000146        0x285 build/default/production/project_functions.o
- .debug_line      0x0003cb         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
- .debug_line      0x00040e         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
- .debug_line      0x000453         0x3a c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_line      0x000146        0x2b2 build/default/production/project_functions.o
+ .debug_line      0x0003f8         0x43 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(divsi3.EP_o)
+ .debug_line      0x00043b         0x45 c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.EP_o)
+ .debug_line      0x000480         0x3a c:/program files/microchip/xc16/v2.10/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.EP_o)
 
-.debug_frame      0x000000        0x1cc
+.debug_frame      0x000000        0x21a
  *(.debug_frame)
  .debug_frame     0x000000         0x2e build/default/production/newmainXC16_project_group4.o
- .debug_frame     0x00002e        0x19e build/default/production/project_functions.o
+ .debug_frame     0x00002e        0x1ec build/default/production/project_functions.o
 
 .debug_str        0x000000        0x2c1
  *(.debug_str)
@@ -359,12 +365,12 @@ __FUID0
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0x14c
+                  0x000000        0x17a
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x1b build/default/production/newmainXC16_project_group4.o
  .debug_pubnames
-                  0x00001b        0x131 build/default/production/project_functions.o
+                  0x00001b        0x15f build/default/production/project_functions.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -3141,8 +3147,8 @@ __c30_signature
 .const              0x84e0          0x6 load address 0x0004e0  
  .const             0x84e0          0x6 build/default/production/project_functions.o
 
-.text             0x0004e6        0x78c
- .text            0x0004e6        0x74a build/default/production/project_functions.o
+.text             0x0004e6        0x8a6
+ .text            0x0004e6        0x864 build/default/production/project_functions.o
                   0x0004e6                  _device_init
                   0x0006f0                  _buffer_init
                   0x000714                  _buffer_is_empty
@@ -3155,8 +3161,11 @@ __c30_signature
                   0x000a7c                  _extract_integer
                   0x000afa                  _next_value
                   0x000b36                  _task_read_speed_yaw
- .text            0x000c30         0x42 build/default/production/newmainXC16_project_group4.o
-                  0x000c30                  _main
+                  0x000c2e                  _task_PWM_set
+                  0x000c60                  _PWM_set
+                  0x000d1c                  _DC_assigning
+ .text            0x000d4a         0x42 build/default/production/newmainXC16_project_group4.o
+                  0x000d4a                  _main
 
-.dinit            0x000c72          0xe
- .dinit           0x000c72          0xe data_init
+.dinit            0x000d8c          0xe
+ .dinit           0x000d8c          0xe data_init
