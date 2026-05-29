@@ -7,6 +7,10 @@ char rx_array[SIZERX];
 char tx_array[SIZETX];
 volatile CircularBuffer rx_buffer;
 volatile CircularBuffer tx_buffer;
+volatile int button_E8_pressed;
+volatile int button_E9_pressed;
+volatile int AN11_value;
+volatile int AN14_value;
 
 void device_init(){
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
@@ -31,6 +35,18 @@ void device_init(){
     LATAbits.LATA7 = 0;
     
     INTCON2bits.GIE = 1; // allow enabling interrupts
+    
+    // ----* Remap Buttons ----* //
+    RPINR0bits.INT1R = 88; // external interrupt 1 is mapped to button T2 (RP88)
+    RPINR1bits.INT2R = 89; // external interrupt 2 is mapped to button T3 (RP89)
+    IFS1bits.INT1IF = 0; // clearing flag of external interrupt 1
+    IFS1bits.INT2IF = 0; // clearing flag of external interrupt 2
+    IPC5bits.INT1IP = 1; // priority level 1
+    IPC7bits.INT2IP = 1; // priority level 1
+    INTCON2bits.INT1EP = 1; // triggers on falling edge (1->0)
+    INTCON2bits.INT2EP = 1; // triggers on falling edge (1->0)
+    IEC1bits.INT1IE = 1; // enabling external interrupt 1
+    IEC1bits.INT2IE = 1; // enabling external interrupt 2
     
     // ----* Configure UART *---- //
     TRISDbits.TRISD0 = 0; // Tx in output
@@ -173,7 +189,7 @@ void device_init(){
     AD1CON2bits.CSCNA = 1; // scan mode active
     
     // selecting analogical pins to be scanned 
-    AD1CSSLbits.CSS5 = 1; // AN5 -> output from IR Sensor board (Volts)
+    AD1CSSLbits.CSS14 = 1; // AN14 -> output from IR Sensor board (Buggy Mikrobus 1) (Volts)
     AD1CSSLbits.CSS11 = 1; // AN11 -> battery voltage (Volts)
     
     ANSELBbits.ANSB11 = 1; // activating AN11 for battery sensing
@@ -182,8 +198,8 @@ void device_init(){
     ANSELBbits.ANSB14 = 1; // activating AN14 for IR sensor voltage (buggy micro BUS)
     TRISBbits.TRISB14 = 1;
     
-    TRISBbits.TRISB9 = 0; // pin to enable IR Sensor board (buggy micro BUS)
-    LATBbits.LATB9 = 1;
+    TRISBbits.TRISB9 = 0; // pin to enable IR Sensor board (Buggy Mikrobus 1)
+    LATBbits.LATB9 = 1; // enabled
     
     AD1CON1bits.ADON = 1; // activating ADC module 1
 
@@ -418,12 +434,30 @@ void task_PWM_set(void* param){
     control_data *cd = (control_data*) param;
     switch(cd->robot_state){
         case HALTED_STATE:
-            PWM_set(0,0);
+            DC_assigning(0, 0, 0, 0);
             break;
         case MOVING_STATE:
             PWM_set(cd->speed,cd->yaw);
             break;
         case OBSTACLE_AVOIDANCE_STATE:
+            
+            switch(cd->robot_sub_state){
+                case AVOIDANCE_STEP_1:
+                    // rotate 90° clockwise (later add gyroscope)
+                    PWM_set(50,-50); // left_pwm = 100, right_pwm = 0 -> sharp rotation to the right
+                    break;
+                    
+                // checking through gyroscope if in position
+                    
+                case AVOIDANCE_STEP_2:
+                    // moving forward for two seconds (setting some flag to stop motion afterwards)
+                    PWM_set(70,0); // left_pwm = 70, right_pwm = 70
+                    break;
+                case AVOIDANCE_STEP_3:
+                    // rotate 90° anti-clockwise (later add gyroscope)
+                    PWM_set(50,50); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
+                    break;
+            }
             break;
     }
 }
@@ -476,19 +510,40 @@ void PWM_set(int speed, int yaw){
     }
 }
 
-void DC_assigning(int RD1, int RD2, int RD3, int RD4){
+void DC_assigning(int DC1, int DC2, int DC3, int DC4){
         
-    OC1R = RD1; // PWM duty cycle
+    OC1R = DC1; // PWM duty cycle
     OC1RS = 7200; // PWM period 10kHz
     
-    OC2R = RD2; // PWM duty cycle
+    OC2R = DC2; // PWM duty cycle
     OC2RS = 7200; // PWM period 10kHz
     
-    OC3R = RD3; // PWM duty cycle
+    OC3R = DC3; // PWM duty cycle
     OC3RS = 7200; // PWM period 10kHz
     
-    OC4R = RD4; // PWM duty cycle
+    OC4R = DC4; // PWM duty cycle
     OC4RS = 7200; // PWM period 10kHz
+}
+
+void task_button_check(void* param){
+    // checked maybe every 100ms
+    control_data *cd = (control_data*) param;
+    if(button_E8_pressed == 1){
+        if(cd->robot_state == HALTED_STATE){
+            cd->robot_state = MOVING_STATE;
+        }
+        else{
+            // either moving or avoiding obstacle
+            cd->robot_state = HALTED_STATE;
+        }
+    }
+    if(button_E9_pressed == 1){
+        // send number of data available inside TX and RX
+    }
+}
+
+void task_processing_ADC_values(){
+    
 }
 
 // ISR redefinition for UART1 Rx register
@@ -499,4 +554,51 @@ void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
     while(U1STAbits.URXDA == 1){
         buffer_write(&rx_buffer, U1RXREG);
     }
+}
+
+// Redefinition of ISR for external interrupt 1 (robust implementation)
+void __attribute__((__interrupt__, __auto_psv__)) _INT1Interrupt(void){
+    IFS1bits.INT1IF = 0; // clearing flag of external interrupt
+    IPC2bits.T3IP = 0x01; // set priority to one
+    IEC0bits.T3IE = 1;
+    tmr_setup_period(TIMER3,10);
+}
+
+// Redefinition of ISR for external interrupt 2
+void __attribute__((__interrupt__, __auto_psv__)) _INT2Interrupt(void){
+    IFS1bits.INT2IF = 0; // clearing flag of external interrupt
+    IPC6bits.T4IP = 0x01; // set priority to one
+    IEC1bits.T4IE = 1;
+    tmr_setup_period(TIMER4,10);
+}
+
+// Redefinition of ISR for timer 3
+void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt(void){
+    T3CONbits.TON = 0;
+    IFS0bits.T3IF = 0; // clearing timer flag
+    IEC0bits.T3IE = 0; // disabling timer interrupt
+    
+    if(PORTEbits.RE8 == 0){
+        button_E8_pressed = 1;
+    }
+}
+
+// Redefinition of ISR for timer 4
+void __attribute__((__interrupt__, __auto_psv__)) _T4Interrupt(void){
+    T4CONbits.TON = 0;
+    IFS1bits.T4IF = 0; // clearing timer flag
+    IEC1bits.T4IE = 0; // disabling timer interrupt
+    
+    if(PORTEbits.RE9 == 0){
+        button_E9_pressed = 1;
+    }
+    
+}
+
+// ISR redefinition for ADC module 1
+void __attribute__((interrupt, no_auto_psv)) _AD1Interrupt(void){
+    IFS0bits.AD1IF = 0;
+
+    AN14_value = ADC1BUF0;
+    AN11_value = ADC1BUF1;
 }

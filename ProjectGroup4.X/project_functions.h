@@ -3,7 +3,11 @@
 
 #include <xc.h> 
 
-#define TIMER1 1
+
+// --- Timers --- //
+#define TIMER1 1 // main loop heartbeat
+#define TIMER3 3 // button E8 press (robust implementation)
+#define TIMER4 4 // button E9 press (robust implementation)
 
 // --- Tx and Rx buffers --- //
 #define SIZERX 16 // buffer emptied every 15ms -> baud rate = 9600 -> at maximum 14 char received
@@ -37,10 +41,11 @@ typedef struct {
 } parser_state;
 
 // --- Scheduler data --- //
-#define MAX_TASKS 9
+#define MAX_TASKS 10
 // PWM updated (500Hz), IR sensor voltage read (10Hz), battery voltage read (1Hz)
 // buggy lights blinking (1Hz for movement or static light), E8 press - E9 press (busy checking or interrupt), 
-// accelerometer values - magnetometer values + roll/pitch/yaw computation (can be grouped -> all at 10Hz )
+// accelerometer values - magnetometer values + roll/pitch/yaw computation (can be grouped -> all at 10Hz ),
+// TX over UART
 
 typedef struct {
     int n;
@@ -55,12 +60,27 @@ typedef struct {
 #define MOVING_STATE (1)
 #define OBSTACLE_AVOIDANCE_STATE (2)
 
-// parameter for tasks structure to avoid using global variables
+// Robot sub-states //
+#define AVOIDANCE_STEP_1 (3)
+#define AVOIDANCE_STEP_2 (4)
+#define AVOIDANCE_STEP_3 (5)
+
+// parameter for tasks structure
 typedef struct{
     int speed;
     int yaw;
     int robot_state;
+    int robot_sub_state;
+    double battery_voltage; // volts
+    double distance_sensor_value; // centimeters
+    
 }control_data;
+
+// Global variable //
+extern volatile int AN11_value;
+extern volatile int AN14_value;
+extern volatile int button_E8_pressed;
+extern volatile int button_E9_pressed;
 
 void device_init();
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size);
@@ -76,6 +96,9 @@ int extract_integer(const char* str);
 void task_PWM_set(void* param);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
+void task_button_check(void* param);
+void task_processing_ADC_values();
+
 
 #endif
 

@@ -3,11 +3,17 @@
 
 int main(void) {
         
-    // peripherals configuration
+    // Peripherals configuration //
     device_init();
     
-    // scheduler configuration
+    // Variable initialisation //
+    button_E8_pressed = 0;
+    button_E9_pressed = 0;
+    buffer_init(&rx_buffer, rx_array, SIZERX);
+    buffer_init(&tx_buffer, tx_array, SIZETX);
     heartbeat schedInfo[MAX_TASKS];
+    // scheduler configuration
+    
     
     tmr_setup_period(TIMER1,2); // control loop executes at 500Hz (2ms)
             
