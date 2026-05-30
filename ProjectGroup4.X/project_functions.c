@@ -433,6 +433,7 @@ void task_read_speed_yaw(void* param){
 }
 
 void task_PWM_set(void* param){
+    // frequency of 500Hz
     control_data *cd = (control_data*) param;
     switch(cd->robot_state){
         case HALTED_STATE:
@@ -544,8 +545,8 @@ void task_button_check(void* param){
     }
 }
 
-void task_processing_VBAT_value_n_sending_to_uart(){
-    // frequency of 1Hz (to send?)
+void task_reading_VBAT_n_sending_to_uart(){
+    // frequency of 1Hz (to send and simply since no requirements in project specs)
     double v_batt = 0.0;
     IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
     // converting AN11 data to correct value (Volts):
@@ -566,8 +567,8 @@ void task_processing_VBAT_value_n_sending_to_uart(){
     IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
 }
 
-void task_processing_IR_value_n_sending_to_uart(void* param){
-    // frequency of 10Hz (to send?)
+void task_reading_IR_value(void* param){
+    // frequency of 500Hz
     control_data *cd = (control_data*) param;
     IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
     // converting AN14 data to correct value (centimetres):
@@ -583,10 +584,15 @@ void task_processing_IR_value_n_sending_to_uart(void* param){
     int distance = 2.34 - 4.74*Vsensor + 4.06*Vsensor2 - 1.6*Vsensor3 + 0.24*Vsensor4; // must be sent as an integer
     distance *= 100;
     cd->distance_sensor_value = distance;
+}
+
+void task_sending_IR_value_to_uart(void* param){
+    // frequency of 10Hz
+    control_data *cd = (control_data*) param;
     
     // sending data to UART
     char msg[30] = "";
-    sprintf(msg,"$MDIST,%d", distance);
+    sprintf(msg,"$MDIST,%d", cd->distance_sensor_value);
     for(int i = 0;i<30;i++){
         if(msg[i] == '\0'){
             break;
@@ -595,6 +601,28 @@ void task_processing_IR_value_n_sending_to_uart(void* param){
     }
     
     IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+}
+
+void task_buggy_lights(void* param){
+    // frequency of 1Hz
+    control_data *cd = (control_data*) param;
+    switch(cd->robot_state){
+        case HALTED_STATE:
+            LATBbits.LATB8 = !LATBbits.LATB8; // toggle left-side lights
+            LATFbits.LATF1 = !LATFbits.LATF1; // toggle right-side lights
+            LATGbits.LATG1 = 0; // low-lights off
+            break;
+        case MOVING_STATE:
+            LATBbits.LATB8 = 0; // left-side lights off
+            LATFbits.LATF1 = 0; // right-side lights off
+            LATGbits.LATG1 = 1; // low-lights on
+            break;
+        case OBSTACLE_AVOIDANCE_STATE:
+            LATFbits.LATF1 = !LATFbits.LATF1; // toggle right-side lights
+            LATBbits.LATB8 = 0; // left-side lights off
+            LATGbits.LATG1 = 1; // low-lights on
+            break;
+    };
 }
 
 // ISR redefinition for UART1 Tx register
@@ -674,6 +702,6 @@ void __attribute__((__interrupt__, __auto_psv__)) _T4Interrupt(void){
 void __attribute__((interrupt, no_auto_psv)) _AD1Interrupt(void){
     IFS0bits.AD1IF = 0;
 
-    AN14_value = ADC1BUF0;
-    AN11_value = ADC1BUF1;
+    AN11_value = ADC1BUF0;
+    AN14_value = ADC1BUF1;
 }

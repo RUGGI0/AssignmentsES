@@ -61,9 +61,9 @@ typedef struct {
 #define OBSTACLE_AVOIDANCE_STATE (2)
 
 // Robot sub-states //
-#define AVOIDANCE_STEP_1 (3)
-#define AVOIDANCE_STEP_2 (4)
-#define AVOIDANCE_STEP_3 (5)
+#define AVOIDANCE_STEP_1 (3) // turning 90° clockwise
+#define AVOIDANCE_STEP_2 (4) // moving forward for 2 seconds
+#define AVOIDANCE_STEP_3 (5) // turning 90° anti-clockwise (back to previous heading)
 
 // parameter for tasks structure
 typedef struct{
@@ -95,9 +95,10 @@ void task_PWM_set(void* param);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 void task_button_check(void* param);
-void task_processing_IR_value_n_sending_to_uart(void* param);
-void task_processing_VBAT_value_n_sending_to_uart();
-
+void task_reading_VBAT_n_sending_to_uart();
+void task_reading_IR_value(void* param);
+void task_sending_IR_value_to_uart(void* param);
+void task_buggy_lights(void* param);
 
 #endif
 
