@@ -62,9 +62,11 @@ typedef struct {
 #define OBSTACLE_AVOIDANCE_STATE (2)
 
 // Robot sub-states //
-#define AVOIDANCE_STEP_1 (3) // turning 90° clockwise
-#define AVOIDANCE_STEP_2 (4) // moving forward for 2 seconds
-#define AVOIDANCE_STEP_3 (5) // turning 90° anti-clockwise (back to previous heading)
+#define AVOIDANCE_STEP_0 (3) // obstacle avoidance mode is not active or cannot function (maximum amount has been hit)
+#define AVOIDANCE_STEP_1 (4) // turning 90° clockwise
+#define AVOIDANCE_STEP_2 (5) // moving forward for 2 seconds
+#define AVOIDANCE_STEP_3 (6) // turning 90° anti-clockwise (back to previous heading)
+#define AVOIDANCE_STEP_4 (7) // checking if there is still obstacle and if maximum obstacle avoidance executions have been reached
 
 // parameter for tasks structure
 typedef struct{
@@ -72,9 +74,12 @@ typedef struct{
     int yaw;
     int robot_state;
     int robot_sub_state;
+    int obs_av_state_ctrl; // counts consequent obstacle avoidance policy
     int distance_sensor_value; // centimetres
-    int angle_values[3]; // roll, pitch, yaw
-    float yaw_ctrl;
+    int angle_values[3]; // roll, pitch, yaw (of magnetometer)
+    float gyro_yaw;
+    float ctrl_yaw; // used to carry out obstacle avoidance policy
+    heartbeat *schedInfo;
 }control_data;
 
 // Global variable //
@@ -101,13 +106,16 @@ void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 unsigned int spi_write(unsigned int data);
 
+void task_read_speed_yaw(void* param);
 void task_PWM_set(void* param);
+void task_stop_buggy_after_2sec (void* param);
 void task_button_check(void* param);
 void task_reading_VBAT_n_sending_to_uart();
 void task_reading_IR_value(void* param);
 void task_sending_IR_value_to_uart(void* param);
 void task_buggy_lights(void* param);
-void task_reading_magn_acc_gyro_n_sending_to_uart(void* param);
+void task_reading_magn_acc_gyro(void* param);
+void sending_IMU_values_to_uart(void* param);
 
 void scheduler(heartbeat schedInfo[], int nTasks);
 

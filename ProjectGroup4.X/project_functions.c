@@ -538,29 +538,47 @@ void task_PWM_set(void* param){
             DC_assigning(0, 0, 0, 0);
             break;
         case MOVING_STATE:
+            cd->obs_av_state_ctrl = 0; // resetting obstacle avoidance policy executions
             PWM_set(cd->speed,cd->yaw);
             break;
         case OBSTACLE_AVOIDANCE_STATE:
-            
+            if(cd->obs_av_state_ctrl == 3){
+                cd->robot_state = HALTED_STATE;
+            }
             switch(cd->robot_sub_state){
+                case AVOIDANCE_STEP_0:
+                    break;
                 case AVOIDANCE_STEP_1:
-                    // rotate 90° clockwise (later add gyroscope)
+                    // rotate 90° clockwise (triggered in task_reading_IR_value)
+                    
+                    // saving current yaw to later check when stop rotation (done in task_reading_magn_acc_gyro)
+                    cd->ctrl_yaw = cd->gyro_yaw;
+                    cd->obs_av_state_ctrl++; // keeping count of three maximum executions
                     PWM_set(50,-50); // left_pwm = 100, right_pwm = 0 -> sharp rotation to the right
                     break;
-                    
-                // checking through gyroscope if in position
-                    
                 case AVOIDANCE_STEP_2:
-                    // moving forward for two seconds (setting some flag to stop motion afterwards)
+                    // moving forward for two seconds
                     PWM_set(70,0); // left_pwm = 70, right_pwm = 70
+                    
+                    // enabling task that expires after two seconds
+                    cd->schedInfo[2].enable = 1;
                     break;
                 case AVOIDANCE_STEP_3:
                     // rotate 90° anti-clockwise (later add gyroscope)
                     PWM_set(50,50); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
                     break;
+                case AVOIDANCE_STEP_4:
+                    break;
             }
             break;
     }
+}
+
+void task_stop_buggy_after_2sec (void* param){
+    control_data *cd = (control_data*) param;
+    
+    cd->robot_sub_state = AVOIDANCE_STEP_3;
+    cd->schedInfo[2].enable = 0;
 }
 
 void task_button_check(void* param){
@@ -597,9 +615,9 @@ void task_reading_VBAT_n_sending_to_uart(){
     v_batt = ((double)AN11_value * 3.6 * 3.0) / 1023.0; // cumulative variable to compute average
     
     // sending data to UART
-    char msg[30] = "";
-    sprintf(msg,"$MBATT,%.2f", v_batt);
-    for(int i = 0;i<30;i++){
+    char msg[16] = "";
+    sprintf(msg,"$MBATT,%.2f*", v_batt);
+    for(int i = 0;i<16;i++){
         if(msg[i] == '\0'){
             break;
         }
@@ -635,10 +653,23 @@ void task_reading_IR_value(void* param){
     distance *= 100;
     cd->distance_sensor_value = distance;
     
-    if(distance <= 20 && cd->robot_state == MOVING_STATE){
+    if(distance <= 20 && cd->robot_state == MOVING_STATE && cd->obs_av_state_ctrl < 3){
         // obstacle closer than 20 centimetres
         cd->robot_state = OBSTACLE_AVOIDANCE_STATE;
         cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90°)
+    }
+    else if(distance <= 20 && cd->robot_sub_state == AVOIDANCE_STEP_4){
+        if(cd->obs_av_state_ctrl == 3){
+            cd->robot_state = HALTED_STATE;
+            cd->robot_sub_state = AVOIDANCE_STEP_0;
+        }
+        else{
+            cd->robot_sub_state = AVOIDANCE_STEP_1;
+        }
+    }
+    else{
+        cd->robot_state = MOVING_STATE;
+        cd->robot_sub_state = AVOIDANCE_STEP_0;
     }
 }
 
@@ -647,9 +678,9 @@ void task_sending_IR_value_to_uart(void* param){
     control_data *cd = (control_data*) param;
     
     // sending data to UART
-    char msg[30] = "";
-    sprintf(msg,"$MDIST,%d", cd->distance_sensor_value);
-    for(int i = 0;i<30;i++){
+    char msg[16] = "";
+    sprintf(msg,"$MDIST,%d*", cd->distance_sensor_value);
+    for(int i = 0;i<16;i++){
         if(msg[i] == '\0'){
             break;
         }
@@ -681,7 +712,7 @@ void task_buggy_lights(void* param){
     };
 }
 
-void task_reading_magn_acc_gyro_n_sending_to_uart(void* param){
+void task_reading_magn_acc_gyro(void* param){
     // frequency of 10Hz (both reading and sending values)
     control_data *cd = (control_data*) param;
     
@@ -750,15 +781,15 @@ void task_reading_magn_acc_gyro_n_sending_to_uart(void* param){
     // need to integrate the value since it is an angular velocity component
     float gz_dps = ((float)raw_gz * 2000.0f) / 32767.0f; // converting value from [32767;-32767] to [2000;-2000] scale
     float dt = 0.1f; // 100ms -> value read at 10Hz
-    cd->yaw_ctrl += gz_dps * dt; // value used to control car movement
+    cd->gyro_yaw += gz_dps * dt; // value used to control car movement
     
     // Value retrieved is a rotation obtained from z component of angular velocity, so it could grow beyond certain limits.
     // Ensure integration doesn't exit range [-180;180] (keep consistency with yaw from magnetometer):
-    if(cd->yaw_ctrl > 180.0f){
-        cd->yaw_ctrl -= 360.0f;
+    if(cd->gyro_yaw > 180.0f){
+        cd->gyro_yaw -= 360.0f;
     }
-    if(cd->yaw_ctrl <= -180.0f){
-        cd->yaw_ctrl += 360.0f;
+    if(cd->gyro_yaw <= -180.0f){
+        cd->gyro_yaw += 360.0f;
     }
     
     /*
@@ -768,6 +799,39 @@ void task_reading_magn_acc_gyro_n_sending_to_uart(void* param){
      
      using this instead of previous formula: float yaw += gz_dps * dt;
      */
+    
+    // If in avoidance obstacle mode, checking if rotation has to stop //
+    if(cd->robot_sub_state == AVOIDANCE_STEP_1){
+        if((cd->gyro_yaw - cd->ctrl_yaw) >= 85){
+            // buggy rotated of 90° clockwise -> next step
+            cd->robot_sub_state = AVOIDANCE_STEP_2;
+        }
+    }
+    else if(cd->robot_sub_state == AVOIDANCE_STEP_3){
+        if((cd->gyro_yaw - cd->ctrl_yaw) <= 5 || (cd->gyro_yaw - cd->ctrl_yaw) >= -5){
+            // buggy rotated back of 90° anti-clockwise to previous heading
+            cd->ctrl_yaw = 0.0;
+            cd->robot_sub_state = AVOIDANCE_STEP_4; // must check if distance is still under threshold,
+            // or if maximum obstacle avoidance executions have been reached
+        }
+    }
+}
+
+void sending_IMU_values_to_uart(void* param){
+    // frequency of 10Hz
+    control_data *cd = (control_data*) param;
+    
+    // sending data to UART
+    char msg[24] = "";
+    sprintf(msg,"$MANGLE,%d,%d,%d*", cd->angle_values[0], cd->angle_values[1], cd->angle_values[2]);
+    for(int i = 0;i<24;i++){
+        if(msg[i] == '\0'){
+            break;
+        }
+        buffer_write(&tx_buffer,msg[i]);
+    }
+    
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
 }
 
 void scheduler(heartbeat schedInfo[], int nTasks){

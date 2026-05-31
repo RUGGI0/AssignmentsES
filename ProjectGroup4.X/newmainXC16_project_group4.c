@@ -11,16 +11,23 @@ int main(void) {
     button_E9_pressed = 0;
     buffer_init(&rx_buffer, rx_array, SIZERX);
     buffer_init(&tx_buffer, tx_array, SIZETX);
-    
-    // shared parameters between tasks
-    control_data cd;
-    cd.yaw_ctrl = 0.0f; // value of yaw to control steering (cumulative change with integration)
-    
+    tmr_setup_period(TIMER1,2); // control loop executes at 500Hz (2ms)
+   
     heartbeat schedInfo[MAX_TASKS];
     // scheduler configuration
     
+    // Task to stop 2sec buggy motion in obstacle avoidance mode
+    schedInfo[2].N = 1000; // 2sec
+    schedInfo[2].enable = 0; // initially not active (activated when needed)
     
-    tmr_setup_period(TIMER1,2); // control loop executes at 500Hz (2ms)
+    // shared parameters between tasks
+    control_data cd;
+    cd.robot_state = HALTED_STATE;
+    cd.robot_sub_state = AVOIDANCE_STEP_0;
+    cd.gyro_yaw = 0.0f; // value of yaw to control steering (cumulative change with integration)
+    cd.schedInfo = schedInfo;
+    cd.obs_av_state_ctrl = 0;
+   
             
     int cycle_counter = 0;
     
@@ -44,3 +51,6 @@ int main(void) {
 // - is there a frequency at which distance and v_batt are taken or just use ADC interrupt?
 // - okay to print v_batt with two digits, not rounding nor truncating?
 // - for magnetometer do we have to read all and only the axes of the magnetic field?
+
+// Possible changes:
+// - move state check logic from task_reading_IR_value and task_reading_magn_acc_gyro to task_PWM_set
