@@ -6,6 +6,7 @@
 
 // --- Timers --- //
 #define TIMER1 1 // main loop heartbeat
+#define TIMER2 2 // timer to wait for IMU board start up
 #define TIMER3 3 // button E8 press (robust implementation)
 #define TIMER4 4 // button E9 press (robust implementation)
 
@@ -71,7 +72,9 @@ typedef struct{
     int yaw;
     int robot_state;
     int robot_sub_state;
-    int distance_sensor_value; // centimeters
+    int distance_sensor_value; // centimetres
+    int angle_values[3]; // roll, pitch, yaw
+    float yaw_ctrl;
 }control_data;
 
 // Global variable //
@@ -81,24 +84,32 @@ extern volatile int button_E8_pressed;
 extern volatile int button_E9_pressed;
 
 void device_init();
+
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size);
 int buffer_is_empty(volatile CircularBuffer* cb);
 int buffer_write(volatile CircularBuffer* cb, char c);
 int buffer_read(volatile CircularBuffer* cb, char* c);
+
 void tmr_setup_period(int timer, int ms);
 int tmr_wait_period(int timer);
-void scheduler(heartbeat schedInfo[], int nTasks);
+void tmr_wait_ms(int timer, int ms);
+
 int parse_byte(parser_state* ps, char byte);
 int next_value(const char* msg, int i);
 int extract_integer(const char* str);
-void task_PWM_set(void* param);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
+unsigned int spi_write(unsigned int data);
+
+void task_PWM_set(void* param);
 void task_button_check(void* param);
 void task_reading_VBAT_n_sending_to_uart();
 void task_reading_IR_value(void* param);
 void task_sending_IR_value_to_uart(void* param);
 void task_buggy_lights(void* param);
+void task_reading_magn_acc_gyro_n_sending_to_uart(void* param);
+
+void scheduler(heartbeat schedInfo[], int nTasks);
 
 #endif
 

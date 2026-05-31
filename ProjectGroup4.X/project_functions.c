@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 char rx_array[SIZERX];
 char tx_array[SIZETX];
@@ -80,41 +81,6 @@ void device_init(){
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
     
-    // ----* Configure SPI *---- //
-    TRISAbits.TRISA1 = 1; // MISO (input)
-    TRISFbits.TRISF12 = 0; // SCK (clock)(output)
-    TRISFbits.TRISF13 = 0; // MOSI (output)
-    TRISBbits.TRISB3 = 0; // CS1 (output)
-    TRISBbits.TRISB4 = 0; // CS2 (output)
-    TRISDbits.TRISD6 = 0; // CS3 (output)
-    
-    // pin mapping
-    RPINR20bits.SDI1R = 17; // RPI17 -> MISO (SDI1)
-    RPOR11bits.RP108R = 0b000110; // RF12 -> SCK1 (clock)
-    RPOR12bits.RP109R = 0b000101; // RF13 -> MOSI (SDO1)
-    
-    // clearing SPI interrupt
-    IFS0bits.SPI1IF = 0;
-    IEC0bits.SPI1IE = 0;
-    
-    SPI1CON1bits.DISSCK = 0;
-    SPI1CON1bits.DISSDO = 0;
-    SPI1CON1bits.SMP = 0;
-    SPI1CON1bits.CKE = 0;
-    SPI1CON1bits.CKP = 1;
-    
-    SPI1CON1bits.MSTEN = 1; // master mode on
-    SPI1CON1bits.PPRE = 2; // primary prescaler 4:1
-    SPI1CON1bits.SPRE = 6; // secondary prescaler 2:1
-    // 9MHZ clock for SPI (Fcy/8 -> 72MHz/8)
-    SPI1CON1bits.MODE16 = 0; // 8-bit data communication
-    SPI1STATbits.SPIEN = 1; // enable SPI
-    
-    // deselecting chips
-    LATBbits.LATB3 = 1; // accelerometers (off)
-    LATBbits.LATB4 = 1; // gyroscope (off)
-    LATDbits.LATD6 = 1; // magnetometer (off)
-    
     // *--- Output compare set up ---* //
     // - using 4 modules to control 4 PWM signals
     // - OCxR: primary OCx module register (used for duty cycle of OCx pin)
@@ -172,27 +138,15 @@ void device_init(){
     // Tad definition: Tad = (ADCS + 1) * Tcy, Tad must be > 75ns for 10-bit ADC,
     // since Fcy = 72MHz -> Tcy = 13.89ns
     AD1CON3bits.ADCS = 8; // Tad = 9 * 13.89 = 125ns
-    AD1CON1bits.ASAM = 1; // automatic sampling (starts at the end of previous conversion phase)
-    AD1CON3bits.SAMC = 16; // sample time ends after 16 Tad (2 us)
-    AD1CON1bits.SSRC = 2; // automatic conversion triggered by Timer 3 expiration
-    
-    // sample time + conversion time = Tad*16 + Tad*12 = 3.5 us -> 3.5mil/s
-    // required sampling/conversion is 1000/s
-    
-    AD1CON2bits.SMPI = 1; // ADC interrupt gets triggered after two conversions (AN11 AN14)
-    IFS0bits.AD1IF = 0;
-    IPC3bits.AD1IP = 1;
-    IEC0bits.AD1IE = 1; // enabling ADC interrupt
-    
-    AD1CON2bits.CHPS = 0; // activating CH0 (1 channel mode -> CH0 needed to access AN11 and AN14 -> using scan mode)
+    AD1CON1bits.ASAM = 0; // manual sampling
+    AD1CON3bits.SAMC = 16; // sample time ends after 16 Tad (2 mus)
+    AD1CON1bits.SSRC = 7; // automatic conversion (when sampling stops)
+    AD1CON2bits.CHPS = 0; // activating CH0 (1 channel mode -> CH0 needed to access alternatively AN11 and AN14)
     AD1CON1bits.FORM = 0; // output format: unsigned integer (10-bit -> 0-1023)
     
-    AD1CON2bits.CSCNA = 1; // scan mode active
-    
-    // selecting analogical pins to be scanned 
-    AD1CSSLbits.CSS14 = 1; // AN14 -> output from IR Sensor board (Buggy Mikrobus 1) (Volts)
-    AD1CSSLbits.CSS11 = 1; // AN11 -> battery voltage (Volts)
-    
+    // Channel will be set accordingly when values will be read
+    AD1CHS0bits.CH0NA = 0; // selecting Vrefh for CH0
+        
     ANSELBbits.ANSB11 = 1; // activating AN11 for battery sensing
     TRISBbits.TRISB11 = 1;
     
@@ -204,6 +158,57 @@ void device_init(){
     
     AD1CON1bits.ADON = 1; // activating ADC module 1
 
+    // ----* Configure SPI *---- //
+    TRISAbits.TRISA1 = 1; // MISO (input)
+    TRISFbits.TRISF12 = 0; // SCK (clock)(output)
+    TRISFbits.TRISF13 = 0; // MOSI (output)
+    TRISBbits.TRISB3 = 0; // CS1 (output)
+    TRISBbits.TRISB4 = 0; // CS2 (output)
+    TRISDbits.TRISD6 = 0; // CS3 (output)
+    
+    // pin mapping
+    RPINR20bits.SDI1R = 17; // RPI17 -> MISO (SDI1)
+    RPOR11bits.RP108R = 0b000110; // RF12 -> SCK1 (clock)
+    RPOR12bits.RP109R = 0b000101; // RF13 -> MOSI (SDO1)
+    
+    // clearing SPI interrupt
+    IFS0bits.SPI1IF = 0;
+    IEC0bits.SPI1IE = 0;
+    
+    SPI1CON1bits.DISSCK = 0;
+    SPI1CON1bits.DISSDO = 0;
+    SPI1CON1bits.SMP = 0;
+    SPI1CON1bits.CKE = 0;
+    SPI1CON1bits.CKP = 1;
+    
+    SPI1CON1bits.MSTEN = 1; // master mode on
+    SPI1CON1bits.PPRE = 2; // primary prescaler 4:1
+    SPI1CON1bits.SPRE = 6; // secondary prescaler 2:1
+    // 9MHZ clock for SPI (Fcy/8 -> 72MHz/8)
+    SPI1CON1bits.MODE16 = 0; // 8-bit data communication
+    SPI1STATbits.SPIEN = 1; // enable SPI
+    
+    // deselecting chips
+    LATBbits.LATB3 = 1; // accelerometers (off)
+    LATBbits.LATB4 = 1; // gyroscope (off)
+    LATDbits.LATD6 = 1; // magnetometer (off)
+    
+    // --- Prepare magnetometer --- //
+    // Switching magnetometer to Sleep mode //
+    tmr_wait_ms(TIMER1, 3); // wait 3ms to reach Suspended mode
+    unsigned int adr = 0x4B & 0x7F;
+    LATDbits.LATD6 = 0;
+    spi_write(adr);
+    spi_write(0x01);
+    LATDbits.LATD6 = 1;
+    
+    // Switching magnetometer to Active mode //
+    tmr_wait_ms(TIMER1, 3); // wait 3ms to reach Sleep mode
+    adr = 0x4C & 0x7F;
+    LATDbits.LATD6 = 0;
+    spi_write(adr);
+    spi_write(0x00);
+    LATDbits.LATD6 = 1;
 }
 
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
@@ -277,6 +282,27 @@ void tmr_setup_period(int timer, int ms){
         PR1 = cycles;
         T1CONbits.TON = 1;
     }
+    else if(timer == TIMER2){
+        T2CONbits.TCS = 0;
+        T2CONbits.TGATE = 0;
+        T2CONbits.TON = 0; // ensure timer is off
+        TMR2 = 0; // reset timer 1
+        IFS0bits.T2IF = 0; // clear state period flag before restarting
+        if(cycle_case == 0){
+            T2CONbits.TCKPS = 0b00; // 1:1 prescaler
+        }
+        else if(cycle_case == 1){
+            T2CONbits.TCKPS = 0b01; // 1:8 prescaler
+        }
+        else if(cycle_case == 2){
+            T2CONbits.TCKPS = 0b10; // 1:64 prescaler
+        }
+        else{
+            T2CONbits.TCKPS = 0b11; // 1:256 prescaler
+        }
+        PR2 = cycles;
+        T2CONbits.TON = 1;
+    }
 }
 
 int tmr_wait_period(int timer){
@@ -296,16 +322,88 @@ int tmr_wait_period(int timer){
     return temp;
 }
 
+// Function to setup and expire a timer with provided ms (max 200)
+void tmr_wait_ms(int timer, int ms){
+    tmr_setup_period(timer, ms);
+    if (timer == TIMER2) {
+        while(IFS0bits.T2IF == 0);
+        T2CONbits.TON = 0;
+        IFS0bits.T2IF = 0;
+    }
+}
 
-void scheduler(heartbeat schedInfo[], int nTasks){
-    int i;
-    for (i = 0; i < nTasks; i++) {
-        schedInfo[i].n++;
-        if (schedInfo[i].enable == 1 && schedInfo[i].n >= schedInfo[i].N) {
-            schedInfo[i].f(schedInfo[i].params);            
-            schedInfo[i].n = 0;
+void PWM_set(int speed, int yaw){
+    
+    int left_pwm = speed - yaw;
+    int right_pwm = speed + yaw;
+    int period = 7200;
+    
+    // saturates values up to +-100
+    if(left_pwm >= 100){
+        left_pwm = 100;
+    }
+    
+    if(left_pwm <= -100){
+        left_pwm = -100;
+    }
+    
+    if(right_pwm >= 100){
+        right_pwm = 100;
+    }
+    
+    if(right_pwm <= -100){
+        right_pwm = -100;
+    }
+    
+    int left_DC = (left_pwm * period) / 100;
+    int right_DC = (right_pwm * period) / 100;
+    
+    if (left_DC >= 0){
+        if (right_DC >= 0){
+            // left and right wheels forward
+            DC_assigning(0,left_DC,0,right_DC);
+        }
+        else{
+            // left wheels forward and right wheels backward
+            DC_assigning(0,left_DC,-right_DC,0);
         }
     }
+    else{
+        if (right_DC >= 0){
+            // right wheels forward and left wheels backward
+            DC_assigning(-left_DC,0,0,right_DC);
+        }
+        else{
+            // left and right wheels backward
+            DC_assigning(-left_DC,0,-right_DC,0);
+        } 
+    }
+}
+
+void DC_assigning(int DC1, int DC2, int DC3, int DC4){
+        
+    OC1R = DC1; // PWM duty cycle
+    OC1RS = 7200; // PWM period 10kHz
+    
+    OC2R = DC2; // PWM duty cycle
+    OC2RS = 7200; // PWM period 10kHz
+    
+    OC3R = DC3; // PWM duty cycle
+    OC3RS = 7200; // PWM period 10kHz
+    
+    OC4R = DC4; // PWM duty cycle
+    OC4RS = 7200; // PWM period 10kHz
+}
+
+unsigned int spi_write(unsigned int data){
+    // writing data provided
+    while(SPI1STATbits.SPITBF == 1); // wait until Tx buffer is empty
+    SPI1BUF = data; // send data (could be greater than a byte)
+    
+    // reading answer
+    while(SPI1STATbits.SPIRBF == 0); // wait until Rx buffer is full
+    data = SPI1BUF;
+    return data;
 }
 
 int parse_byte(parser_state* ps, char byte) {
@@ -465,69 +563,6 @@ void task_PWM_set(void* param){
     }
 }
 
-void PWM_set(int speed, int yaw){
-    
-    int left_pwm = speed - yaw;
-    int right_pwm = speed + yaw;
-    int period = 7200;
-    
-    // saturates values up to +-100
-    if(left_pwm >= 100){
-        left_pwm = 100;
-    }
-    
-    if(left_pwm <= -100){
-        left_pwm = -100;
-    }
-    
-    if(right_pwm >= 100){
-        right_pwm = 100;
-    }
-    
-    if(right_pwm <= -100){
-        right_pwm = -100;
-    }
-    
-    int left_DC = (left_pwm * period) / 100;
-    int right_DC = (right_pwm * period) / 100;
-    
-    if (left_DC >= 0){
-        if (right_DC >= 0){
-            // left and right wheels forward
-            DC_assigning(0,left_DC,0,right_DC);
-        }
-        else{
-            // left wheels forward and right wheels backward
-            DC_assigning(0,left_DC,-right_DC,0);
-        }
-    }
-    else{
-        if (right_DC >= 0){
-            // right wheels forward and left wheels backward
-            DC_assigning(-left_DC,0,0,right_DC);
-        }
-        else{
-            // left and right wheels backward
-            DC_assigning(-left_DC,0,-right_DC,0);
-        } 
-    }
-}
-
-void DC_assigning(int DC1, int DC2, int DC3, int DC4){
-        
-    OC1R = DC1; // PWM duty cycle
-    OC1RS = 7200; // PWM period 10kHz
-    
-    OC2R = DC2; // PWM duty cycle
-    OC2RS = 7200; // PWM period 10kHz
-    
-    OC3R = DC3; // PWM duty cycle
-    OC3RS = 7200; // PWM period 10kHz
-    
-    OC4R = DC4; // PWM duty cycle
-    OC4RS = 7200; // PWM period 10kHz
-}
-
 void task_button_check(void* param){
     // frequency of 10Hz (not required)
     control_data *cd = (control_data*) param;
@@ -546,13 +581,20 @@ void task_button_check(void* param){
 }
 
 void task_reading_VBAT_n_sending_to_uart(){
-    // frequency of 1Hz (to send and simply since no requirements in project specs)
+    // frequency of 1Hz (to send, not considering separate frequency for reading since no requirements in project specs)
     double v_batt = 0.0;
-    IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
+    int AN11_value = 0;
+    
+    // manual sampling + auto conversion
+    AD1CHS0bits.CH0SA = 11; // selecting AN11 for CH0 (pin OUT of battery voltage)
+    AD1CON1bits.DONE = 0; // ensuring done bit is zero before sampling
+    AD1CON1bits.SAMP = 1; // starting sampling
+    // sampling starts, and, after 16 Tad, automatically stops
+    while(AD1CON1bits.DONE == 0); // waiting for conversion to finish
+    AN11_value = ADC1BUF0; // reading result (0-1023)
     // converting AN11 data to correct value (Volts):
     // Vbattery = (AN11_value/1023)*Vrefh*k (Volts) (where k is coefficient from voltage divider)
     v_batt = ((double)AN11_value * 3.6 * 3.0) / 1023.0; // cumulative variable to compute average
-    IEC0bits.AD1IE = 1; // enabling ADC interrupt again
     
     // sending data to UART
     char msg[30] = "";
@@ -570,11 +612,19 @@ void task_reading_VBAT_n_sending_to_uart(){
 void task_reading_IR_value(void* param){
     // frequency of 500Hz
     control_data *cd = (control_data*) param;
-    IEC0bits.AD1IE = 0; // disabling ADC interrupt (shared variables)
+    double Vsensor = 0.0;
+    int AN14_value = 0;
+    
+    // manual sampling + auto conversion
+    AD1CHS0bits.CH0SA = 14; // selecting AN14 for CH0 (pin OUT of IR sensor)
+    AD1CON1bits.DONE = 0; // ensuring done bit is zero before sampling
+    AD1CON1bits.SAMP = 1; // starting sampling
+    // sampling starts, and, after 16 Tad, automatically stops
+    while(AD1CON1bits.DONE == 0); // waiting for conversion to finish
+    AN14_value = ADC1BUF0; // reading result (0-1023)
     // converting AN14 data to correct value (centimetres):
     // Vsensor = (AN14_value/1023)*Vrefh (Volts)
-    double Vsensor = ((double)AN14_value * 3.6) / 1023.0;
-    IEC0bits.AD1IE = 1; // enabling ADC interrupt again
+    Vsensor = ((double)AN14_value * 3.6) / 1023.0;
 
     // applying formula to get distance (meters) registered by sensor
     // (not using pow() to increase computation speed)
@@ -584,6 +634,12 @@ void task_reading_IR_value(void* param){
     int distance = 2.34 - 4.74*Vsensor + 4.06*Vsensor2 - 1.6*Vsensor3 + 0.24*Vsensor4; // must be sent as an integer
     distance *= 100;
     cd->distance_sensor_value = distance;
+    
+    if(distance <= 20 && cd->robot_state == MOVING_STATE){
+        // obstacle closer than 20 centimetres
+        cd->robot_state = OBSTACLE_AVOIDANCE_STATE;
+        cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90°)
+    }
 }
 
 void task_sending_IR_value_to_uart(void* param){
@@ -623,6 +679,106 @@ void task_buggy_lights(void* param){
             LATGbits.LATG1 = 1; // low-lights on
             break;
     };
+}
+
+void task_reading_magn_acc_gyro_n_sending_to_uart(void* param){
+    // frequency of 10Hz (both reading and sending values)
+    control_data *cd = (control_data*) param;
+    
+    // Reading x,y,z accelerometer values //
+    int values[3];
+    unsigned int output_1;
+    unsigned int output_2;
+    LATBbits.LATB3 = 0;
+    spi_write(0x02 | 0x80); // providing first address (MSB x-axis)
+    for(int i = 0;i<3;i++){
+        output_1 = spi_write(0x00);
+        output_2 = spi_write(0x00);
+        output_1 = output_1 & 0x00F0; // clear last 4 bits
+        output_2 = output_2 << 8; // left shift of 8 bits
+        int data = output_2 | output_1;
+        data = data / 16; // right shift of 16 bits
+        values[i] = data;
+    }
+    LATBbits.LATB3 = 1;
+    
+    // Computing roll and pitch //
+    cd->angle_values[0] = (int)(atan2(values[1], values[2]) * (180.0 / 3.14));
+    cd->angle_values[1] = (int)(atan2(-values[0], sqrt((long)values[1] * (long)values[1] + (long)values[2] * (long)values[2])) * (180.0 / 3.14));
+    
+    // Reading x,y,z magnetometer values //
+    LATDbits.LATD6 = 0;
+    spi_write(0x42 | 0x80); // providing first address (MSB x-axis)
+    for(int i = 0;i<3;i++){
+        output_1 = spi_write(0x00);
+        output_2 = spi_write(0x00);
+        
+        if(i<2){
+            output_1 = output_1 & 0x00F8; // clearing last 3 bits of byte with 5 MSBs the 5 LSBs of x-axis
+            output_2 = output_2 << 8; // shifting of 8 slots the 8 MSBs of x-axis
+            int data = output_2 | output_1; // or between two parts (8 MSBs and 5 LSBs + 3 zero bits)
+            data = data / 8; // safe shifting 13 bits (x-axis) to the left by 3 slots (13 bits in 16 bit register)
+            values[i] = data;
+        }
+        else{
+            // z-axis is allocated in a different way
+            output_1 = output_1 & 0x00FE; // clear bit 0, keep bits [7:1]
+            output_2 = output_2 << 8; // move MSBs to upper byte
+            int data = output_2 | output_1; // combine parts
+            data = data / 2; // shift right by 1
+            values[i] = data;
+        }
+    }
+    LATDbits.LATD6 = 1;
+    
+    // Computing yaw with magnetometer values //
+    // magnetic field of motor wheels may disturb it
+    cd->angle_values[2] = (int)(atan2(values[1], values[0]) * 180.0 / 3.14);
+    
+    // Reading z gyroscope value //
+    // useful to compute yaw
+    LATBbits.LATB4 = 0;
+    spi_write(0x06 | 0x80); // providing first address (MSB x-axis)
+    output_1 = spi_write(0x00);
+    output_2 = spi_write(0x00);
+    output_2 = output_2 << 8; // left shift of 8 bits (MSB)
+    int16_t raw_gz = output_2 | output_1; 
+    // 16 bit value (need a 16-bit integer to ensure sign is kept and not converted in a grater value once inside a 32-bit integer)
+    LATBbits.LATB4 = 1;
+    
+    // Computing yaw with gyroscope value //
+    // need to integrate the value since it is an angular velocity component
+    float gz_dps = ((float)raw_gz * 2000.0f) / 32767.0f; // converting value from [32767;-32767] to [2000;-2000] scale
+    float dt = 0.1f; // 100ms -> value read at 10Hz
+    cd->yaw_ctrl += gz_dps * dt; // value used to control car movement
+    
+    // Value retrieved is a rotation obtained from z component of angular velocity, so it could grow beyond certain limits.
+    // Ensure integration doesn't exit range [-180;180] (keep consistency with yaw from magnetometer):
+    if(cd->yaw_ctrl > 180.0f){
+        cd->yaw_ctrl -= 360.0f;
+    }
+    if(cd->yaw_ctrl <= -180.0f){
+        cd->yaw_ctrl += 360.0f;
+    }
+    
+    /*
+     gz may introduce drift -> progressive cumulative bias,
+     in that case we can combine with yaw from magnetometer:
+     final_yaw = 0.98f * (final_yaw + gz_dps * dt) + 0.02f * yaw_mag;
+     
+     using this instead of previous formula: float yaw += gz_dps * dt;
+     */
+}
+
+void scheduler(heartbeat schedInfo[], int nTasks){
+    int i;
+    for (i = 0; i < nTasks; i++) {
+        schedInfo[i].n++;
+        if (schedInfo[i].enable == 1 && schedInfo[i].n >= schedInfo[i].N) {
+            schedInfo[i].f(schedInfo[i].params);            
+            schedInfo[i].n = 0;
+        }
+    }
 }
 
 // ISR redefinition for UART1 Tx register
@@ -696,12 +852,4 @@ void __attribute__((__interrupt__, __auto_psv__)) _T4Interrupt(void){
         button_E9_pressed = 1;
     }
     
-}
-
-// ISR redefinition for ADC module 1
-void __attribute__((interrupt, no_auto_psv)) _AD1Interrupt(void){
-    IFS0bits.AD1IF = 0;
-
-    AN11_value = ADC1BUF0;
-    AN14_value = ADC1BUF1;
 }
