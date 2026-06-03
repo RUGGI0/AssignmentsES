@@ -35,11 +35,11 @@ extern volatile CircularBuffer tx_buffer;
 
 typedef struct { 
 	int state;
-	char msg_type[7]; // message type is up to 6 chars + string terminator
-	char msg_payload[11];  // assume payload cannot be longer than 100 chars
+	char msg_type[6]; // message type is up to 5 chars + string terminator
+	char msg_payload[10];  // assume payload cannot be longer than 10 chars
 	int index_type;
 	int index_payload;
-} parser_state;
+} parser_state; 
 
 // --- Scheduler data --- //
 #define MAX_TASKS 10
@@ -68,7 +68,7 @@ typedef struct {
 #define AVOIDANCE_STEP_3 (6) // turning 90° anti-clockwise (back to previous heading)
 #define AVOIDANCE_STEP_4 (7) // checking if there is still obstacle and if maximum obstacle avoidance executions have been reached
 
-// parameter for tasks structure
+// structure for tasks parameter
 typedef struct{
     int speed;
     int yaw;
@@ -80,6 +80,7 @@ typedef struct{
     float gyro_yaw;
     float ctrl_yaw; // used to carry out obstacle avoidance policy
     heartbeat *schedInfo;
+    parser_state *par_state;
 }control_data;
 
 // Global variable //

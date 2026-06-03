@@ -303,6 +303,48 @@ void tmr_setup_period(int timer, int ms){
         PR2 = cycles;
         T2CONbits.TON = 1;
     }
+    else if(timer == TIMER3){
+        T3CONbits.TCS = 0;
+        T3CONbits.TGATE = 0;
+        T3CONbits.TON = 0; // ensure timer is off
+        TMR3 = 0; // reset timer 1
+        IFS0bits.T3IF = 0; // clear state period flag before restarting
+        if(cycle_case == 0){
+            T3CONbits.TCKPS = 0b00; // 1:1 prescaler
+        }
+        else if(cycle_case == 1){
+            T3CONbits.TCKPS = 0b01; // 1:8 prescaler
+        }
+        else if(cycle_case == 2){
+            T3CONbits.TCKPS = 0b10; // 1:64 prescaler
+        }
+        else{
+            T3CONbits.TCKPS = 0b11; // 1:256 prescaler
+        }
+        PR3 = cycles;
+        T3CONbits.TON = 1;
+    }
+    else if(timer == TIMER4){
+        T4CONbits.TCS = 0;
+        T4CONbits.TGATE = 0;
+        T4CONbits.TON = 0; // ensure timer is off
+        TMR4 = 0; // reset timer 1
+        IFS1bits.T4IF = 0; // clear state period flag before restarting
+        if(cycle_case == 0){
+            T4CONbits.TCKPS = 0b00; // 1:1 prescaler
+        }
+        else if(cycle_case == 1){
+            T4CONbits.TCKPS = 0b01; // 1:8 prescaler
+        }
+        else if(cycle_case == 2){
+            T4CONbits.TCKPS = 0b10; // 1:64 prescaler
+        }
+        else{
+            T4CONbits.TCKPS = 0b11; // 1:256 prescaler
+        }
+        PR4 = cycles;
+        T4CONbits.TON = 1;
+    }
 }
 
 int tmr_wait_period(int timer){
@@ -333,10 +375,11 @@ void tmr_wait_ms(int timer, int ms){
 }
 
 void PWM_set(int speed, int yaw){
-    
     int left_pwm = speed - yaw;
     int right_pwm = speed + yaw;
     int period = 7200;
+    long left_DC = 0;
+    long right_DC = 0;
     
     // saturates values up to +-100
     if(left_pwm >= 100){
@@ -355,8 +398,9 @@ void PWM_set(int speed, int yaw){
         right_pwm = -100;
     }
     
-    int left_DC = (left_pwm * period) / 100;
-    int right_DC = (right_pwm * period) / 100;
+    // using long to avoid overflow from 'pwm_value * period'
+    left_DC = ((long)left_pwm * period) / 100;
+    right_DC = ((long)right_pwm * period) / 100;
     
     if (left_DC >= 0){
         if (right_DC >= 0){
@@ -419,7 +463,7 @@ int parse_byte(parser_state* ps, char byte) {
                 ps->state = STATE_PAYLOAD;
                 ps->msg_type[ps->index_type] = '\0';
                 ps->index_payload = 0; // initialise properly the index
-            } else if (ps->index_type == 5) { // error! (type is PCREF for messages received)
+            } else if (ps->index_type == 6) { // error! (type is PCREF for messages received)
                 ps->state = STATE_DOLLAR;
                 ps->index_type = 0;
 			} else if (byte == '*') {
@@ -437,7 +481,7 @@ int parse_byte(parser_state* ps, char byte) {
                 ps->state = STATE_DOLLAR; // get ready for a new message
                 ps->msg_payload[ps->index_payload] = '\0';
                 return NEW_MESSAGE;
-                } else if (ps->index_payload == 11) { // error (surpassed: two values + one comma + *)
+                } else if (ps->index_payload == 10) { // error (surpassed: two values + one comma + *)
                 ps->state = STATE_DOLLAR;
                 ps->index_payload = 0;
             } else {
@@ -478,48 +522,48 @@ int next_value(const char* msg, int i) {
 	return i;
 }
 
-// Parses one message (assumed correct structurer is $PCREF,speed,yaw*)
+// Parses one message (assumed correct structurer is $PCREF,speed,yaw*) $PCREF,70,0*
 void task_read_speed_yaw(void* param){
     // frequency of 500Hz
     control_data *cd = (control_data*) param;
-    parser_state ps;
-    ps.state = STATE_DOLLAR;
+    cd->par_state->state = STATE_DOLLAR;
     
     char byte;
-    int res = NO_MESSAGE, counter = 0;
+    int res1 = NO_MESSAGE, res2 = -1, counter = 0;
     while(buffer_is_empty(&rx_buffer) == 0 && counter <= 18){
         // keeps going until either circular buffer is empty or ps arrays are full
         buffer_read(&rx_buffer,&byte);
-        if(parse_byte(&ps,byte) == NEW_MESSAGE){
+        res2 = parse_byte(cd->par_state,byte);
+        if(res2 == NEW_MESSAGE){
             // takes only one message at a time
-            res = NEW_MESSAGE;
+            res1 = NEW_MESSAGE;
             break;
         }
         counter++;
     }
     
-    if(res != NEW_MESSAGE){
-        // wrong message -> speed and yaw not updated
+    if(res1 != NEW_MESSAGE){
+        // wrong message -> speed and yaw not updated, or no message
         return;
     }
     
-    if(!strcmp(ps.msg_type, "PCREF") && ps.index_payload >= 3){
+    if(strcmp(cd->par_state->msg_type, "PCREF") == 0 && cd->par_state->index_payload >= 3){
         // correct protocol and payload is not empty (smallest size is 3) (index_payload points at \0)
         
         // extracting values //
         counter = 0; // to know which value is being read
         int i = 0, j = 0;
         char temp[5]; // to store string value (dim = maximum value length + \0)
-        while(i < ps.index_payload && counter < 2){
-            j = next_value(ps.msg_payload,i);
+        while(i < cd->par_state->index_payload && counter < 2){
+            j = next_value(cd->par_state->msg_payload,i);
             switch(counter){
                 case 0:             
-                    strncpy(temp, ps.msg_payload + i, j-1); // copy substring from index i of payload with length j-1
+                    strncpy(temp, cd->par_state->msg_payload + i, j-1); // copy substring from index i of payload with length j-1
                     temp[j-1] = '\0';
                     cd->speed = extract_integer(temp);
                     break;
                 case 1:
-                    strncpy(temp, ps.msg_payload + i, j-i); // copy substring from index i of payload with length j-i
+                    strncpy(temp, cd->par_state->msg_payload + i, j-i); // copy substring from index i of payload with length j-i
                     temp[j-i] = '\0';
                     cd->yaw = extract_integer(temp);
                     break;
@@ -585,9 +629,10 @@ void task_button_check(void* param){
     // frequency of 10Hz (not required)
     control_data *cd = (control_data*) param;
     if(button_E8_pressed == 1){
+        button_E8_pressed = 0;
         if(cd->robot_state == HALTED_STATE){
             cd->robot_state = MOVING_STATE;
-        }
+       }
         else{
             // either moving or avoiding obstacle
             cd->robot_state = HALTED_STATE;
@@ -595,6 +640,7 @@ void task_button_check(void* param){
     }
     if(button_E9_pressed == 1){
         // send number of data available inside TX and RX
+        button_E9_pressed = 0;
     }
 }
 
