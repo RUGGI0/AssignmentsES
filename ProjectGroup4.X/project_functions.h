@@ -107,6 +107,7 @@ int extract_integer(const char* str);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 unsigned int spi_write(unsigned int data);
+int get_accelerometer_value(unsigned int adr);
 
 void task_read_speed_yaw(void* param);
 void task_PWM_set(void* param);
@@ -117,7 +118,7 @@ void task_reading_IR_value(void* param);
 void task_sending_IR_value_to_uart(void* param);
 void task_buggy_lights(void* param);
 void task_reading_magn_acc_gyro(void* param);
-void sending_IMU_values_to_uart(void* param);
+void sending_angle_values_to_uart(void* param);
 
 void scheduler(heartbeat schedInfo[], int nTasks);
 

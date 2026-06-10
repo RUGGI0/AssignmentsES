@@ -156,6 +156,7 @@ void device_init(){
     TRISBbits.TRISB9 = 0; // pin to enable IR Sensor board (Buggy Mikrobus 1)
     LATBbits.LATB9 = 1; // enabled
     
+    
     AD1CON1bits.ADON = 1; // activating ADC module 1
 
     // ----* Configure SPI *---- //
@@ -458,6 +459,38 @@ unsigned int spi_write(unsigned int data){
     return data;
 }
 
+int get_accelerometer_value(unsigned int adr){
+    unsigned int output1 = 0;
+    unsigned int output2 = 0;
+    LATBbits.LATB3 = 0;
+    spi_write(adr | 0x80);
+    output1 = spi_write(0x00); // 0x02 | 0x04 | 0x06
+    output2 = spi_write(0x00); // 0x03 | 0x05 | 0x07
+    LATBbits.LATB3 = 1;
+
+    output1 = output1 & 0x00F0; // clear last 4 bits
+    output2 = output2 << 8; // left shift of 8 bits
+    int data = output2 | output1;
+    data = data / 16; // right shift of 16 bits
+    return data;
+}
+
+int get_magnetometer_value(unsigned int adr){
+    unsigned int output1 = 0;
+    unsigned int output2 = 0;
+    LATDbits.LATD6 = 0;
+    spi_write(adr | 0x80);
+    output1 = spi_write(0x00); // 0x42 | 0x44
+    output2 = spi_write(0x00); // 0x43 | 0x45
+    LATDbits.LATD6 = 1;
+
+    output1 = output1 & 0x00F8; // clearing last 3 bits of byte with 5 MSBs the 5 LSBs of x-axis
+    output2 = output2 << 8; // shifting of 8 slots the 8 MSBs of x-axis
+    int data = output2 | output1; // or between two parts (8 MSBs and 5 LSBs + 3 zero bits)
+    data = data / 8; // safe shifting 13 bits (x-axis) to the left by 3 slots (13 bits in 16 bit register)
+    return data;
+}
+
 int parse_byte(parser_state* ps, char byte) {
     switch (ps->state) {
         case STATE_DOLLAR:
@@ -534,13 +567,14 @@ int next_value(const char* msg, int i) {
 void task_read_speed_yaw(void* param){
     // frequency of 500Hz
     control_data *cd = (control_data*) param;
-    cd->par_state->state = STATE_DOLLAR;
     
     char byte;
     int res1 = NO_MESSAGE, res2 = -1, counter = 0;
     while(buffer_is_empty(&rx_buffer) == 0 && counter <= 18){
         // keeps going until either circular buffer is empty or ps arrays are full
+        IEC0bits.U1RXIE = 0; 
         buffer_read(&rx_buffer,&byte);
+        IEC0bits.U1RXIE = 1;
         res2 = parse_byte(cd->par_state,byte);
         if(res2 == NEW_MESSAGE){
             // takes only one message at a time
@@ -716,7 +750,7 @@ void task_reading_IR_value(void* param){
     double Vsensor2 = Vsensor*Vsensor;
     double Vsensor3 = Vsensor2*Vsensor;
     double Vsensor4 = Vsensor3*Vsensor;
-    int distance = 2.34 - 4.74*Vsensor + 4.06*Vsensor2 - 1.6*Vsensor3 + 0.24*Vsensor4; // must be sent as an integer
+    double distance = 2.34 - 4.74*Vsensor + 4.06*Vsensor2 - 1.6*Vsensor3 + 0.24*Vsensor4; // must be sent as an integer
     distance *= 100;
     cd->distance_sensor_value = distance;
     
@@ -786,56 +820,27 @@ void task_reading_magn_acc_gyro(void* param){
     
     // Reading x,y,z accelerometer values //
     int values[3];
-    unsigned int output_1;
-    unsigned int output_2;
-    LATBbits.LATB3 = 0;
-    spi_write(0x02 | 0x80); // providing first address (MSB x-axis)
-    for(int i = 0;i<3;i++){
-        output_1 = spi_write(0x00);
-        output_2 = spi_write(0x00);
-        output_1 = output_1 & 0x00F0; // clear last 4 bits
-        output_2 = output_2 << 8; // left shift of 8 bits
-        int data = output_2 | output_1;
-        data = data / 16; // right shift of 16 bits
-        values[i] = data;
-    }
-    LATBbits.LATB3 = 1;
+    values[0] = get_accelerometer_value(0x02);
+    values[1] = get_accelerometer_value(0x04);
+    values[2] = get_accelerometer_value(0x06);
     
     // Computing roll and pitch //
     cd->angle_values[0] = (int)(atan2(values[1], values[2]) * (180.0 / 3.14));
     cd->angle_values[1] = (int)(atan2(-values[0], sqrt((long)values[1] * (long)values[1] + (long)values[2] * (long)values[2])) * (180.0 / 3.14));
     
     // Reading x,y,z magnetometer values //
-    LATDbits.LATD6 = 0;
-    spi_write(0x42 | 0x80); // providing first address (MSB x-axis)
-    for(int i = 0;i<3;i++){
-        output_1 = spi_write(0x00);
-        output_2 = spi_write(0x00);
+    values[0] = get_magnetometer_value(0x42);
+    values[1] = get_magnetometer_value(0x44);
         
-        if(i<2){
-            output_1 = output_1 & 0x00F8; // clearing last 3 bits of byte with 5 MSBs the 5 LSBs of x-axis
-            output_2 = output_2 << 8; // shifting of 8 slots the 8 MSBs of x-axis
-            int data = output_2 | output_1; // or between two parts (8 MSBs and 5 LSBs + 3 zero bits)
-            data = data / 8; // safe shifting 13 bits (x-axis) to the left by 3 slots (13 bits in 16 bit register)
-            values[i] = data;
-        }
-        else{
-            // z-axis is allocated in a different way
-            output_1 = output_1 & 0x00FE; // clear bit 0, keep bits [7:1]
-            output_2 = output_2 << 8; // move MSBs to upper byte
-            int data = output_2 | output_1; // combine parts
-            data = data / 2; // shift right by 1
-            values[i] = data;
-        }
-    }
-    LATDbits.LATD6 = 1;
-    
     // Computing yaw with magnetometer values //
     // magnetic field of motor wheels may disturb it
-    cd->angle_values[2] = (int)(atan2(values[1], values[0]) * 180.0 / 3.14);
+    //cd->angle_values[2] = (int)(atan2(values[1], values[0]) * 180.0 / 3.14);
+    cd->angle_values[2] = values[0];
     
     // Reading z gyroscope value //
     // useful to compute yaw
+    unsigned int output_1;
+    unsigned int output_2;
     LATBbits.LATB4 = 0;
     spi_write(0x06 | 0x80); // providing first address (MSB x-axis)
     output_1 = spi_write(0x00);
@@ -885,7 +890,7 @@ void task_reading_magn_acc_gyro(void* param){
     }
 }
 
-void sending_IMU_values_to_uart(void* param){
+void sending_angle_values_to_uart(void* param){
     // frequency of 10Hz
     control_data *cd = (control_data*) param;
     
