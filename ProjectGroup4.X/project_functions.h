@@ -95,6 +95,7 @@ void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size);
 int buffer_is_empty(volatile CircularBuffer* cb);
 int buffer_write(volatile CircularBuffer* cb, char c);
 int buffer_read(volatile CircularBuffer* cb, char* c);
+int buffer_occupancy(volatile CircularBuffer* cb);
 
 void tmr_setup_period(int timer, int ms);
 int tmr_wait_period(int timer);
@@ -103,7 +104,6 @@ void tmr_wait_ms(int timer, int ms);
 int parse_byte(parser_state* ps, char byte);
 int next_value(const char* msg, int i);
 int extract_integer(const char* str);
-int buffer_occupancy(volatile CircularBuffer* cb);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 unsigned int spi_write(unsigned int data);

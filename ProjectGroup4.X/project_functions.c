@@ -241,6 +241,14 @@ int buffer_read(volatile CircularBuffer* cb, char* c) {
     return 0;
 }
 
+int buffer_occupancy(volatile CircularBuffer* cb) {
+    if (cb->head >= cb->tail) {
+        return cb->head - cb->tail; 
+    } else {
+        return cb->size - cb->tail + cb->head; 
+    }
+}
+
 void tmr_setup_period(int timer, int ms){
     int cycle_case = -1;
     long Fcy = 72000000; // dsPIC33EP512MU810
@@ -522,14 +530,6 @@ int next_value(const char* msg, int i) {
 	return i;
 }
 
-int buffer_occupancy(volatile CircularBuffer* cb) {
-    if (cb->head >= cb->tail) {
-        return cb->head - cb->tail; 
-    } else {
-        return cb->size - cb->tail + cb->head; 
-    }
-}
-
 // Parses one message (assumed correct structurer is $PCREF,speed,yaw*) $PCREF,70,0*
 void task_read_speed_yaw(void* param){
     // frequency of 500Hz
@@ -760,9 +760,7 @@ void task_sending_IR_value_to_uart(void* param){
 void task_buggy_lights(void* param){
     // frequency of 1Hz
     control_data *cd = (control_data*) param;
-    
     // LATAbits.LATA0 = !LATAbits.LATA0;
-    
     switch(cd->robot_state){
         case HALTED_STATE:
             LATBbits.LATB8 = !LATBbits.LATB8; // toggle left-side lights
