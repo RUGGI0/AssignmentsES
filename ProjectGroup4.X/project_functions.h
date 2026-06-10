@@ -103,6 +103,7 @@ void tmr_wait_ms(int timer, int ms);
 int parse_byte(parser_state* ps, char byte);
 int next_value(const char* msg, int i);
 int extract_integer(const char* str);
+int buffer_occupancy(volatile CircularBuffer* cb);
 void PWM_set(int speed, int yaw);
 void DC_assigning(int RD1, int RD2, int RD3, int RD4);
 unsigned int spi_write(unsigned int data);

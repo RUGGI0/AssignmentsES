@@ -522,6 +522,14 @@ int next_value(const char* msg, int i) {
 	return i;
 }
 
+int buffer_occupancy(volatile CircularBuffer* cb) {
+    if (cb->head >= cb->tail) {
+        return cb->head - cb->tail; 
+    } else {
+        return cb->size - cb->tail + cb->head; 
+    }
+}
+
 // Parses one message (assumed correct structurer is $PCREF,speed,yaw*) $PCREF,70,0*
 void task_read_speed_yaw(void* param){
     // frequency of 500Hz
@@ -641,6 +649,19 @@ void task_button_check(void* param){
     if(button_E9_pressed == 1){
         // send number of data available inside TX and RX
         button_E9_pressed = 0;
+        int tx_occ = buffer_occupancy(&tx_buffer);
+        int rx_occ = buffer_occupancy(&rx_buffer);
+    
+        char msg[16];
+        sprintf(msg, "$MBUF,%d,%d*", tx_occ, rx_occ);
+        for(int i = 0;i<16;i++){
+            if(msg[i] == '\0'){
+                break;
+            }
+            buffer_write(&tx_buffer,msg[i]);
+        }
+        
+        IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
     }
 }
 
@@ -739,6 +760,9 @@ void task_sending_IR_value_to_uart(void* param){
 void task_buggy_lights(void* param){
     // frequency of 1Hz
     control_data *cd = (control_data*) param;
+    
+    // LATAbits.LATA0 = !LATAbits.LATA0;
+    
     switch(cd->robot_state){
         case HALTED_STATE:
             LATBbits.LATB8 = !LATBbits.LATB8; // toggle left-side lights

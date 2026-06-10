@@ -63,6 +63,7 @@ int main(void) {
     int cycle_counter = 0;
     
     while(1){
+        // maybe with buggy lights
         if(cycle_counter == 250){
             // LD0 blinks every 500ms (short task can be inserted in main loop)
             LATAbits.LATA0 = !LATAbits.LATA0;
