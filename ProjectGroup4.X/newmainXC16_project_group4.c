@@ -46,14 +46,14 @@ int main(void) {
     schedInfo[0].N = 1;
     schedInfo[0].f = task_read_speed_yaw;
     schedInfo[0].params = (void*)(&cd);
-    schedInfo[0].enable = 0;
+    schedInfo[0].enable = 1;
     
     // Task to set PWM for buggy motion (500Hz)
     schedInfo[1].n = -1;
     schedInfo[1].N = 1;
     schedInfo[1].f = task_PWM_set;
     schedInfo[1].params = (void*)(&cd);
-    schedInfo[1].enable = 0;
+    schedInfo[1].enable = 1;
     
     // Task to stop 2sec buggy motion in obstacle avoidance mode
     schedInfo[2].N = 1000; // 2sec
@@ -64,7 +64,7 @@ int main(void) {
     schedInfo[3].N = 50;
     schedInfo[3].f = task_button_check;
     schedInfo[3].params = (void*)(&cd);
-    schedInfo[3].enable = 0;
+    schedInfo[3].enable = 1;
     
     // Task to read VBAT (1Hz)
     schedInfo[4].n = 0;
@@ -75,11 +75,11 @@ int main(void) {
     
     // Task to read IR value from collision sensor (500Hz)
     // could be better to implement average to clear outlayers
-    schedInfo[5].n = 0;
+    schedInfo[5].n = -1;
     schedInfo[5].N = 1;
     schedInfo[5].f = task_reading_IR_value;
     schedInfo[5].params = (void*)(&cd);
-    schedInfo[5].enable = 0;
+    schedInfo[5].enable = 1;
     
     // Task to send IR value to uart (10Hz)
     schedInfo[6].n = -1;
@@ -88,20 +88,27 @@ int main(void) {
     schedInfo[6].params = (void*)(&cd);
     schedInfo[6].enable = 0;
     
-    // Task to receive IMU data and compute roll,pitch and yaw (10Hz)
-    schedInfo[7].n = 0;
+    // Task to activating buggy lights (10Hz)
+    schedInfo[7].n = -17;
     schedInfo[7].N = 50;
-    schedInfo[7].f = task_reading_magn_acc_gyro;
+    schedInfo[7].f = task_buggy_lights;
     schedInfo[7].params = (void*)(&cd);
     schedInfo[7].enable = 1;
     
-    // Task to send angle value to uart (10Hz)
-    schedInfo[8].n = -25;
-    schedInfo[8].N = 250;
-    schedInfo[8].f = sending_angle_values_to_uart;
+    // Task to receive IMU data and compute roll,pitch and yaw (10Hz)
+    schedInfo[8].n = -34;
+    schedInfo[8].N = 50;
+    schedInfo[8].f = task_reading_magn_acc_gyro;
     schedInfo[8].params = (void*)(&cd);
     schedInfo[8].enable = 1;
     
+    // Task to send angle value to uart (10Hz)
+    schedInfo[9].n = -25;
+    schedInfo[9].N = 250;
+    schedInfo[9].f = sending_angle_values_to_uart;
+    schedInfo[9].params = (void*)(&cd);
+    schedInfo[9].enable = 0;
+   
     int cycle_counter = 0;
     
     while(1){

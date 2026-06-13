@@ -195,6 +195,12 @@ void device_init(){
     LATDbits.LATD6 = 1; // magnetometer (off)
     
     // --- Prepare magnetometer --- //
+    // Force activation of SPI
+    LATDbits.LATD6 = 0;
+    tmr_wait_ms(TIMER1, 2);
+    LATDbits.LATD6 = 1;
+    tmr_wait_ms(TIMER1, 2);
+    
     // Switching magnetometer to Sleep mode //
     tmr_wait_ms(TIMER1, 3); // wait 3ms to reach Suspended mode
     unsigned int adr = 0x4B & 0x7F;
@@ -204,12 +210,14 @@ void device_init(){
     LATDbits.LATD6 = 1;
     
     // Switching magnetometer to Active mode //
-    tmr_wait_ms(TIMER1, 3); // wait 3ms to reach Sleep mode
+    tmr_wait_ms(TIMER1, 50); // wait 3ms to reach Sleep mode
     adr = 0x4C & 0x7F;
     LATDbits.LATD6 = 0;
     spi_write(adr);
     spi_write(0x00);
     LATDbits.LATD6 = 1;
+    
+    tmr_wait_ms(TIMER1, 50);
 }
 
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
@@ -436,16 +444,16 @@ void PWM_set(int speed, int yaw){
 void DC_assigning(int DC1, int DC2, int DC3, int DC4){
         
     OC1R = DC1; // PWM duty cycle
-    OC1RS = 7200; // PWM period 10kHz
+    //OC1RS = 7200; // PWM period 10kHz
     
     OC2R = DC2; // PWM duty cycle
-    OC2RS = 7200; // PWM period 10kHz
+    //OC2RS = 7200; // PWM period 10kHz
     
     OC3R = DC3; // PWM duty cycle
-    OC3RS = 7200; // PWM period 10kHz
+    //OC3RS = 7200; // PWM period 10kHz
     
     OC4R = DC4; // PWM duty cycle
-    OC4RS = 7200; // PWM period 10kHz
+    //OC4RS = 7200; // PWM period 10kHz
 }
 
 unsigned int spi_write(unsigned int data){
@@ -621,7 +629,7 @@ void task_PWM_set(void* param){
     control_data *cd = (control_data*) param;
     switch(cd->robot_state){
         case HALTED_STATE:
-            DC_assigning(0, 0, 0, 0);
+            PWM_set(0,0);
             break;
         case MOVING_STATE:
             cd->obs_av_state_ctrl = 0; // resetting obstacle avoidance policy executions
@@ -640,6 +648,7 @@ void task_PWM_set(void* param){
                     // saving current yaw to later check when stop rotation (done in task_reading_magn_acc_gyro)
                     cd->ctrl_yaw = cd->gyro_yaw;
                     cd->obs_av_state_ctrl++; // keeping count of three maximum executions
+                    //DC_assigning(0,7200,0,0);
                     PWM_set(50,-50); // left_pwm = 100, right_pwm = 0 -> sharp rotation to the right
                     break;
                 case AVOIDANCE_STEP_2:
@@ -651,7 +660,7 @@ void task_PWM_set(void* param){
                     break;
                 case AVOIDANCE_STEP_3:
                     // rotate 90° anti-clockwise (later add gyroscope)
-                    PWM_set(50,50); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
+                    PWM_set(50,60); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
                     break;
                 case AVOIDANCE_STEP_4:
                     break;
@@ -754,23 +763,31 @@ void task_reading_IR_value(void* param){
     distance *= 100;
     cd->distance_sensor_value = distance;
     
-    if(distance <= 20 && cd->robot_state == MOVING_STATE && cd->obs_av_state_ctrl < 3){
-        // obstacle closer than 20 centimetres
-        cd->robot_state = OBSTACLE_AVOIDANCE_STATE;
-        cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90°)
-    }
-    else if(distance <= 20 && cd->robot_sub_state == AVOIDANCE_STEP_4){
-        if(cd->obs_av_state_ctrl == 3){
+    if(cd->robot_state != HALTED_STATE){
+        if(distance <= 20 && cd->robot_state == MOVING_STATE && cd->obs_av_state_ctrl < 3){
+            // obstacle closer than 20 centimetres
+            cd->robot_state = OBSTACLE_AVOIDANCE_STATE;
+            cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90°)
+        }
+        else if(distance <= 20 && cd->robot_sub_state == AVOIDANCE_STEP_4){
+            if(cd->obs_av_state_ctrl == 3){
+                cd->robot_state = HALTED_STATE;
+                cd->robot_sub_state = AVOIDANCE_STEP_0;
+                cd->obs_av_state_ctrl = 0;
+            }
+            else{
+                cd->robot_sub_state = AVOIDANCE_STEP_1;
+            }
+        }
+        else if(distance <= 20 && cd->robot_sub_state == AVOIDANCE_STEP_2){
             cd->robot_state = HALTED_STATE;
             cd->robot_sub_state = AVOIDANCE_STEP_0;
+            cd->obs_av_state_ctrl = 0;
         }
         else{
-            cd->robot_sub_state = AVOIDANCE_STEP_1;
+            cd->robot_state = MOVING_STATE;
+            cd->robot_sub_state = AVOIDANCE_STEP_0;
         }
-    }
-    else{
-        cd->robot_state = MOVING_STATE;
-        cd->robot_sub_state = AVOIDANCE_STEP_0;
     }
 }
 
@@ -829,13 +846,13 @@ void task_reading_magn_acc_gyro(void* param){
     cd->angle_values[1] = (int)(atan2(-values[0], sqrt((long)values[1] * (long)values[1] + (long)values[2] * (long)values[2])) * (180.0 / 3.14));
     
     // Reading x,y,z magnetometer values //
+    // remember to reset the buggy with red button to make magnetometer work
     values[0] = get_magnetometer_value(0x42);
     values[1] = get_magnetometer_value(0x44);
         
     // Computing yaw with magnetometer values //
     // magnetic field of motor wheels may disturb it
-    //cd->angle_values[2] = (int)(atan2(values[1], values[0]) * 180.0 / 3.14);
-    cd->angle_values[2] = values[0];
+    cd->angle_values[2] = (int)(atan2(values[1], values[0]) * 180.0 / 3.14);
     
     // Reading z gyroscope value //
     // useful to compute yaw
@@ -872,7 +889,7 @@ void task_reading_magn_acc_gyro(void* param){
      
      using this instead of previous formula: float yaw += gz_dps * dt;
      */
-    
+   
     // If in avoidance obstacle mode, checking if rotation has to stop //
     if(cd->robot_sub_state == AVOIDANCE_STEP_1){
         if((cd->gyro_yaw - cd->ctrl_yaw) >= 85){
