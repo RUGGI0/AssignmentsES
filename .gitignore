@@ -64,3 +64,10 @@ Thumbs.db
 *.o
 *.obj
 *.d
+.generated_files/
+nbproject/
+Makefile*
+Package-*
+private/
+cmake/**/.generated/*
+cmake/**/CMake*

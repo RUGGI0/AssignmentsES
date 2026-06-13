@@ -1,3 +1,4 @@
 {
-    "mplab.project.workspace.addNewSourceFiles": "Always"
+    "mplab.project.workspace.addNewSourceFiles": "Always",
+    "mplab.clangd.compileCommandsDir": "${workspaceFolder}/_build/Assignment1ES/default"
 }
