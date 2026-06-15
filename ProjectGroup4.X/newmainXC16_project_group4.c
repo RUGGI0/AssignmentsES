@@ -36,6 +36,7 @@ int main(void) {
     cd.angle_values[0] = 0;
     cd.angle_values[1] = 0;
     cd.angle_values[2] = 0;
+    cd.one_time_exec = 0;
     
     ps->index_type = 0;
     ps->state = STATE_DOLLAR;
@@ -57,6 +58,8 @@ int main(void) {
     
     // Task to stop 2sec buggy motion in obstacle avoidance mode
     schedInfo[2].N = 1000; // 2sec
+    schedInfo[2].f = task_stop_buggy_after_2sec;
+    schedInfo[2].params = (void*)(&cd);
     schedInfo[2].enable = 0; // initially not active (activated when needed)
     
     // Task to check if either button has been clicked (10Hz)
@@ -88,7 +91,7 @@ int main(void) {
     schedInfo[6].params = (void*)(&cd);
     schedInfo[6].enable = 0;
     
-    // Task to activating buggy lights (10Hz)
+    // Task to activate buggy lights (10Hz)
     schedInfo[7].n = -17;
     schedInfo[7].N = 50;
     schedInfo[7].f = task_buggy_lights;

@@ -79,6 +79,8 @@ typedef struct{
     int angle_values[3]; // roll, pitch, yaw (of magnetometer)
     float gyro_yaw;
     float ctrl_yaw; // used to carry out obstacle avoidance policy
+    int one_time_exec; // used to ensure that variables like ctrl_yaw, obs_av_state_ctrl are updated only once
+    // inside their corresponding case in task_PWM_set(periodic task)
     heartbeat *schedInfo;
     parser_state *par_state;
 }control_data;

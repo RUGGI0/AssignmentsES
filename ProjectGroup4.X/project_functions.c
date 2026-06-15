@@ -638,6 +638,7 @@ void task_PWM_set(void* param){
         case OBSTACLE_AVOIDANCE_STATE:
             if(cd->obs_av_state_ctrl == 3){
                 cd->robot_state = HALTED_STATE;
+                cd->robot_sub_state = AVOIDANCE_STEP_0;
             }
             switch(cd->robot_sub_state){
                 case AVOIDANCE_STEP_0:
@@ -645,10 +646,15 @@ void task_PWM_set(void* param){
                 case AVOIDANCE_STEP_1:
                     // rotate 90° clockwise (triggered in task_reading_IR_value)
                     
-                    // saving current yaw to later check when stop rotation (done in task_reading_magn_acc_gyro)
-                    cd->ctrl_yaw = cd->gyro_yaw;
-                    cd->obs_av_state_ctrl++; // keeping count of three maximum executions
-                    //DC_assigning(0,7200,0,0);
+                    // - Saving current yaw to later check when stop rotation (done in task_reading_magn_acc_gyro)
+                    // - Keeping count of three maximum executions
+                    if(!cd->one_time_exec){
+                        // Gyro value and the number of executions need to be registered only during first execution of this case
+                        // (task is periodic)
+                        cd->one_time_exec = 1;
+                        cd->ctrl_yaw = cd->gyro_yaw;
+                        cd->obs_av_state_ctrl++;
+                    }
                     PWM_set(50,-50); // left_pwm = 100, right_pwm = 0 -> sharp rotation to the right
                     break;
                 case AVOIDANCE_STEP_2:
@@ -656,7 +662,12 @@ void task_PWM_set(void* param){
                     PWM_set(70,0); // left_pwm = 70, right_pwm = 70
                     
                     // enabling task that expires after two seconds
-                    cd->schedInfo[2].enable = 1;
+                    if(!cd->one_time_exec){
+                        // must be enabled only one time
+                        cd->schedInfo[2].n = 0;
+                        cd->schedInfo[2].enable = 1;
+                        cd->one_time_exec = 1;
+                    }
                     break;
                 case AVOIDANCE_STEP_3:
                     // rotate 90° anti-clockwise (later add gyroscope)
@@ -674,6 +685,7 @@ void task_stop_buggy_after_2sec (void* param){
     
     cd->robot_sub_state = AVOIDANCE_STEP_3;
     cd->schedInfo[2].enable = 0;
+    cd->one_time_exec = 0;
 }
 
 void task_button_check(void* param){
@@ -683,6 +695,7 @@ void task_button_check(void* param){
         button_E8_pressed = 0;
         if(cd->robot_state == HALTED_STATE){
             cd->robot_state = MOVING_STATE;
+            cd->robot_sub_state = AVOIDANCE_STEP_0;
        }
         else{
             // either moving or avoiding obstacle
@@ -764,12 +777,12 @@ void task_reading_IR_value(void* param){
     cd->distance_sensor_value = distance;
     
     if(cd->robot_state != HALTED_STATE){
-        if(distance <= 20 && cd->robot_state == MOVING_STATE && cd->obs_av_state_ctrl < 3){
+        if(distance <= 35 && cd->robot_state == MOVING_STATE && cd->obs_av_state_ctrl < 3){
             // obstacle closer than 20 centimetres
             cd->robot_state = OBSTACLE_AVOIDANCE_STATE;
             cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90°)
         }
-        else if(distance <= 20 && cd->robot_sub_state == AVOIDANCE_STEP_4){
+        else if(distance <= 35 && cd->robot_sub_state == AVOIDANCE_STEP_4){
             if(cd->obs_av_state_ctrl == 3){
                 cd->robot_state = HALTED_STATE;
                 cd->robot_sub_state = AVOIDANCE_STEP_0;
@@ -779,12 +792,12 @@ void task_reading_IR_value(void* param){
                 cd->robot_sub_state = AVOIDANCE_STEP_1;
             }
         }
-        else if(distance <= 20 && cd->robot_sub_state == AVOIDANCE_STEP_2){
+        else if(distance <= 35 && cd->robot_sub_state == AVOIDANCE_STEP_2){
             cd->robot_state = HALTED_STATE;
             cd->robot_sub_state = AVOIDANCE_STEP_0;
             cd->obs_av_state_ctrl = 0;
         }
-        else{
+        else if(distance > 35 && cd->robot_sub_state == AVOIDANCE_STEP_4){
             cd->robot_state = MOVING_STATE;
             cd->robot_sub_state = AVOIDANCE_STEP_0;
         }
@@ -892,13 +905,14 @@ void task_reading_magn_acc_gyro(void* param){
    
     // If in avoidance obstacle mode, checking if rotation has to stop //
     if(cd->robot_sub_state == AVOIDANCE_STEP_1){
-        if((cd->gyro_yaw - cd->ctrl_yaw) >= 85){
+        if(fabs(cd->gyro_yaw - cd->ctrl_yaw) >= 90){
             // buggy rotated of 90° clockwise -> next step
             cd->robot_sub_state = AVOIDANCE_STEP_2;
+            cd->one_time_exec = 0; // AVOIDANCE_STEP_1 exited (gyro value won't be registered again before next OBSTACLE_AVOIDANCE_STATE)
         }
     }
     else if(cd->robot_sub_state == AVOIDANCE_STEP_3){
-        if((cd->gyro_yaw - cd->ctrl_yaw) <= 5 || (cd->gyro_yaw - cd->ctrl_yaw) >= -5){
+        if(fabs(cd->gyro_yaw - cd->ctrl_yaw) <= 3 ){
             // buggy rotated back of 90° anti-clockwise to previous heading
             cd->ctrl_yaw = 0.0;
             cd->robot_sub_state = AVOIDANCE_STEP_4; // must check if distance is still under threshold,
