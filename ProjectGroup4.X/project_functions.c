@@ -655,7 +655,8 @@ void task_PWM_set(void* param){
                         cd->ctrl_yaw = cd->gyro_yaw;
                         cd->obs_av_state_ctrl++;
                     }
-                    PWM_set(50,-50); // left_pwm = 100, right_pwm = 0 -> sharp rotation to the right
+                    //PWM_set(50,-50); // left_pwm = 100, right_pwm = 0 -> sharp rotation to the right
+                    PWM_set(50,-100);
                     break;
                 case AVOIDANCE_STEP_2:
                     // moving forward for two seconds
@@ -671,7 +672,8 @@ void task_PWM_set(void* param){
                     break;
                 case AVOIDANCE_STEP_3:
                     // rotate 90° anti-clockwise (later add gyroscope)
-                    PWM_set(50,60); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
+                    //PWM_set(50,60); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
+                    PWM_set(50,100);
                     break;
                 case AVOIDANCE_STEP_4:
                     break;
@@ -918,7 +920,7 @@ void task_reading_magn_acc_gyro(void* param){
         while(diff > 180.0f) diff -= 360.0f;
         while(diff < -180.0f) diff += 360.0f;
         
-        if(fabs(diff) >= 85.0f){ 
+        if(fabs(diff) >= 87.0f){ 
             cd->robot_sub_state = AVOIDANCE_STEP_2;
             cd->one_time_exec = 0;
         }
@@ -935,7 +937,7 @@ void task_reading_magn_acc_gyro(void* param){
         while(diff > 180.0f) diff -= 360.0f;
         while(diff < -180.0f) diff += 360.0f;
         
-        if(fabs(diff) <= 5.0f ){ 
+        if(fabs(diff) <= 3.0f ){ 
             cd->robot_sub_state = AVOIDANCE_STEP_4;
         }
     }
