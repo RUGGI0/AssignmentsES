@@ -89,30 +89,30 @@ MP_LINKER_FILE_OPTION=,--script=p33EP512MU810.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/5b457a11984369a2c190db8f2057e916b1c3b053 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/6e553d8c66092775a0b4ccab9c3b74272a689dec .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_project_group4.c  -o ${OBJECTDIR}/newmainXC16_project_group4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_project_group4.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_project_group4.c  -o ${OBJECTDIR}/newmainXC16_project_group4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_project_group4.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)     -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/e1c7a6abff7410d0d9e1fcbb6ee1df9e70dfe1fc .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/db6dd3c98ab11761572ff96c16756e97c058544e .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/project_functions.o.d 
 	@${RM} ${OBJECTDIR}/project_functions.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  project_functions.c  -o ${OBJECTDIR}/project_functions.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/project_functions.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	${MP_CC} $(MP_EXTRA_CC_PRE)  project_functions.c  -o ${OBJECTDIR}/project_functions.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/project_functions.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)     -mdfp="${DFP_DIR}/xc16"
 	
 else
-${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/57906ecfd2558bad18ab8ac46ad9959a34d3a294 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/5dd0bce9dc14755e657f681a7c0cad6b41faae3d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_project_group4.c  -o ${OBJECTDIR}/newmainXC16_project_group4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_project_group4.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_project_group4.c  -o ${OBJECTDIR}/newmainXC16_project_group4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_project_group4.o.d"      -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)     -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/f28cabc47071861244557cdf72d609fa013ed7a1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/908247150b3bfe768bf28623de6192b1653077cb .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/project_functions.o.d 
 	@${RM} ${OBJECTDIR}/project_functions.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  project_functions.c  -o ${OBJECTDIR}/project_functions.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/project_functions.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	${MP_CC} $(MP_EXTRA_CC_PRE)  project_functions.c  -o ${OBJECTDIR}/project_functions.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/project_functions.o.d"      -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)     -mdfp="${DFP_DIR}/xc16"
 	
 endif
 
