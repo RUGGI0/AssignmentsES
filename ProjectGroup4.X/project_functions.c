@@ -829,7 +829,9 @@ void task_sending_IR_value_to_uart(void* param){
 void task_buggy_lights(void* param){
     // frequency of 1Hz
     control_data *cd = (control_data*) param;
-    // LATAbits.LATA0 = !LATAbits.LATA0;
+    
+    LATAbits.LATA0 = !LATAbits.LATA0;
+    
     switch(cd->robot_state){
         case HALTED_STATE:
             LATBbits.LATB8 = !LATBbits.LATB8; // toggle left-side lights
@@ -910,35 +912,27 @@ void task_reading_magn_acc_gyro(void* param){
    
     // If in avoidance obstacle mode, checking if rotation has to stop //
     if(cd->robot_sub_state == AVOIDANCE_STEP_1){
-        //if(fabs(cd->gyro_yaw - cd->ctrl_yaw) >= 90){
-        //    // buggy rotated of 90° clockwise -> next step
-        //    cd->robot_sub_state = AVOIDANCE_STEP_2;
-        //    cd->one_time_exec = 0; // AVOIDANCE_STEP_1 exited (gyro value won't be registered again before next OBSTACLE_AVOIDANCE_STATE)
-        //}
         
         float diff = cd->gyro_yaw - cd->ctrl_yaw;
         while(diff > 180.0f) diff -= 360.0f;
         while(diff < -180.0f) diff += 360.0f;
         
         if(fabs(diff) >= 87.0f){ 
+            // buggy rotated of 90° clockwise -> next step
             cd->robot_sub_state = AVOIDANCE_STEP_2;
-            cd->one_time_exec = 0;
+            cd->one_time_exec = 0; // AVOIDANCE_STEP_1 exited (gyro value won't be registered again before next OBSTACLE_AVOIDANCE_STATE)
         }
     }
     else if(cd->robot_sub_state == AVOIDANCE_STEP_3){
-        //if(fabs(cd->gyro_yaw - cd->ctrl_yaw) <= 3 ){
-        //    // buggy rotated back of 90° anti-clockwise to previous heading
-        //    //cd->ctrl_yaw = 0.0;
-        //    cd->robot_sub_state = AVOIDANCE_STEP_4; // must check if distance is still under threshold,
-        //    // or if maximum obstacle avoidance executions have been reached
-        //}
         
         float diff = cd->gyro_yaw - cd->ctrl_yaw;
         while(diff > 180.0f) diff -= 360.0f;
         while(diff < -180.0f) diff += 360.0f;
         
         if(fabs(diff) <= 3.0f ){ 
-            cd->robot_sub_state = AVOIDANCE_STEP_4;
+            // buggy rotated back of 90° anti-clockwise to previous heading
+            cd->robot_sub_state = AVOIDANCE_STEP_4; // must check if distance is still under threshold,
+            // or if maximum obstacle avoidance executions have been reached
         }
     }
 }

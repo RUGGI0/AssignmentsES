@@ -70,11 +70,11 @@ int main(void) {
     schedInfo[3].enable = 1;
     
     // Task to read VBAT (1Hz)
-    schedInfo[4].n = 0;
+    schedInfo[4].n = -144;
     schedInfo[4].N = 500;
     schedInfo[4].f = task_reading_VBAT_n_sending_to_uart;
     schedInfo[4].params = (void*)(&cd);
-    schedInfo[4].enable = 0;
+    schedInfo[4].enable = 1;
     
     // Task to read IR value from collision sensor (500Hz)
     // could be better to implement average to clear outlayers
@@ -85,45 +85,45 @@ int main(void) {
     schedInfo[5].enable = 1;
     
     // Task to send IR value to uart (10Hz)
-    schedInfo[6].n = -1;
+    schedInfo[6].n = -12;
     schedInfo[6].N = 50;
     schedInfo[6].f = task_sending_IR_value_to_uart;
     schedInfo[6].params = (void*)(&cd);
-    schedInfo[6].enable = 0;
+    schedInfo[6].enable = 1;
     
     // Task to activate buggy lights (10Hz)
-    schedInfo[7].n = -17;
+    schedInfo[7].n = -25;
     schedInfo[7].N = 50;
     schedInfo[7].f = task_buggy_lights;
     schedInfo[7].params = (void*)(&cd);
     schedInfo[7].enable = 1;
     
     // Task to receive IMU data and compute roll,pitch and yaw (10Hz)
-    schedInfo[8].n = -34;
+    schedInfo[8].n = -37;
     schedInfo[8].N = 50;
     schedInfo[8].f = task_reading_magn_acc_gyro;
     schedInfo[8].params = (void*)(&cd);
     schedInfo[8].enable = 1;
     
     // Task to send angle value to uart (10Hz)
-    schedInfo[9].n = -25;
+    schedInfo[9].n = -18;
     schedInfo[9].N = 250;
     schedInfo[9].f = sending_angle_values_to_uart;
     schedInfo[9].params = (void*)(&cd);
-    schedInfo[9].enable = 0;
+    schedInfo[9].enable = 1;
    
-    int cycle_counter = 0;
+    //int cycle_counter = 0;
     
     while(1){
         // maybe with buggy lights
-        if(cycle_counter == 250){
+        //if(cycle_counter == 250){
             // LD0 blinks every 500ms (short task can be inserted in main loop)
-            LATAbits.LATA0 = !LATAbits.LATA0;
-            cycle_counter = 0;
-        }
+            //LATAbits.LATA0 = !LATAbits.LATA0;
+            //cycle_counter = 0;
+        //}
         scheduler(schedInfo, MAX_TASKS);
         tmr_wait_period(TIMER1);
-        cycle_counter++;
+        //cycle_counter++;
     }
     
     return 0;
