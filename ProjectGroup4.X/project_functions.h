@@ -10,9 +10,28 @@
 #define TIMER3 3 // button E8 press (robust implementation)
 #define TIMER4 4 // button E9 press (robust implementation)
 
+// ---* Baud Rate configuration *---
+// lowest baud rate necessary in worst case scenario is 3520 (considering only periodic messages):
+// - MBATT message sent at maximum 1 Hz (12 char) -> 12 char/s
+// - MDIST message sent at maximum 10 Hz (11 char) -> 110 char/s
+// - MANGLE message sent at maximum 10 Hz (23 char) -> 230 char/s
+// - MBUF message sent at maximum 10 Hz (11 char) -> 110 char/s
+// total = (12 + 110 + 230 + 110) char/s = 462 char/s
+// UART protocol uses 10 bit for each char -> 462 * 10 = 4620 bit/s
+// We choose a baud rate of 9600 to guarantee that at maximum 1.92 char are received in a main cycle (2 ms) (see line 31)
+
 // --- Tx and Rx buffers --- //
-#define SIZERX 16 // buffer emptied every 15ms -> baud rate = 9600 -> at maximum 14 char received
-#define SIZETX 64 // da rivedere
+#define SIZETX 64 // Tx buffer size -> maximum number of char in a single burst is 57:
+// - highest amount of char composing a MBATT message is 12
+// - highest amount of char composing a MDIST message is 11
+// - highest amount of char composing a MANGLE message is 23
+// - highest amount of char composing a MBUF message (triggered by RE9) is 11 
+// this ensures all chars to be sent are saved in the buffer without loss
+
+#define SIZERX 8 // Rx buffer size -> with baud rate = 9600
+// the maximum amount of char received in a single control loop cycle (500Hz -> 2 ms) is ~1.92
+
+// #define SIZERX 16 // buffer emptied every 15ms -> baud rate = 9600 -> at maximum 14 char received
 
 typedef struct {
     char* buffer; 
