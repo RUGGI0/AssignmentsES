@@ -91,9 +91,9 @@ int main(void) {
     schedInfo[6].params = (void*)(&cd);
     schedInfo[6].enable = 1;
     
-    // Task to activate buggy lights (10Hz)
+    // Task to activate buggy lights (1Hz)
     schedInfo[7].n = -25;
-    schedInfo[7].N = 50;
+    schedInfo[7].N = 250;
     schedInfo[7].f = task_buggy_lights;
     schedInfo[7].params = (void*)(&cd);
     schedInfo[7].enable = 1;
@@ -107,7 +107,7 @@ int main(void) {
     
     // Task to send angle value to uart (10Hz)
     schedInfo[9].n = -18;
-    schedInfo[9].N = 250;
+    schedInfo[9].N = 50;
     schedInfo[9].f = sending_angle_values_to_uart;
     schedInfo[9].params = (void*)(&cd);
     schedInfo[9].enable = 1;
