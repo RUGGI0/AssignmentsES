@@ -50,7 +50,7 @@ int main(void) {
     schedInfo[0].enable = 1;
     
     // Task to set PWM for buggy motion (500Hz)
-    schedInfo[1].n = -1;
+    schedInfo[1].n = 0;
     schedInfo[1].N = 1;
     schedInfo[1].f = task_PWM_set;
     schedInfo[1].params = (void*)(&cd);
@@ -63,14 +63,14 @@ int main(void) {
     schedInfo[2].enable = 0; // initially not active (activated when needed)
     
     // Task to check if either button has been clicked (10Hz)
-    schedInfo[3].n = 0;
+    schedInfo[3].n = -8;
     schedInfo[3].N = 50;
     schedInfo[3].f = task_button_check;
     schedInfo[3].params = (void*)(&cd);
     schedInfo[3].enable = 1;
     
     // Task to read VBAT (1Hz)
-    schedInfo[4].n = -144;
+    schedInfo[4].n = -150;
     schedInfo[4].N = 500;
     schedInfo[4].f = task_reading_VBAT_n_sending_to_uart;
     schedInfo[4].params = (void*)(&cd);
@@ -78,14 +78,14 @@ int main(void) {
     
     // Task to read IR value from collision sensor (500Hz)
     // could be better to implement average to clear outlayers
-    schedInfo[5].n = -1;
+    schedInfo[5].n = 0;
     schedInfo[5].N = 1;
     schedInfo[5].f = task_reading_IR_value;
     schedInfo[5].params = (void*)(&cd);
     schedInfo[5].enable = 1;
     
     // Task to send IR value to uart (10Hz)
-    schedInfo[6].n = -12;
+    schedInfo[6].n = -17;
     schedInfo[6].N = 50;
     schedInfo[6].f = task_sending_IR_value_to_uart;
     schedInfo[6].params = (void*)(&cd);
@@ -99,14 +99,14 @@ int main(void) {
     schedInfo[7].enable = 1;
     
     // Task to receive IMU data and compute roll,pitch and yaw (10Hz)
-    schedInfo[8].n = -37;
+    schedInfo[8].n = -33;
     schedInfo[8].N = 50;
     schedInfo[8].f = task_reading_magn_acc_gyro;
     schedInfo[8].params = (void*)(&cd);
     schedInfo[8].enable = 1;
     
     // Task to send angle value to uart (10Hz)
-    schedInfo[9].n = -18;
+    schedInfo[9].n = -42;
     schedInfo[9].N = 50;
     schedInfo[9].f = sending_angle_values_to_uart;
     schedInfo[9].params = (void*)(&cd);

@@ -89,26 +89,26 @@ MP_LINKER_FILE_OPTION=,--script=p33EP512MU810.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/5b457a11984369a2c190db8f2057e916b1c3b053 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/4a91fbb0b75e8ac8868380945be183a678aac627 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_project_group4.c  -o ${OBJECTDIR}/newmainXC16_project_group4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_project_group4.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/e1c7a6abff7410d0d9e1fcbb6ee1df9e70dfe1fc .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/8bfd0e5595b958e5809612a79991ceb2eb4950d6 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/project_functions.o.d 
 	@${RM} ${OBJECTDIR}/project_functions.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  project_functions.c  -o ${OBJECTDIR}/project_functions.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/project_functions.o.d"      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
 else
-${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/57906ecfd2558bad18ab8ac46ad9959a34d3a294 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/newmainXC16_project_group4.o: newmainXC16_project_group4.c  .generated_files/flags/default/22c3c3080537828052a669e701d627a18557929a .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o.d 
 	@${RM} ${OBJECTDIR}/newmainXC16_project_group4.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  newmainXC16_project_group4.c  -o ${OBJECTDIR}/newmainXC16_project_group4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/newmainXC16_project_group4.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
-${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/f28cabc47071861244557cdf72d609fa013ed7a1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/project_functions.o: project_functions.c  .generated_files/flags/default/83a0726e57f530081fc7ad1ef1eab26378be1fb4 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/project_functions.o.d 
 	@${RM} ${OBJECTDIR}/project_functions.o 

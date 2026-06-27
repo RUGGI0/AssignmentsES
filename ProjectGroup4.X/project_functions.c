@@ -384,6 +384,11 @@ int tmr_wait_period(int timer){
 // Function to setup and expire a timer with provided ms (max 200)
 void tmr_wait_ms(int timer, int ms){
     tmr_setup_period(timer, ms);
+    if (timer == TIMER1) {
+        while(IFS0bits.T1IF == 0);
+        T1CONbits.TON = 0;
+        IFS0bits.T1IF = 0;
+    }
     if (timer == TIMER2) {
         while(IFS0bits.T2IF == 0);
         T2CONbits.TON = 0;
