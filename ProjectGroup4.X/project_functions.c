@@ -4,6 +4,17 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdint.h>
+
+#define FCY_HZ 72000000L
+#define PWM_PERIOD_COUNTS 7200
+#define ADC_MAX_COUNTS 1023.0
+#define ADC_VREF 3.3
+#define BATTERY_DIVIDER_GAIN 3.0
+#define AVOIDANCE_TURN_TARGET_DEG 87.0f
+#define AVOIDANCE_TURN_TOLERANCE_DEG 3.0f
+#define IMU_FILTER_NUMERATOR 3
+#define IMU_FILTER_DENOMINATOR 4
 
 char rx_array[SIZERX];
 char tx_array[SIZETX];
@@ -14,30 +25,37 @@ volatile int button_E9_pressed;
 volatile int AN11_value;
 volatile int AN14_value;
 
+static int buffer_free_space(volatile CircularBuffer* cb);
+static int uart_queue_message(const char* msg);
+static int parse_next_integer(const char* msg, int* index, int* value);
+static int saturate_percent(int value);
+static int sign_extend(unsigned int value, int bits);
+static void enter_halted_state(control_data* cd);
+
 void device_init(){
     ANSELA = ANSELB = ANSELC = ANSELD = ANSELE = ANSELG = 0x0000;
-    
+
     // ----* Configure lights *---- //
     TRISAbits.TRISA0 = 0; // LD1
     LATAbits.LATA0 = 0;
-    
+
     TRISBbits.TRISB8 = 0; // left-side lights
     LATBbits.LATB8 = 0;
-    
+
     TRISFbits.TRISF1 = 0; // right-side lights
     LATFbits.LATF1 = 0;
-    
+
     TRISFbits.TRISF0 = 0; // break lights
     LATFbits.LATF0 = 0;
-    
+
     TRISGbits.TRISG1 = 0; // low lights
     LATGbits.LATG1 = 0;
-    
+
     TRISAbits.TRISA7 = 0; // beam headlights
     LATAbits.LATA7 = 0;
-    
-    INTCON2bits.GIE = 1; // allow enabling interrupts
-    
+
+    INTCON2bits.GIE = 0; // interrupts are enabled in main after shared data setup
+
     // ----* Remap Buttons ----* //
     RPINR0bits.INT1R = 88; // external interrupt 1 is mapped to button T2 (RP88)
     RPINR1bits.INT2R = 89; // external interrupt 2 is mapped to button T3 (RP89)
@@ -49,11 +67,11 @@ void device_init(){
     INTCON2bits.INT2EP = 1; // triggers on falling edge (1->0)
     IEC1bits.INT1IE = 1; // enabling external interrupt 1
     IEC1bits.INT2IE = 1; // enabling external interrupt 2
-    
+
     // ----* Configure UART *---- //
     TRISDbits.TRISD0 = 0; // Tx in output
     TRISDbits.TRISD11 = 1; // Rx in input
-    
+
     // Mapping pins
     RPOR0bits.RP64R = 1; // RD0 (RP64) mapped to UART1 Tx
     RPINR18bits.U1RXR = 75; // UART1 Rx mapped to RD11
@@ -64,77 +82,77 @@ void device_init(){
     U1MODEbits.PDSEL = 0; // no parity bits - 8 data bits
     U1MODEbits.ABAUD = 0; // no auto baud rate
     U1MODEbits.BRGH = 0; // low-speed mode
-    
+
     // Rx interrupt set up
     IFS0bits.U1RXIF = 0; // clearing Rx interrupt flag
     IPC2bits.U1RXIP = 1; // priority for Rx
     U1STAbits.URXISEL = 0; // interrupt if a character is received
     IEC0bits.U1RXIE = 1; // enabling interrupt for UART1 Rx
-    
+
     // Tx interrupt set up
     IFS0bits.U1TXIF = 0; // clearing Tx interrupt flag
     IPC3bits.U1TXIP = 1; // priority for Tx
     U1STAbits.UTXISEL0 = 0; // Tx interrupt triggers if a char is sent to U1TXREG,
     U1STAbits.UTXISEL1 = 0; // meaning U1TXREG has at least one slot empty ->
     // it will trigger right after enabling U1TX
-    
+
     U1MODEbits.UARTEN = 1; // enable UART1
     U1STAbits.UTXEN = 1; // enable U1TX (transmission)
-    
+
     // *--- Output compare set up ---* //
     // - using 4 modules to control 4 PWM signals
     // - OCxR: primary OCx module register (used for duty cycle of OCx pin)
     // - OCxRS: secondary OCx module register (used for period of OCx pin)
-    
+
     // PWM pins remap (values for OCx functionalities at page 215 of datasheet)
     RPOR0bits.RP65R = 0b010000; // RD1 -> OC1
     RPOR1bits.RP66R = 0b010001; // RD2 -> OC2
     RPOR1bits.RP67R = 0b010010; // RD3 -> OC3
     RPOR2bits.RP68R = 0b010011; // RD4 -> OC4
-    
+
     TRISDbits.TRISD1 = 0;
     TRISDbits.TRISD2 = 0;
     TRISDbits.TRISD3 = 0;
     TRISDbits.TRISD4 = 0;
-    
+
     // OC1 module
     OC1CON1bits.OCM = 0; // ensure disabled for safety
     OC1R = 0; // initial value -> duty cycle zero (no movement)
-    OC1RS = 7200; // initial  value of frequency (look OCs_assigning function for details)
+    OC1RS = PWM_PERIOD_COUNTS; // initial  value of frequency (look OCs_assigning function for details)
     OC1CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC1 module
     OC1CON2bits.SYNCSEL = 0b11111; // No Sync source, however OC1TMR resets if = OC1RS, and OC 1 module uses its own Sync signal
     OC1CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC1) is set high when OC1TMR = 0 and low when OC1TMR = OC1R
-    
+
     // OC2 module
     OC2CON1bits.OCM = 0; // ensure disabled for safety
     OC2R = 0; // initial value -> duty cycle zero (no movement)
-    OC2RS = 7200; // initial value of frequency (look OCs_assigning function for details)
+    OC2RS = PWM_PERIOD_COUNTS; // initial value of frequency (look OCs_assigning function for details)
     OC2CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC2 module
     OC2CON2bits.SYNCSEL = 0b11111; // No Sync source, however OC2TMR resets if = OC2RS, and OC 2 module uses its own Sync signal
     OC2CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC2) is set high when OC2TMR = 0 and low when OC2TMR = OC2R
-    
+
     // OC3 module
     OC3CON1bits.OCM = 0; // ensure disabled for safety
     OC3R = 0; // initial value -> duty cycle zero (no movement)
-    OC3RS = 7200; // initial value of frequency (look OCs_assigning function for details)
+    OC3RS = PWM_PERIOD_COUNTS; // initial value of frequency (look OCs_assigning function for details)
     OC3CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC3 module
     OC3CON2bits.SYNCSEL = 0b11111; // No Sync source, however OC3TMR resets if = OC3RS, and OC 3 module uses its own Sync signal
     OC3CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC3) is set high when OC1TMR = 0 and low when OC3TMR = OC3R
-    
+
     // OC4 module
     OC4CON1bits.OCM = 0; // ensure disabled for safety
     OC4R = 0; // initial value -> duty cycle zero (no movement)
-    OC4RS = 7200; // initial value of frequency (look OCs_assigning function for details)
+    OC4RS = PWM_PERIOD_COUNTS; // initial value of frequency (look OCs_assigning function for details)
     OC4CON1bits.OCTSEL = 0b111; // internal clock (Fp) as clock source of OC4 module
     OC4CON2bits.SYNCSEL = 0b11111; // No Sync source, however OC4TMR resets if = OC4RS, and OC 4 module uses its own Sync signal
     OC4CON1bits.OCM = 0b110; // OC modality is Edge-Aligned: Output (OC4) is set high when OC4TMR = 0 and low when OC4TMR = OC4R
-    
+
     // ---* Configure ADC *--- //
     // - using ADC module 1 (registers 'AD1...')
-    // - AVdd = Vrefh = 3.6V (considering 3.3V ?) / Vinl = AVss = Vrefl = 0v -> page 558
+    // - AVdd = Vrefh = ADC_VREF / Vinl = AVss = Vrefl = 0v -> page 558
     AD1CON1bits.AD12B = 0; // 10-bit ADC mode (4 channels available) -> conversion time = 12 * Tad
     AD1CON3bits.ADRC = 0; // using internal clock cycle (Tcy) for ADC module
-    
+
     // Tad definition: Tad = (ADCS + 1) * Tcy, Tad must be > 75ns for 10-bit ADC,
     // since Fcy = 72MHz -> Tcy = 13.89ns
     AD1CON3bits.ADCS = 8; // Tad = 9 * 13.89 = 125ns
@@ -143,20 +161,20 @@ void device_init(){
     AD1CON1bits.SSRC = 7; // automatic conversion (when sampling stops)
     AD1CON2bits.CHPS = 0; // activating CH0 (1 channel mode -> CH0 needed to access alternatively AN11 and AN14)
     AD1CON1bits.FORM = 0; // output format: unsigned integer (10-bit -> 0-1023)
-    
+
     // Channel will be set accordingly when values will be read
     AD1CHS0bits.CH0NA = 0; // selecting Vrefh for CH0
-        
+
     ANSELBbits.ANSB11 = 1; // activating AN11 for battery sensing
     TRISBbits.TRISB11 = 1;
-    
+
     ANSELBbits.ANSB14 = 1; // activating AN14 for IR sensor voltage (buggy micro BUS)
     TRISBbits.TRISB14 = 1;
-    
+
     TRISBbits.TRISB9 = 0; // pin to enable IR Sensor board (Buggy Mikrobus 1)
     LATBbits.LATB9 = 1; // enabled
-    
-    
+
+
     AD1CON1bits.ADON = 1; // activating ADC module 1
 
     // ----* Configure SPI *---- //
@@ -166,41 +184,41 @@ void device_init(){
     TRISBbits.TRISB3 = 0; // CS1 (output)
     TRISBbits.TRISB4 = 0; // CS2 (output)
     TRISDbits.TRISD6 = 0; // CS3 (output)
-    
+
     // pin mapping
     RPINR20bits.SDI1R = 17; // RPI17 -> MISO (SDI1)
     RPOR11bits.RP108R = 0b000110; // RF12 -> SCK1 (clock)
     RPOR12bits.RP109R = 0b000101; // RF13 -> MOSI (SDO1)
-    
+
     // clearing SPI interrupt
     IFS0bits.SPI1IF = 0;
     IEC0bits.SPI1IE = 0;
-    
+
     SPI1CON1bits.DISSCK = 0;
     SPI1CON1bits.DISSDO = 0;
     SPI1CON1bits.SMP = 0;
     SPI1CON1bits.CKE = 0;
     SPI1CON1bits.CKP = 1;
-    
+
     SPI1CON1bits.MSTEN = 1; // master mode on
     SPI1CON1bits.PPRE = 2; // primary prescaler 4:1
     SPI1CON1bits.SPRE = 6; // secondary prescaler 2:1
     // 9MHZ clock for SPI (Fcy/8 -> 72MHz/8)
     SPI1CON1bits.MODE16 = 0; // 8-bit data communication
     SPI1STATbits.SPIEN = 1; // enable SPI
-    
+
     // deselecting chips
     LATBbits.LATB3 = 1; // accelerometers (off)
     LATBbits.LATB4 = 1; // gyroscope (off)
     LATDbits.LATD6 = 1; // magnetometer (off)
-    
+
     // --- Prepare magnetometer --- //
     // Force activation of SPI
     LATDbits.LATD6 = 0;
     tmr_wait_ms(TIMER1, 2);
     LATDbits.LATD6 = 1;
     tmr_wait_ms(TIMER1, 2);
-    
+
     // Switching magnetometer to Sleep mode //
     tmr_wait_ms(TIMER1, 3); // wait 3ms to reach Suspended mode
     unsigned int adr = 0x4B & 0x7F;
@@ -208,7 +226,7 @@ void device_init(){
     spi_write(adr);
     spi_write(0x01);
     LATDbits.LATD6 = 1;
-    
+
     // Switching magnetometer to Active mode //
     tmr_wait_ms(TIMER1, 50); // wait 3ms to reach Sleep mode
     adr = 0x4C & 0x7F;
@@ -216,12 +234,12 @@ void device_init(){
     spi_write(adr);
     spi_write(0x00);
     LATDbits.LATD6 = 1;
-    
+
     tmr_wait_ms(TIMER1, 50);
 }
 
 void buffer_init(volatile CircularBuffer* cb, char* array_ptr, int max_size) {
-    cb->buffer = array_ptr; 
+    cb->buffer = array_ptr;
     cb->size = max_size;
     cb->head = 0;
     cb->tail = 0;
@@ -252,15 +270,112 @@ int buffer_read(volatile CircularBuffer* cb, char* c) {
 
 int buffer_occupancy(volatile CircularBuffer* cb) {
     if (cb->head >= cb->tail) {
-        return cb->head - cb->tail; 
+        return cb->head - cb->tail;
     } else {
-        return cb->size - cb->tail + cb->head; 
+        return cb->size - cb->tail + cb->head;
     }
+}
+
+static int buffer_free_space(volatile CircularBuffer* cb) {
+    return cb->size - buffer_occupancy(cb) - 1;
+}
+
+static int uart_queue_message(const char* msg) {
+    int len = strlen(msg);
+    int tx_ie = IEC0bits.U1TXIE;
+
+    IEC0bits.U1TXIE = 0;
+    if(buffer_free_space(&tx_buffer) < len){
+        IEC0bits.U1TXIE = tx_ie;
+        if(!buffer_is_empty(&tx_buffer)){
+            IEC0bits.U1TXIE = 1;
+        }
+        return -1;
+    }
+
+    for(int i = 0; i < len; i++){
+        buffer_write(&tx_buffer,msg[i]);
+    }
+
+    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+    return 0;
+}
+
+static int parse_next_integer(const char* msg, int* index, int* value) {
+    int i = *index;
+    int sign = 1;
+    int number = 0;
+    int digits = 0;
+
+    if(msg[i] == '-'){
+        sign = -1;
+        i++;
+    }
+    else if(msg[i] == '+'){
+        i++;
+    }
+
+    while(msg[i] >= '0' && msg[i] <= '9'){
+        number *= 10;
+        number += msg[i] - '0';
+        digits++;
+        i++;
+    }
+
+    if(digits == 0){
+        return -1;
+    }
+
+    if(msg[i] == ','){
+        i++;
+    }
+    else if(msg[i] != '\0'){
+        return -1;
+    }
+
+    *index = i;
+    *value = sign * number;
+    return 0;
+}
+
+static int saturate_percent(int value) {
+    if(value > 100){
+        return 100;
+    }
+    if(value < -100){
+        return -100;
+    }
+    return value;
+}
+
+static int sign_extend(unsigned int value, int bits) {
+    long mask = 1L << (bits - 1);
+    long full_scale = 1L << bits;
+    long signed_value = value;
+
+    if(signed_value & mask){
+        signed_value -= full_scale;
+    }
+    return (int)signed_value;
+}
+
+static void enter_halted_state(control_data* cd) {
+    cd->robot_state = HALTED_STATE;
+    cd->robot_sub_state = AVOIDANCE_STEP_0;
+    cd->obs_av_state_ctrl = 0;
+    cd->one_time_exec = 0;
+
+    if(cd->schedInfo != 0){
+        cd->schedInfo[2].enable = 0;
+        cd->schedInfo[2].n = 0;
+    }
+
+    PWM_set(0,0);
 }
 
 void tmr_setup_period(int timer, int ms){
     int cycle_case = -1;
-    long Fcy = 72000000; // dsPIC33EP512MU810
+    long Fcy = FCY_HZ; // dsPIC33EP512MU810
     long cycles = Fcy / 1000;
     cycles *= ms; // avoids overflow with Fcy*ms/1000
     if(cycles <= 65535){
@@ -399,31 +514,31 @@ void tmr_wait_ms(int timer, int ms){
 void PWM_set(int speed, int yaw){
     int left_pwm = speed - yaw;
     int right_pwm = speed + yaw;
-    int period = 7200;
+    int period = PWM_PERIOD_COUNTS;
     long left_DC = 0;
     long right_DC = 0;
-    
+
     // saturates values up to +-100
     if(left_pwm >= 100){
         left_pwm = 100;
     }
-    
+
     if(left_pwm <= -100){
         left_pwm = -100;
     }
-    
+
     if(right_pwm >= 100){
         right_pwm = 100;
     }
-    
+
     if(right_pwm <= -100){
         right_pwm = -100;
     }
-    
+
     // using long to avoid overflow from 'pwm_value * period'
     left_DC = ((long)left_pwm * period) / 100;
     right_DC = ((long)right_pwm * period) / 100;
-    
+
     if (left_DC >= 0){
         if (right_DC >= 0){
             // left and right wheels forward
@@ -442,21 +557,21 @@ void PWM_set(int speed, int yaw){
         else{
             // left and right wheels backward
             DC_assigning(-left_DC,0,-right_DC,0);
-        } 
+        }
     }
 }
 
 void DC_assigning(int DC1, int DC2, int DC3, int DC4){
-        
+
     OC1R = DC1; // PWM duty cycle
     //OC1RS = 7200; // PWM period 10kHz
-    
+
     OC2R = DC2; // PWM duty cycle
     //OC2RS = 7200; // PWM period 10kHz
-    
+
     OC3R = DC3; // PWM duty cycle
     //OC3RS = 7200; // PWM period 10kHz
-    
+
     OC4R = DC4; // PWM duty cycle
     //OC4RS = 7200; // PWM period 10kHz
 }
@@ -465,7 +580,7 @@ unsigned int spi_write(unsigned int data){
     // writing data provided
     while(SPI1STATbits.SPITBF == 1); // wait until Tx buffer is empty
     SPI1BUF = data; // send data (could be greater than a byte)
-    
+
     // reading answer
     while(SPI1STATbits.SPIRBF == 0); // wait until Rx buffer is full
     data = SPI1BUF;
@@ -483,9 +598,8 @@ int get_accelerometer_value(unsigned int adr){
 
     output1 = output1 & 0x00F0; // clear last 4 bits
     output2 = output2 << 8; // left shift of 8 bits
-    int data = output2 | output1;
-    data = data / 16; // right shift of 16 bits
-    return data;
+    unsigned int data = (output2 | output1) >> 4;
+    return sign_extend(data,12);
 }
 
 int get_magnetometer_value(unsigned int adr){
@@ -499,33 +613,50 @@ int get_magnetometer_value(unsigned int adr){
 
     output1 = output1 & 0x00F8; // clearing last 3 bits of byte with 5 MSBs the 5 LSBs of x-axis
     output2 = output2 << 8; // shifting of 8 slots the 8 MSBs of x-axis
-    int data = output2 | output1; // or between two parts (8 MSBs and 5 LSBs + 3 zero bits)
-    data = data / 8; // safe shifting 13 bits (x-axis) to the left by 3 slots (13 bits in 16 bit register)
-    return data;
+    unsigned int data = (output2 | output1) >> 3;
+    return sign_extend(data,13);
+}
+
+void parser_init(parser_state* ps) {
+    ps->state = STATE_DOLLAR;
+    ps->index_type = 0;
+    ps->index_payload = 0;
+    ps->msg_type[0] = '\0';
+    ps->msg_payload[0] = '\0';
 }
 
 int parse_byte(parser_state* ps, char byte) {
+    if(byte == '$'){
+        ps->state = STATE_TYPE;
+        ps->index_type = 0;
+        ps->index_payload = 0;
+        ps->msg_type[0] = '\0';
+        ps->msg_payload[0] = '\0';
+        return NO_MESSAGE;
+    }
+
     switch (ps->state) {
         case STATE_DOLLAR:
-            if (byte == '$') {
-                ps->state = STATE_TYPE;
-                ps->index_type = 0;
-            }
             break;
         case STATE_TYPE:
             if (byte == ',') {
+                if(ps->index_type == 0){
+                    parser_init(ps);
+                    break;
+                }
                 ps->state = STATE_PAYLOAD;
                 ps->msg_type[ps->index_type] = '\0';
                 ps->index_payload = 0; // initialise properly the index
-            } else if (ps->index_type == 6) { // error! (type is PCREF for messages received)
-                ps->state = STATE_DOLLAR;
-                ps->index_type = 0;
 			} else if (byte == '*') {
 				ps->state = STATE_DOLLAR; // get ready for a new message
                 ps->msg_type[ps->index_type] = '\0';
 				ps->msg_payload[0] = '\0'; // no payload
                 return NEW_MESSAGE;
             } else {
+                if(ps->index_type >= MSG_TYPE_SIZE - 1){
+                    parser_init(ps);
+                    break;
+                }
                 ps->msg_type[ps->index_type] = byte; // ok!
                 ps->index_type++; // increment for the next time;
             }
@@ -535,10 +666,11 @@ int parse_byte(parser_state* ps, char byte) {
                 ps->state = STATE_DOLLAR; // get ready for a new message
                 ps->msg_payload[ps->index_payload] = '\0';
                 return NEW_MESSAGE;
-                } else if (ps->index_payload == 10) { // error (surpassed: two values + one comma + *)
-                ps->state = STATE_DOLLAR;
-                ps->index_payload = 0;
             } else {
+                if(ps->index_payload >= MSG_PAYLOAD_SIZE - 1){
+                    parser_init(ps);
+                    break;
+                }
                 ps->msg_payload[ps->index_payload] = byte; // ok!
                 ps->index_payload++; // increment for the next time;
             }
@@ -549,7 +681,7 @@ int parse_byte(parser_state* ps, char byte) {
 
 int extract_integer(const char* str) {
 	int i = 0, number = 0, sign = 1;
-	
+
 	if (str[i] == '-') {
 		sign = -1;
 		i++;
@@ -564,10 +696,10 @@ int extract_integer(const char* str) {
 		i++;
 	}
 	return sign*number;
-}		
+}
 
 int next_value(const char* msg, int i) {
-	while (msg[i] != ',' && msg[i] != '\0') { 
+	while (msg[i] != ',' && msg[i] != '\0') {
         i++;
     }
 	if (msg[i] == ','){
@@ -580,13 +712,16 @@ int next_value(const char* msg, int i) {
 void task_read_speed_yaw(void* param){
     // frequency of 500Hz
     control_data *cd = (control_data*) param;
-    
+
     char byte;
     int res1 = NO_MESSAGE, res2 = -1, counter = 0;
-    while(buffer_is_empty(&rx_buffer) == 0 && counter <= 18){
+    while(buffer_is_empty(&rx_buffer) == 0 && counter < SIZERX - 1){
         // keeps going until either circular buffer is empty or ps arrays are full
-        IEC0bits.U1RXIE = 0; 
-        buffer_read(&rx_buffer,&byte);
+        IEC0bits.U1RXIE = 0;
+        if(buffer_read(&rx_buffer,&byte) != 0){
+            IEC0bits.U1RXIE = 1;
+            break;
+        }
         IEC0bits.U1RXIE = 1;
         res2 = parse_byte(cd->par_state,byte);
         if(res2 == NEW_MESSAGE){
@@ -596,35 +731,24 @@ void task_read_speed_yaw(void* param){
         }
         counter++;
     }
-    
+
     if(res1 != NEW_MESSAGE){
         // wrong message -> speed and yaw not updated, or no message
         return;
     }
-    
+
     if(strcmp(cd->par_state->msg_type, "PCREF") == 0 && cd->par_state->index_payload >= 3){
         // correct protocol and payload is not empty (smallest size is 3) (index_payload points at \0)
-        
-        // extracting values //
-        counter = 0; // to know which value is being read
-        int i = 0, j = 0;
-        char temp[5]; // to store string value (dim = maximum value length + \0)
-        while(i < cd->par_state->index_payload && counter < 2){
-            j = next_value(cd->par_state->msg_payload,i);
-            switch(counter){
-                case 0:             
-                    strncpy(temp, cd->par_state->msg_payload + i, j-1); // copy substring from index i of payload with length j-1
-                    temp[j-1] = '\0';
-                    cd->speed = extract_integer(temp);
-                    break;
-                case 1:
-                    strncpy(temp, cd->par_state->msg_payload + i, j-i); // copy substring from index i of payload with length j-i
-                    temp[j-i] = '\0';
-                    cd->yaw = extract_integer(temp);
-                    break;
-            }
-            i = j; // pointing next value
-            counter++;
+
+        int i = 0;
+        int speed = 0;
+        int yaw = 0;
+
+        if(parse_next_integer(cd->par_state->msg_payload,&i,&speed) == 0 &&
+           parse_next_integer(cd->par_state->msg_payload,&i,&yaw) == 0 &&
+           cd->par_state->msg_payload[i] == '\0'){
+            cd->speed = saturate_percent(speed);
+            cd->yaw = saturate_percent(yaw);
         }
     }
 }
@@ -641,16 +765,13 @@ void task_PWM_set(void* param){
             PWM_set(cd->speed,cd->yaw);
             break;
         case OBSTACLE_AVOIDANCE_STATE:
-            if(cd->obs_av_state_ctrl == 3){
-                cd->robot_state = HALTED_STATE;
-                cd->robot_sub_state = AVOIDANCE_STEP_0;
-            }
             switch(cd->robot_sub_state){
                 case AVOIDANCE_STEP_0:
+                    PWM_set(0,0);
                     break;
                 case AVOIDANCE_STEP_1:
-                    // rotate 90° clockwise (triggered in task_reading_IR_value)
-                    
+                    // rotate 90 degrees clockwise (triggered in task_reading_IR_value)
+
                     // - Saving current yaw to later check when stop rotation (done in task_reading_magn_acc_gyro)
                     // - Keeping count of three maximum executions
                     if(!cd->one_time_exec){
@@ -666,7 +787,7 @@ void task_PWM_set(void* param){
                 case AVOIDANCE_STEP_2:
                     // moving forward for two seconds
                     PWM_set(70,0); // left_pwm = 70, right_pwm = 70
-                    
+
                     // enabling task that expires after two seconds
                     if(!cd->one_time_exec){
                         // must be enabled only one time
@@ -676,7 +797,7 @@ void task_PWM_set(void* param){
                     }
                     break;
                 case AVOIDANCE_STEP_3:
-                    // rotate 90° anti-clockwise (later add gyroscope)
+                    // rotate 90 degrees anti-clockwise (later add gyroscope)
                     //PWM_set(50,60); // left_pwm = 0, right_pwm = 100 -> sharp rotation to the left
                     PWM_set(50,100);
                     break;
@@ -689,9 +810,12 @@ void task_PWM_set(void* param){
 
 void task_stop_buggy_after_2sec (void* param){
     control_data *cd = (control_data*) param;
-    
-    cd->robot_sub_state = AVOIDANCE_STEP_3;
+
+    if(cd->robot_state == OBSTACLE_AVOIDANCE_STATE && cd->robot_sub_state == AVOIDANCE_STEP_2){
+        cd->robot_sub_state = AVOIDANCE_STEP_3;
+    }
     cd->schedInfo[2].enable = 0;
+    cd->schedInfo[2].n = 0;
     cd->one_time_exec = 0;
 }
 
@@ -703,36 +827,39 @@ void task_button_check(void* param){
         if(cd->robot_state == HALTED_STATE){
             cd->robot_state = MOVING_STATE;
             cd->robot_sub_state = AVOIDANCE_STEP_0;
-       }
+            cd->obs_av_state_ctrl = 0;
+            cd->one_time_exec = 0;
+        }
         else{
             // either moving or avoiding obstacle
-            cd->robot_state = HALTED_STATE;
+            enter_halted_state(cd);
         }
     }
     if(button_E9_pressed == 1){
         // send number of data available inside TX and RX
         button_E9_pressed = 0;
+        int tx_ie = IEC0bits.U1TXIE;
+        int rx_ie = IEC0bits.U1RXIE;
+
+        IEC0bits.U1TXIE = 0;
+        IEC0bits.U1RXIE = 0;
         int tx_occ = buffer_occupancy(&tx_buffer);
         int rx_occ = buffer_occupancy(&rx_buffer);
-    
+        IEC0bits.U1RXIE = rx_ie;
+        IEC0bits.U1TXIE = tx_ie;
+
         char msg[16];
         sprintf(msg, "$MBUF,%d,%d*", tx_occ, rx_occ);
-        for(int i = 0;i<16;i++){
-            if(msg[i] == '\0'){
-                break;
-            }
-            buffer_write(&tx_buffer,msg[i]);
-        }
-        
-        IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+        uart_queue_message(msg);
     }
 }
 
-void task_reading_VBAT_n_sending_to_uart(){
+void task_reading_VBAT_n_sending_to_uart(void* param){
     // frequency of 1Hz (to send, not considering separate frequency for reading since no requirements in project specs)
+    (void)param;
     double v_batt = 0.0;
     int AN11_value = 0;
-    
+
     // manual sampling + auto conversion
     AD1CHS0bits.CH0SA = 11; // selecting AN11 for CH0 (pin OUT of battery voltage)
     AD1CON1bits.DONE = 0; // ensuring done bit is zero before sampling
@@ -742,19 +869,12 @@ void task_reading_VBAT_n_sending_to_uart(){
     AN11_value = ADC1BUF0; // reading result (0-1023)
     // converting AN11 data to correct value (Volts):
     // Vbattery = (AN11_value/1023)*Vrefh*k (Volts) (where k is coefficient from voltage divider)
-    v_batt = ((double)AN11_value * 3.6 * 3.0) / 1023.0; // cumulative variable to compute average
-    
+    v_batt = ((double)AN11_value * ADC_VREF * BATTERY_DIVIDER_GAIN) / ADC_MAX_COUNTS;
+
     // sending data to UART
-    char msg[16] = "";
+    char msg[20] = "";
     sprintf(msg,"$MBATT,%.2f*", v_batt);
-    for(int i = 0;i<16;i++){
-        if(msg[i] == '\0'){
-            break;
-        }
-        buffer_write(&tx_buffer,msg[i]);
-    }
-    
-    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+    uart_queue_message(msg);
 }
 
 void task_reading_IR_value(void* param){
@@ -762,7 +882,7 @@ void task_reading_IR_value(void* param){
     control_data *cd = (control_data*) param;
     double Vsensor = 0.0;
     int AN14_value = 0;
-    
+
     // manual sampling + auto conversion
     AD1CHS0bits.CH0SA = 14; // selecting AN14 for CH0 (pin OUT of IR sensor)
     AD1CON1bits.DONE = 0; // ensuring done bit is zero before sampling
@@ -772,7 +892,7 @@ void task_reading_IR_value(void* param){
     AN14_value = ADC1BUF0; // reading result (0-1023)
     // converting AN14 data to correct value (centimetres):
     // Vsensor = (AN14_value/1023)*Vrefh (Volts)
-    Vsensor = ((double)AN14_value * 3.6) / 1023.0;
+    Vsensor = ((double)AN14_value * ADC_VREF) / ADC_MAX_COUNTS;
 
     // applying formula to get distance (meters) registered by sensor
     // (not using pow() to increase computation speed)
@@ -782,34 +902,28 @@ void task_reading_IR_value(void* param){
     double distance = 2.34 - 4.74*Vsensor + 4.06*Vsensor2 - 1.6*Vsensor3 + 0.24*Vsensor4; // must be sent as an integer
     distance *= 100;
     cd->distance_sensor_value = distance;
-    
+
     if(cd->robot_state != HALTED_STATE){
-        if(distance <= 35 && cd->robot_state == MOVING_STATE && cd->obs_av_state_ctrl < 3){
-            // obstacle closer than 20 centimetres
+        if(distance <= OBSTACLE_THRESHOLD_CM && cd->robot_state == MOVING_STATE){
             cd->robot_state = OBSTACLE_AVOIDANCE_STATE;
-            cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90°)
+            cd->robot_sub_state = AVOIDANCE_STEP_1; // first phase (rotating of 90 degrees)
         }
-        else if(distance <= 35 && cd->robot_sub_state == AVOIDANCE_STEP_4){
-            if(cd->obs_av_state_ctrl == 3){
-                cd->robot_state = HALTED_STATE;
-                cd->robot_sub_state = AVOIDANCE_STEP_0;
-                cd->obs_av_state_ctrl = 0;
+        else if(distance <= OBSTACLE_THRESHOLD_CM && cd->robot_sub_state == AVOIDANCE_STEP_4){
+            if(cd->obs_av_state_ctrl >= MAX_AVOIDANCE_ATTEMPTS){
+                enter_halted_state(cd);
             }
             else{
                 cd->robot_sub_state = AVOIDANCE_STEP_1;
             }
         }
-        else if(distance <= 35 && cd->robot_sub_state == AVOIDANCE_STEP_2){
-            cd->robot_state = HALTED_STATE;
-            cd->robot_sub_state = AVOIDANCE_STEP_0;
-            cd->obs_av_state_ctrl = 0;
-            
-            cd->schedInfo[2].enable = 0; 
-            cd->one_time_exec = 0;
+        else if(distance <= OBSTACLE_THRESHOLD_CM && cd->robot_sub_state == AVOIDANCE_STEP_2){
+            enter_halted_state(cd);
         }
-        else if(distance > 35 && cd->robot_sub_state == AVOIDANCE_STEP_4){
+        else if(distance > OBSTACLE_THRESHOLD_CM && cd->robot_sub_state == AVOIDANCE_STEP_4){
             cd->robot_state = MOVING_STATE;
             cd->robot_sub_state = AVOIDANCE_STEP_0;
+            cd->obs_av_state_ctrl = 0;
+            cd->one_time_exec = 0;
         }
     }
 }
@@ -817,26 +931,19 @@ void task_reading_IR_value(void* param){
 void task_sending_IR_value_to_uart(void* param){
     // frequency of 10Hz
     control_data *cd = (control_data*) param;
-    
+
     // sending data to UART
     char msg[16] = "";
     sprintf(msg,"$MDIST,%d*", cd->distance_sensor_value);
-    for(int i = 0;i<16;i++){
-        if(msg[i] == '\0'){
-            break;
-        }
-        buffer_write(&tx_buffer,msg[i]);
-    }
-    
-    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+    uart_queue_message(msg);
 }
 
 void task_buggy_lights(void* param){
     // frequency of 1Hz
     control_data *cd = (control_data*) param;
-    
+
     LATAbits.LATA0 = !LATAbits.LATA0;
-    
+
     switch(cd->robot_state){
         case HALTED_STATE:
             LATBbits.LATB8 = !LATBbits.LATB8; // toggle left-side lights
@@ -859,26 +966,45 @@ void task_buggy_lights(void* param){
 void task_reading_magn_acc_gyro(void* param){
     // frequency of 10Hz (both reading and sending values)
     control_data *cd = (control_data*) param;
-    
+
     // Reading x,y,z accelerometer values //
     int values[3];
-    values[0] = get_accelerometer_value(0x02);
-    values[1] = get_accelerometer_value(0x04);
-    values[2] = get_accelerometer_value(0x06);
-    
+    int raw_acc[3];
+    raw_acc[0] = get_accelerometer_value(0x02);
+    raw_acc[1] = get_accelerometer_value(0x04);
+    raw_acc[2] = get_accelerometer_value(0x06);
+
+    if(!cd->imu_filter_ready){
+        cd->acc_filtered_values[0] = raw_acc[0];
+        cd->acc_filtered_values[1] = raw_acc[1];
+        cd->acc_filtered_values[2] = raw_acc[2];
+        cd->imu_filter_ready = 1;
+    }
+    else{
+        for(int i = 0; i < 3; i++){
+            cd->acc_filtered_values[i] =
+                    (IMU_FILTER_NUMERATOR * cd->acc_filtered_values[i] + raw_acc[i]) /
+                    IMU_FILTER_DENOMINATOR;
+        }
+    }
+
+    values[0] = cd->acc_filtered_values[0];
+    values[1] = cd->acc_filtered_values[1];
+    values[2] = cd->acc_filtered_values[2];
+
     // Computing roll and pitch //
     cd->angle_values[0] = (int)(atan2(values[1], values[2]) * (180.0 / 3.14));
     cd->angle_values[1] = (int)(atan2(-values[0], sqrt((long)values[1] * (long)values[1] + (long)values[2] * (long)values[2])) * (180.0 / 3.14));
-    
+
     // Reading x,y,z magnetometer values //
     // remember to reset the buggy with red button to make magnetometer work
     values[0] = get_magnetometer_value(0x42);
     values[1] = get_magnetometer_value(0x44);
-        
+
     // Computing yaw with magnetometer values //
     // magnetic field of motor wheels may disturb it
     cd->angle_values[2] = (int)(atan2(values[1], values[0]) * 180.0 / 3.14);
-    
+
     // Reading z gyroscope value //
     // useful to compute yaw
     unsigned int output_1;
@@ -888,16 +1014,16 @@ void task_reading_magn_acc_gyro(void* param){
     output_1 = spi_write(0x00);
     output_2 = spi_write(0x00);
     output_2 = output_2 << 8; // left shift of 8 bits (MSB)
-    int16_t raw_gz = output_2 | output_1; 
+    int16_t raw_gz = (int16_t)(output_2 | output_1);
     // 16 bit value (need a 16-bit integer to ensure sign is kept and not converted in a grater value once inside a 32-bit integer)
     LATBbits.LATB4 = 1;
-    
+
     // Computing yaw with gyroscope value //
     // need to integrate the value since it is an angular velocity component
     float gz_dps = ((float)raw_gz * 2000.0f) / 32767.0f; // converting value from [32767;-32767] to [2000;-2000] scale
     float dt = 0.1f; // 100ms -> value read at 10Hz
     cd->gyro_yaw += gz_dps * dt; // value used to control car movement
-    
+
     // Value retrieved is a rotation obtained from z component of angular velocity, so it could grow beyond certain limits.
     // Ensure integration doesn't exit range [-180;180] (keep consistency with yaw from magnetometer):
     if(cd->gyro_yaw > 180.0f){
@@ -906,36 +1032,36 @@ void task_reading_magn_acc_gyro(void* param){
     if(cd->gyro_yaw <= -180.0f){
         cd->gyro_yaw += 360.0f;
     }
-    
+
     /*
      gz may introduce drift -> progressive cumulative bias,
      in that case we can combine with yaw from magnetometer:
      final_yaw = 0.98f * (final_yaw + gz_dps * dt) + 0.02f * yaw_mag;
-     
+
      using this instead of previous formula: float yaw += gz_dps * dt;
      */
-   
+
     // If in avoidance obstacle mode, checking if rotation has to stop //
     if(cd->robot_sub_state == AVOIDANCE_STEP_1){
-        
+
         float diff = cd->gyro_yaw - cd->ctrl_yaw;
         while(diff > 180.0f) diff -= 360.0f;
         while(diff < -180.0f) diff += 360.0f;
-        
-        if(fabs(diff) >= 87.0f){ 
-            // buggy rotated of 90° clockwise -> next step
+
+        if(fabs(diff) >= AVOIDANCE_TURN_TARGET_DEG){
+            // buggy rotated of 90 degrees clockwise -> next step
             cd->robot_sub_state = AVOIDANCE_STEP_2;
             cd->one_time_exec = 0; // AVOIDANCE_STEP_1 exited (gyro value won't be registered again before next OBSTACLE_AVOIDANCE_STATE)
         }
     }
     else if(cd->robot_sub_state == AVOIDANCE_STEP_3){
-        
+
         float diff = cd->gyro_yaw - cd->ctrl_yaw;
         while(diff > 180.0f) diff -= 360.0f;
         while(diff < -180.0f) diff += 360.0f;
-        
-        if(fabs(diff) <= 3.0f ){ 
-            // buggy rotated back of 90° anti-clockwise to previous heading
+
+        if(fabs(diff) <= AVOIDANCE_TURN_TOLERANCE_DEG){
+            // buggy rotated back of 90 degrees anti-clockwise to previous heading
             cd->robot_sub_state = AVOIDANCE_STEP_4; // must check if distance is still under threshold,
             // or if maximum obstacle avoidance executions have been reached
         }
@@ -945,27 +1071,22 @@ void task_reading_magn_acc_gyro(void* param){
 void sending_angle_values_to_uart(void* param){
     // frequency of 10Hz
     control_data *cd = (control_data*) param;
-    
+
     // sending data to UART
-    char msg[24] = "";
+    char msg[32] = "";
     sprintf(msg,"$MANGLE,%d,%d,%d*", cd->angle_values[0], cd->angle_values[1], cd->angle_values[2]);
-    for(int i = 0;i<24;i++){
-        if(msg[i] == '\0'){
-            break;
-        }
-        buffer_write(&tx_buffer,msg[i]);
-    }
-    
-    IEC0bits.U1TXIE = 1; // enabling Tx interrupt -> triggers interrupt
+    uart_queue_message(msg);
 }
 
 void scheduler(heartbeat schedInfo[], int nTasks){
     int i;
     for (i = 0; i < nTasks; i++) {
-        schedInfo[i].n++;
-        if (schedInfo[i].enable == 1 && schedInfo[i].n >= schedInfo[i].N) {
-            schedInfo[i].f(schedInfo[i].params);            
-            schedInfo[i].n = 0;
+        if (schedInfo[i].enable == 1) {
+            schedInfo[i].n++;
+            if (schedInfo[i].n >= schedInfo[i].N) {
+                schedInfo[i].f(schedInfo[i].params);
+                schedInfo[i].n = 0;
+            }
         }
     }
 }
@@ -973,7 +1094,7 @@ void scheduler(heartbeat schedInfo[], int nTasks){
 // ISR redefinition for UART1 Tx register
 void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
     IFS0bits.U1TXIF = 0;
-    
+
     // Reading all characters in the circular buffer buffer (until empty),
     // and writing them in the Tx buffer until it is full
     while(U1STAbits.UTXBF == 0 && !buffer_is_empty(&tx_buffer)){
@@ -983,13 +1104,13 @@ void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
             buffer_read(&tx_buffer, &c);
             U1TXREG = c;
     }
-    
+
     if(buffer_is_empty(&tx_buffer)){
         // Tx buffer could be full or not, in any case no more data to send
         IEC0bits.U1TXIE = 0; // disable interrupt to avoid multiple triggers
     }
-    
-    // In case the circular buffer is not empty, the enabler remains set, 
+
+    // In case the circular buffer is not empty, the enabler remains set,
     // so, as soon as one byte is sent, thus freeing on slot in the Tx buffer,
     // the interrupt will trigger again
 }
@@ -997,10 +1118,18 @@ void __attribute__((__interrupt__, __auto_psv__)) _U1TXInterrupt(void){
 // ISR redefinition for UART1 Rx register
 void __attribute__((__interrupt__, __auto_psv__)) _U1RXInterrupt(void){
     IFS0bits.U1RXIF = 0;
-    
+
+    if(U1STAbits.OERR == 1){
+        U1STAbits.OERR = 0;
+    }
+
     // Reading all characters in the Rx buffer (until empty) and writing them in the circular buffer
     while(U1STAbits.URXDA == 1){
-        buffer_write(&rx_buffer, U1RXREG);
+        char c = U1RXREG;
+        if(buffer_write(&rx_buffer, c) != 0){
+            rx_buffer.tail = (rx_buffer.tail + 1) % rx_buffer.size;
+            buffer_write(&rx_buffer, c);
+        }
     }
 }
 
@@ -1025,7 +1154,7 @@ void __attribute__((__interrupt__, __auto_psv__)) _T3Interrupt(void){
     T3CONbits.TON = 0;
     IFS0bits.T3IF = 0; // clearing timer flag
     IEC0bits.T3IE = 0; // disabling timer interrupt
-    
+
     if(PORTEbits.RE8 == 0){
         button_E8_pressed = 1;
     }
@@ -1036,9 +1165,9 @@ void __attribute__((__interrupt__, __auto_psv__)) _T4Interrupt(void){
     T4CONbits.TON = 0;
     IFS1bits.T4IF = 0; // clearing timer flag
     IEC1bits.T4IE = 0; // disabling timer interrupt
-    
+
     if(PORTEbits.RE9 == 0){
         button_E9_pressed = 1;
     }
-    
+
 }
